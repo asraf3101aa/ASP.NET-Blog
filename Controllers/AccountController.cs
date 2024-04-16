@@ -1,66 +1,203 @@
-﻿using BlogApplication.Models;
-using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using BlogApplication.Models;
+using EmailService;
+using BlogApplication.DTOs;
+
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+
 
 namespace BlogApplication.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly UserManager<ApplicationUser> userManager;
-        private readonly SignInManager<ApplicationUser> signInManager;
-        private readonly ISenderEmail emailSender;
-        public AccountController(UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager, ISenderEmail emailSender)
+        private readonly IMapper _mapper;
+        private readonly UserManager<User> _userManager;
+        private readonly SignInManager<User> _signInManager;
+        private readonly IMailSender _emailSender;
+
+        public AccountController(IMapper mapper, UserManager<User> userManager, SignInManager<User> signInManager, IMailSender emailSender)
         {
-            this.userManager = userManager;
-            this.signInManager = signInManager;
-            this.emailSender = emailSender;
+            _mapper = mapper;
+            _userManager = userManager;
+            _signInManager = signInManager;
+            _emailSender = emailSender;
+        }
+
+        [HttpGet]
+        public IActionResult Register()
+        {
+            return View();
         }
 
         [HttpPost]
-        [AllowAnonymous]
-        public async Task<IActionResult> Register(RegisterViewModel model)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Register(UserRegistration userModel)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                // Copy data from RegisterViewModel to ApplicationUser
-                var user = new ApplicationUser
-                {
-                    UserName = model.Email,
-                    Email = model.Email,
-                    FirstName = model.FirstName,
-                    LastName = model.LastName
-                };
+                return View(userModel);
+            }
 
-                // Store user data in AspNetUsers database table
-                var result = await userManager.CreateAsync(user, model.Password);
+            var user = _mapper.Map<User>(userModel);
 
-                // If user is successfully created, sign-in the user using
-                // SignInManager and redirect to index action of HomeController
-                if (result.Succeeded)
-                {
-                    //Then send the Confirmation Email to the User
-                    await SendConfirmationEmail(model.Email, user);
-
-                    // If the user is signed in and in the Admin role, then it is
-                    // the Admin user that is creating a new user. 
-                    // So, redirect the Admin user to ListUsers action of Administration Controller
-                    if (signInManager.IsSignedIn(User) && User.IsInRole("Admin"))
-                    {
-                        return RedirectToAction("ListUsers", "Administration");
-                    }
-                    return View("RegistrationSuccessful");
-                }
-
-                // If there are any errors, add them to the ModelState object
-                // which will be displayed by the validation summary tag helper
+            var result = await _userManager.CreateAsync(user, userModel.Password);
+            if (!result.Succeeded)
+            {
                 foreach (var error in result.Errors)
                 {
-                    ModelState.AddModelError(string.Empty, error.Description);
+                    ModelState.TryAddModelError(error.Code, error.Description);
                 }
+
+                return View(userModel);
             }
+
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            var confirmationLink = Url.Action(nameof(ConfirmEmail), "Account", new { token, email = user.Email }, Request.Scheme);
+
+            var message = new Message(new string[] { user.Email }, "Confirmation email link", confirmationLink, null);
+            await _emailSender.SendEmailAsync(message);
+
+            await _userManager.AddToRoleAsync(user, "Visitor");
+
+            return RedirectToAction(nameof(SuccessRegistration));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ConfirmEmail(string token, string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+                return View("Error");
+
+            var result = await _userManager.ConfirmEmailAsync(user, token);
+            return View(result.Succeeded ? nameof(ConfirmEmail) : "Error");
+        }
+
+        [HttpGet]
+        public IActionResult SuccessRegistration()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult Login(string returnUrl = null)
+        {
+            ViewData["ReturnUrl"] = returnUrl;
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login(UserLogin userModel, string returnUrl = null)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(userModel);
+            }
+
+            var result = await _signInManager.PasswordSignInAsync(userModel.Email, userModel.Password, userModel.RememberMe, false);
+            if (result.Succeeded)
+            {
+                return RedirectToLocal(returnUrl);
+            }
+            else
+            {
+                ModelState.AddModelError("", "Invalid Login Attempt");
+                return View();
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+
+            return RedirectToAction(nameof(HomeController.Index), "Home");
+        }
+
+        [HttpGet]
+        public IActionResult ForgotPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ForgotPassword(ForgotPassword forgotPasswordModel)
+        {
+            if (!ModelState.IsValid)
+                return View(forgotPasswordModel);
+
+            var user = await _userManager.FindByEmailAsync(forgotPasswordModel.Email);
+            if (user == null)
+                return RedirectToAction(nameof(ForgotPasswordConfirmation));
+
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var callback = Url.Action(nameof(ResetPassword), "Account", new { token, email = user.Email }, Request.Scheme);
+
+            var message = new Message(new string[] { user.Email }, "Reset password token", callback, null);
+            await _emailSender.SendEmailAsync(message);
+
+            return RedirectToAction(nameof(ForgotPasswordConfirmation));
+        }
+
+        public IActionResult ForgotPasswordConfirmation()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult ResetPassword(string token, string email)
+        {
+            var model = new ResetPassword { Token = token, Email = email };
             return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetPassword(ResetPassword resetPasswordModel)
+        {
+            if (!ModelState.IsValid)
+                return View(resetPasswordModel);
+
+            var user = await _userManager.FindByEmailAsync(resetPasswordModel.Email);
+            if (user == null)
+                RedirectToAction(nameof(ResetPasswordConfirmation));
+
+            var resetPassResult = await _userManager.ResetPasswordAsync(user, resetPasswordModel.Token, resetPasswordModel.Password);
+            if (!resetPassResult.Succeeded)
+            {
+                foreach (var error in resetPassResult.Errors)
+                {
+                    ModelState.TryAddModelError(error.Code, error.Description);
+                }
+
+                return View();
+            }
+
+            return RedirectToAction(nameof(ResetPasswordConfirmation));
+        }
+
+        [HttpGet]
+        public IActionResult ResetPasswordConfirmation()
+        {
+            return View();
+        }
+
+        private IActionResult RedirectToLocal(string returnUrl)
+        {
+            if (Url.IsLocalUrl(returnUrl))
+                return Redirect(returnUrl);
+            else
+                return RedirectToAction(nameof(HomeController.Index), "Home");
+        }
+
+        [HttpGet]
+        public IActionResult Error()
+        {
+            return View();
         }
     }
 }

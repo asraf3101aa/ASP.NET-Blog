@@ -1,19 +1,21 @@
 using BlogApplication.Data;
-using BlogApplication.Services;
-using BlogApplication.Serviecs;
+using BlogApplication.Models;
+using EmailService;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
+using BlogApplication;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddAutoMapper(typeof(MappingProfile));
+
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
 
@@ -27,8 +29,13 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.Password.RequiredLength = 6; // Set your desired minimum password length
 });
 
-builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
-builder.Services.AddTransient<IEmailSender, EmailSender>();
+
+builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
+var mailSettings = builder.Configuration
+                .GetSection("MailSettings")
+                .Get<MailSettings>();
+builder.Services.AddSingleton(mailSettings);
+builder.Services.AddTransient<IMailSender, MailSender>();
 
 builder.Services.AddControllersWithViews();
 
@@ -55,7 +62,7 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Blog}/{action=Index}/{id?}");
 app.MapRazorPages();
 
 app.Run();
