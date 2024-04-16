@@ -16,6 +16,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
 
@@ -30,12 +31,12 @@ builder.Services.Configure<IdentityOptions>(options =>
 });
 
 
-builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 var mailSettings = builder.Configuration
                 .GetSection("MailSettings")
-                .Get<MailSettings>();
+                .Get<MailSettings>() ?? throw new InvalidOperationException("Mail settings cannot be null.");
+
 builder.Services.AddSingleton(mailSettings);
-builder.Services.AddTransient<IMailSender, MailSender>();
+builder.Services.AddSingleton<IMailSender, MailSender>();
 
 builder.Services.AddControllersWithViews();
 

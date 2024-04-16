@@ -38,7 +38,12 @@ namespace BlogApplication.Controllers
             {
                 return View(userModel);
             }
-
+            var existingUser = await _userManager.FindByNameAsync(userModel.Email);
+            if (existingUser != null)
+            {
+                ModelState.AddModelError("Email", "Email is already registered.");
+                return View(userModel);
+            }
             var user = _mapper.Map<User>(userModel);
 
             var result = await _userManager.CreateAsync(user, userModel.Password);
@@ -58,8 +63,7 @@ namespace BlogApplication.Controllers
             var message = new Message(new string[] { user.Email }, "Confirmation email link", confirmationLink, null);
             await _emailSender.SendEmailAsync(message);
 
-            await _userManager.AddToRoleAsync(user, "Visitor");
-
+            await _userManager.AddToRoleAsync(user, "Blogger");
             return RedirectToAction(nameof(SuccessRegistration));
         }
 
