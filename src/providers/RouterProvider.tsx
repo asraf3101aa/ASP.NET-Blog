@@ -8,12 +8,12 @@ import { RouterContext } from "@/contexts/RouterContext";
  * - children: React node representing the children components.
  */
 export const RouterProvider = ({ children }: ProviderProps) => {
-  // Access `navigate` instance from Next.js useRouter hook
+  // Access `navigate` instance from React's useNavigate hook
   const navigate = useNavigate();
 
-  // Set up functions to handle return navigation
+  // Handle return navigation, -1 means go back 1 step in Browser history
   const handleReturn = () => navigate(-1);
-  // Reload the current page
+  // Redirect from the current page to a provided route
   const handleRedirect = (route: string) => navigate(route);
 
   // Create a shared context value
