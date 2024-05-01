@@ -4,6 +4,7 @@ using Bislerium.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using X.PagedList;
 
 namespace Bislerium.Presentation.Controllers
 {
@@ -39,29 +40,34 @@ namespace Bislerium.Presentation.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index([FromQuery] string sortBy = "recency", [FromQuery] int page = 1, [FromQuery] int pageSize = 9)
+        public async Task<IActionResult> Index([FromQuery] string sortBy = "recency", [FromQuery] int page = 1, [FromQuery] int pageSize = 9)
         {
             int currentPage = page;
             // Sort the blogs
             var blogs = SortBlogs(sortBy);
 
-            // Get the total count before pagination
-            var totalCount = blogs.Count();
+            // Using X.PagedList to paginate the sorted blogs
+            var pagedBlogs = await blogs.ToPagedListAsync(currentPage, pageSize);
 
-            var paginatedBlogs = blogs.Skip((currentPage - 1) * pageSize).Take(pageSize);
-
-            var paginatedBlogsDTO = new PaginatedBlogsDTO
+            // Creating a response object that includes pagination metadata
+            var response = new
             {
-                PaginationMetaData = new PaginationMetaData
+                PaginationMetaData = new
                 {
                     SortBy = sortBy,
-                    CurrentPage = currentPage,
-                    TotalPages = (int)Math.Ceiling((double)totalCount / pageSize)
+                    PageNumber = pagedBlogs.PageNumber,
+                    PageSize = pagedBlogs.PageSize,
+                    TotalPages = pagedBlogs.PageCount,
+                    TotalItems = pagedBlogs.TotalItemCount,
+                    HasPreviousPage = pagedBlogs.HasPreviousPage,
+                    HasNextPage = pagedBlogs.HasNextPage
                 },
-                Blogs = paginatedBlogs.ToList()
+                Blogs = pagedBlogs // The paged list of blogs
             };
-            return Ok(_responseService.SuccessResponse(paginatedBlogsDTO));
+
+            return Ok(_responseService.SuccessResponse(response));
         }
+
 
         [HttpGet]
         [Route("{id}")]
@@ -150,7 +156,7 @@ namespace Bislerium.Presentation.Controllers
         }
 
         [HttpPost]
-        [Route("{id}/reaction")]
+        [Route("{id}/Reaction")]
         public async Task<IActionResult> AddReaction(int id, [FromBody] ReactionType reactionType)
         {
             var blog = await _blogService.FindByIdAsync(id);
@@ -160,6 +166,52 @@ namespace Bislerium.Presentation.Controllers
             await _blogService.ReactOnBlogAsync(blog, userId, reactionType);
             return Ok();
 
+        }
+
+        [HttpPost]
+        [Route("{blogId}/Comment")]
+        public async Task<IActionResult> AddComment(int blogId, [FromBody] CommentDTO commentDto)
+        {
+            var blog = await _blogService.FindByIdAsync(blogId);
+            if (blog == null)
+                return NotFound(_responseService.CustomErrorResponse("Blog", "Blog not found"));
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            await _blogService.AddCommentAsync(commentDto, blog.Id, userId);
+            return Ok();
+        }
+
+        [HttpPut]
+        [Route("{blogId}/Comment/{commentId}")]
+        public async Task<IActionResult> UpdateComment(int blogId, int commentId, [FromBody] CommentDTO commentDto)
+        {
+            var blog = await _blogService.FindByIdAsync(blogId);
+            if (blog == null)
+                return NotFound(_responseService.CustomErrorResponse("Blog", "Blog not found"));
+
+            var comment = blog.Comments.FirstOrDefault(c => c.Id == commentId);
+            if (comment == null)
+                return NotFound(_responseService.CustomErrorResponse("Comment", "Comment not found"));
+
+            await _blogService.UpdateCommentAsync(comment, commentDto);
+
+            return Ok();
+        }
+
+        [HttpDelete]
+        [Route("{blogId}/Comment/{commentId}")]
+        public async Task<IActionResult> DeleteComment(int blogId, int commentId)
+        {
+            var blog = await _blogService.FindByIdAsync(blogId);
+            if (blog == null)
+                return NotFound(_responseService.CustomErrorResponse("Blog", "Blog not found"));
+
+            var comment = blog.Comments.FirstOrDefault(c => c.Id == commentId);
+            //var comment = await _blogService.GetCommentByIdAsync(commentId);
+            if (comment == null)
+                return NotFound(_responseService.CustomErrorResponse("Comment", "Comment not found"));
+            await _blogService.DeleteCommentAsync(comment);
+            return Ok();
         }
     }
 }

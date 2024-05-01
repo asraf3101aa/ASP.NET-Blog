@@ -28,7 +28,8 @@ namespace Bislerium.Presentation.Controllers
         }
 
         [HttpPost]
-        [HttpPost("Register")]
+        [Route("Register")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Register(AdminRegisterDTO adminRegister)
         {
             if (!ModelState.IsValid)
@@ -63,63 +64,10 @@ namespace Bislerium.Presentation.Controllers
             await _emailService.SendEmailAsync(message);
             return Ok();
         }
-        //[Route("[controller]/blogs")]
-        //[HttpGet]
-        //public IActionResult PopularBlogs([FromQuery] string duration, [FromQuery] int? month)
-        //{
-        //    var queryablePopularBlogs = _blogService.GetQueryablePopularBlogAsync();
-
-        //    if (duration!=null && string.Equals(duration.ToLower(), "monthly", StringComparison.OrdinalIgnoreCase))
-        //    {
-        //        DateTime now = DateTime.Now;
-        //        DateTime monthStart = new DateTime(now.Year, month ?? now.Month, 1);
-        //        DateTime monthEnd = monthStart.AddMonths(1).AddDays(-1);
-        //        queryablePopularBlogs = queryablePopularBlogs.Where(b => b.CreatedAt >= monthStart && b.CreatedAt <= monthEnd).OrderByDescending(b => b.CreatedAt); ;
-        //    }
-        //    else
-        //    {
-        //        queryablePopularBlogs = queryablePopularBlogs.OrderByDescending(b => b.CreatedAt);
-
-        //    }
-        //    return View(queryablePopularBlogs.ToList());
-        //}
-        //[Route("[controller]/bloggers")]
-        //[HttpGet]
-        //public IActionResult PopularBloggers([FromQuery] string duration, [FromQuery] int? month)
-        //{
-        //    var queryableBlogs = _blogService.GetQueryableBlogs().ToList();
-        //    IQueryable<PopularBlogger> queryablePopularBloggers;
-
-        //    if (duration != null && string.Equals(duration.ToLower(), "monthly", StringComparison.OrdinalIgnoreCase))
-        //    {
-        //        DateTime now = DateTime.Now;
-        //        DateTime monthStart = new DateTime(now.Year, month ?? now.Month, 1);
-        //        DateTime monthEnd = monthStart.AddMonths(1).AddDays(-1);
-        //        queryableBlogs = queryableBlogs.Where(b => b.CreatedAt >= monthStart && b.CreatedAt <= monthEnd).ToList();
-        //    }
-
-        //    queryablePopularBloggers = queryableBlogs
-        //        .GroupBy(b => b.Author)
-        //        .Select(g => new PopularBlogger
-        //        {
-        //            FirstName = g.Key.FirstName,
-        //            LastName = g.Key.LastName,
-        //            Email = g.Key.Email,
-        //            TotalBlogs = g.Count(),
-        //            TotalUpvote = g.Sum(b => b.Reactions.Count(r => r.Type == ReactionType.Upvote)),
-        //            TotalDownvote = g.Sum(b => b.Reactions.Count(r => r.Type == ReactionType.Downvote)),
-        //            TotalComments = g.Sum(b => b.Comments.Count()),
-        //            TotalPopularityScore = g.Sum(b => _blogService.CalculatePopularity(b))
-        //        })
-        //        .OrderByDescending(b => b.TotalPopularityScore)
-        //        .AsQueryable();
-
-        //    return View(queryablePopularBloggers.ToList());
-        //}
-
-        [HttpGet]
+        
         [Authorize(Roles = "Admin")]
-        [HttpGet("Dashboard")]
+        [HttpGet]
+        [Route("Dashboard")]
         public IActionResult Dashboard([FromQuery] string duration, [FromQuery] int? month)
         {
             var queryableBlogs = _blogService.GetQueryableBlogs();

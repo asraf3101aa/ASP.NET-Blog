@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Text.Json;
 
 namespace Bislerium.Infrastructure.DI
 {
@@ -58,7 +59,7 @@ namespace Bislerium.Infrastructure.DI
                         {
                             errorResponse.Errors.Add(new ErrorResponse.ErrorDetail
                             {
-                                Title = entry.Key,
+                                Title = JsonNamingPolicy.CamelCase.ConvertName(entry.Key),
                                 Message = error.ErrorMessage
                             });
                         }

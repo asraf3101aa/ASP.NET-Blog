@@ -100,7 +100,7 @@ namespace Bislerium.Infrastructure.Services
             existingBlog.CategoryId = updateBlog.CategoryId;
             existingBlog.Images = blogImages;
 
-            _context.Blogs.Update(existingBlog);
+            _context.Entry(existingBlog).State = EntityState.Modified; // Mark the entity as modified
             await _context.SaveChangesAsync();
             return existingBlog;
         }
@@ -128,6 +128,38 @@ namespace Bislerium.Infrastructure.Services
                 _context.Reactions.Add(reaction);
             }
 
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<Comment> GetCommentByIdAsync(int id)
+        {
+            var comment = await _context.Comments.FirstOrDefaultAsync(r => r.Id == id);
+            return comment;
+        }
+
+        public async Task DeleteCommentAsync(Comment comment)
+        {
+            _context.Comments.Remove(comment);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateCommentAsync(Comment comment, CommentDTO updateComment)
+        {
+            comment.Text = updateComment.Text;
+            _context.Entry(comment).State = EntityState.Modified; // Mark the entity as modified
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task AddCommentAsync(CommentDTO commentDto, int blogId, string userId)
+        {
+            var comment = new Comment
+            {
+                Text = commentDto.Text,
+                UserId = userId,
+                BlogId = blogId,
+                CreatedAt = DateTime.UtcNow
+            };
+            _context.Comments.Add(comment);
             await _context.SaveChangesAsync();
         }
     }

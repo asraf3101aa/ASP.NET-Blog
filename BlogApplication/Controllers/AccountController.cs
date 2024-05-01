@@ -1,8 +1,10 @@
 ﻿using Bislerium.Application.Common.Interfaces;
 using Bislerium.Application.DTOs.AccountDTOs;
 using Bislerium.Application.DTOs.Extensions;
+using Bislerium.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using X.PagedList;
 
 
 namespace Bislerium.Presentation.Controllers
@@ -158,11 +160,33 @@ namespace Bislerium.Presentation.Controllers
 
         [HttpGet("Profile")]
         [Authorize]
-        public async Task<IActionResult> Profile()
+        public async Task<IActionResult> Profile(int pageNumber = 1, int pageSize = 10)
         {
             var user = await _accountService.GetUserByClaimsAsync(User);
-            return Ok(user);
+            var queryableBlogs = _blogService.GetQueryableAuthorBlogsAsync(user);
+
+            // Using X.PagedList to paginate the queryable blogs
+            var pagedBlogs = await queryableBlogs.ToPagedListAsync(pageNumber, pageSize);
+
+            // Creating a response object that includes pagination metadata
+            var response = new
+            {
+                User = user,
+                Blogs = pagedBlogs, // The paged list of blogs
+                PaginationMetaData = new
+                {
+                    TotalItems = pagedBlogs.TotalItemCount,
+                    PageNumber = pagedBlogs.PageNumber,
+                    PageSize = pagedBlogs.PageSize,
+                    TotalPages = pagedBlogs.PageCount,
+                    HasPreviousPage = pagedBlogs.HasPreviousPage,
+                    HasNextPage = pagedBlogs.HasNextPage
+                }
+            };
+
+            return Ok(_responseService.SuccessResponse(response));
         }
+
         [HttpPost]
         [Route("Email/Confirmation/Resend")]
         [Authorize]
