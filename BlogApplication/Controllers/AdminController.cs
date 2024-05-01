@@ -137,7 +137,7 @@ namespace Bislerium.Presentation.Controllers
             var downvoteCount = queryableBlogForStats.SelectMany(b => b.Reactions.Where(r => r.Type == ReactionType.Downvote)).Count();
             var commentCount = queryableBlogForStats.SelectMany(b => b.Comments).Count();
 
-            var blogStats = new BlogStats
+            var blogStats = new BlogStatsDTO
             {
                 BlogCount = blogCount,
                 UpvoteCount = upvoteCount,

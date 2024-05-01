@@ -3,6 +3,7 @@ using Bislerium.Application.DTOs.BlogDTOs;
 using Bislerium.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Bislerium.Presentation.Controllers
 {
@@ -14,7 +15,7 @@ namespace Bislerium.Presentation.Controllers
         private readonly IBlogService _blogService;
         private readonly IAccountService _accountService;
         private readonly IResponseService _responseService;
-        public BlogController(IResponseService responseService ,IBlogService blogService, IFileService fileService, IAccountService accountService)
+        public BlogController(IResponseService responseService, IBlogService blogService, IFileService fileService, IAccountService accountService)
         {
             _blogService = blogService;
             _fileService = fileService;
@@ -38,7 +39,7 @@ namespace Bislerium.Presentation.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index([FromQuery] string sortBy = "recency", [FromQuery] int page = 1, [FromQuery] int pageSize = 9)
+        public IActionResult Index([FromQuery] string sortBy = "recency", [FromQuery] int page = 1, [FromQuery] int pageSize = 9)
         {
             int currentPage = page;
             // Sort the blogs
@@ -83,7 +84,7 @@ namespace Bislerium.Presentation.Controllers
         [HttpPost]
         [Authorize]
         [RequireConfirmedEmail]
-        public async Task<IActionResult> Create(BlogCreateDTO newblog)
+        public async Task<IActionResult> Create(BlogDTO newblog)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -107,40 +108,34 @@ namespace Bislerium.Presentation.Controllers
             return Ok(_responseService.SuccessResponse(blog));
         }
 
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Body,CategoryId")] Blog blog)
-        //{
-        //    if (id != blog.Id)
-        //    {
-        //        return NotFound();
-        //    }
+        [HttpPut]
+        [Route("{id}/update")]
+        public async Task<IActionResult> Update([FromQuery] int id, BlogDTO blogUpdate)
+        {
+            var blog = await _blogService.FindByIdAsync(id);
+            if (blog == null || blog.AuthorId != User.FindFirstValue(ClaimTypes.NameIdentifier))
+                return NotFound(_responseService.CustomErrorResponse("Blog", "Blog not found"));
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            var blogImages = new List<BlogImage>();
+            if (blogUpdate.Images.Any())
+            {
+                foreach (var image in blogUpdate.Images)
+                {
+                    var (imagePath, error) = _fileService.UploadFile(image.File);
+                    if (error != string.Empty)
+                        return BadRequest(_responseService.CustomErrorResponse(image.ImageType.ToString(), error));
+                    blogImages.Add(new BlogImage
+                    {
+                        Path = imagePath,
+                        ImageType = image.ImageType
+                    });
+                }
+            }
+            var updatedBlog = await _blogService.UpdateAsync(blogUpdate, blog, blogImages);
+            return Accepted();
+        }
 
-        //    if (ModelState.IsValid)
-        //    {
-        //        try
-        //        {
-        //            blog.UpdatedAt = DateTime.UtcNow;
-        //            _context.Update(blog);
-        //            await _context.SaveChangesAsync();
-        //        }
-        //        catch (DbUpdateConcurrencyException)
-        //        {
-        //            if (!_context.Blog.Any(e => e.Id == blog.Id))
-        //            {
-        //                return NotFound();
-        //            }
-        //            else
-        //            {
-        //                throw;
-        //            }
-        //        }
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    ViewData["CategoryId"] = new SelectList(_context.Category, "Id", "Name", blog.CategoryId);
-        //    return View(blog);
-        //}
-        
 
         [HttpDelete]
         [Route("{id}/Delete")]
@@ -148,11 +143,23 @@ namespace Bislerium.Presentation.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var blog = await _blogService.FindByIdAsync(id);
-            if (blog == null)
+            if (blog == null || blog.AuthorId != User.FindFirstValue(ClaimTypes.NameIdentifier))
                 return NotFound(_responseService.CustomErrorResponse("Blog", "Blog not found"));
             await _blogService.DeleteBlogAsync(blog);
             return Ok();
         }
 
+        [HttpPost]
+        [Route("{id}/reaction")]
+        public async Task<IActionResult> AddReaction(int id, [FromBody] ReactionType reactionType)
+        {
+            var blog = await _blogService.FindByIdAsync(id);
+            if (blog == null)
+                return NotFound(_responseService.CustomErrorResponse("Blog", "Blog not found"));
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            await _blogService.ReactOnBlogAsync(blog, userId, reactionType);
+            return Ok();
+
+        }
     }
 }

@@ -39,6 +39,17 @@ builder.Services.AddSwaggerGen(opt =>
     });
 });
 
+// Configure CORS to allow any origin
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("MyCors", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
@@ -51,6 +62,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("MyCors"); // Use the CORS policy that allows any origin
 
 app.UseStaticFiles();
 

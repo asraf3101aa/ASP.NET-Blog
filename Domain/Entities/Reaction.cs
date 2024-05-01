@@ -15,6 +15,5 @@
         public Blog? Blog { get; set; }
         public int? CommentId { get; set; }
         public Comment? Comment { get; set; }
-        public DateTime CreatedAt { get; set; }
     }
 }

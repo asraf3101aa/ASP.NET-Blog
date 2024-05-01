@@ -2,7 +2,7 @@
 
 namespace Bislerium.Application.DTOs.BlogDTOs
 {
-    public class BlogCreateDTO
+    public class BlogDTO
     {
         [Required]
         public string Title { get; set; }

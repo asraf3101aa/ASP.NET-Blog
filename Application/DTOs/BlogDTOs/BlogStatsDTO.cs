@@ -1,6 +1,6 @@
 ﻿namespace Bislerium.Application.DTOs.BlogDTOs
 {
-    public class BlogStats
+    public class BlogStatsDTO
     {
         public int BlogCount { get; set; }
         public int UpvoteCount { get; set; }

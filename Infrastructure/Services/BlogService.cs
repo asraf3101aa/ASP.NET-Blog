@@ -73,7 +73,7 @@ namespace Bislerium.Infrastructure.Services
             _context.Blogs.Remove(blog);
             await _context.SaveChangesAsync();
         }
-        public async Task<Blog> CreateAsync(BlogCreateDTO newBlog, User author, List<BlogImage> blogImages)
+        public async Task<Blog> CreateAsync(BlogDTO newBlog, User author, List<BlogImage> blogImages)
         {
             var blog = new Blog
             {
@@ -91,6 +91,44 @@ namespace Bislerium.Infrastructure.Services
         public IQueryable<Blog> GetQueryableAuthorBlogsAsync(User author)
         {
             return GetQueryableBlogs().OrderByDescending(b => b.CreatedAt).Where(b => b.AuthorId == author.Id);
+        }
+
+        public async Task<Blog> UpdateAsync(BlogDTO updateBlog, Blog existingBlog, List<BlogImage> blogImages)
+        {
+            existingBlog.Title = updateBlog.Title;
+            existingBlog.Body = updateBlog.Body;
+            existingBlog.CategoryId = updateBlog.CategoryId;
+            existingBlog.Images = blogImages;
+
+            _context.Blogs.Update(existingBlog);
+            await _context.SaveChangesAsync();
+            return existingBlog;
+        }
+
+        public async Task ReactOnBlogAsync(Blog blog, string userId, ReactionType reactionType)
+        {
+            var existingReaction = blog.Reactions.FirstOrDefault(r => r.UserId == userId);
+
+            if (existingReaction != null)
+            {
+                if (existingReaction.Type == reactionType)
+                    _context.Reactions.Remove(existingReaction);
+                else
+                    existingReaction.Type = reactionType;
+            }
+            else
+            {
+                var reaction = new Reaction
+                {
+                    Type = reactionType,
+                    UserId = userId,
+                    BlogId = blog.Id,
+                };
+
+                _context.Reactions.Add(reaction);
+            }
+
+            await _context.SaveChangesAsync();
         }
     }
 }
