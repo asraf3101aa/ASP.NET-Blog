@@ -3,8 +3,18 @@ import Toolbar from "@mui/material/Toolbar";
 import Button from "@mui/material/Button";
 import Link from "@mui/material/Link";
 import Typography from "@mui/material/Typography";
+import { useStorage } from "@/contexts/StorageContext";
+import { useRouter } from "@/contexts/RouterContext";
+import { RoutePath } from "@/@enums/router.enum";
 
 export default function Header(props: { title: string }) {
+  const localStorageClient = useStorage()!;
+  const { handleRedirect } = useRouter()!;
+
+  const handleLogout = () => {
+    localStorageClient.clearLocalStorage();
+    handleRedirect(RoutePath.LOGIN);
+  };
   return (
     <React.Fragment>
       <Toolbar sx={{ borderBottom: 1, borderColor: "divider" }}>
@@ -18,11 +28,17 @@ export default function Header(props: { title: string }) {
         >
           {props.title}
         </Typography>
-        <Button variant="outlined" size="small">
-          <Link href="/login" underline="none">
-            Sign in
-          </Link>
-        </Button>
+        {!localStorageClient.getAccessToken() ? (
+          <Button variant="outlined" size="small">
+            <Link href="/login" underline="none">
+              Sign in
+            </Link>
+          </Button>
+        ) : (
+          <Button variant="outlined" size="small" onClick={handleLogout}>
+            Logout
+          </Button>
+        )}
       </Toolbar>
     </React.Fragment>
   );

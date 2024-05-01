@@ -7,6 +7,8 @@ import MainFeaturedPost from "./MainFeaturedPost.tsx";
 import FeaturedPost from "./FeaturedPost.tsx";
 import Footer from "./Footer.tsx";
 
+const headerTitle = import.meta.env.VITE_BLOG_APP_HEADER_TITLE;
+
 const mainFeaturedPost = {
   title: "Title of a longer featured blog post",
   description:
@@ -40,7 +42,7 @@ export default function Blog() {
     <>
       <CssBaseline />
       <Container>
-        <Header title="Blog" />
+        <Header title={headerTitle} />
         <main>
           <MainFeaturedPost post={mainFeaturedPost} />
           <Grid container spacing={4}>

@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useForm, SubmitHandler } from "react-hook-form";
 import {
   Avatar,
   Button,
@@ -13,49 +14,53 @@ import {
   Typography,
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-
-import { FormEvent, useState } from "react";
 import MiniFooter from "@/components/MiniFooter";
+import { useRepository } from "@/contexts/RepositoryContext";
+import { useRouter } from "@/contexts/RouterContext";
+import { RoutePath } from "@/@enums/router.enum";
 import { AccountModels } from "@/@types/account";
 import { AccountModelsType } from "@/@enums/account.enum";
-import { HTMLElementType } from "@/@enums/components.enum";
+import { LocalStorageItemsKeys } from "@/@enums/storage.enum";
+import { useStorage } from "@/contexts/StorageContext";
+import BlogLoginBg from "/assets/images/BlogLoginBg.jpg";
 
 const SignIn = () => {
-  const [formData, setFormData] = useState<
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors },
+  } = useForm<AccountModels[AccountModelsType.USER_LOGIN]>();
+
+  const { handleRedirect } = useRouter()!;
+  const localStorageClient = useStorage()!;
+  const { isLoading, setIsLoading, accountRepository } = useRepository()!;
+
+  const onSubmit: SubmitHandler<
     AccountModels[AccountModelsType.USER_LOGIN]
-  >({
-    email: "",
-    password: "",
-    rememberMe: false,
-  });
-
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, checked } = event.target;
-    // Determine whether to use 'checked' or 'value' based on input type.
-    const newValue =
-      event.target.type === HTMLElementType.CHECKBOX ? checked : value;
-
-    setFormData((prev) => ({
-      ...prev,
-      [name]: newValue,
-    }));
-  };
-
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    if (!formData.email || !formData.password) {
-      console.error("Email and password are required");
-      return;
-    }
-
-    console.log({
-      email: formData.email,
-      password: formData.password,
-      rememberMe: formData.rememberMe,
-    });
-
-    // Submit form data to backend or login service
+  > = async (data) => {
+    setIsLoading(true);
+    accountRepository
+      .login(data)
+      .then(
+        (
+          userSignInResponse: ApiResponse<
+            AccountModels[AccountModelsType.AUTH_TOKEN]
+          >
+        ) => {
+          if (LocalStorageItemsKeys.ACCESS_TOKEN in userSignInResponse) {
+            localStorageClient.setAccessToken(userSignInResponse);
+            setIsLoading(false);
+            handleRedirect(RoutePath.HOME);
+          } else {
+            setError("rememberMe", {
+              message: userSignInResponse.errors[0].message,
+            });
+          }
+        }
+      )
+      .catch((error) => console.error(error))
+      .finally(() => setIsLoading(false));
   };
 
   return (
@@ -67,7 +72,7 @@ const SignIn = () => {
         sm={4}
         md={8}
         sx={{
-          backgroundImage: "url(https://source.unsplash.com/random?wallpapers)",
+          backgroundImage: `url(${BlogLoginBg})`,
           backgroundRepeat: "no-repeat",
           backgroundColor: (t) =>
             t.palette.mode === "light"
@@ -109,52 +114,76 @@ const SignIn = () => {
           <Box
             component="form"
             noValidate
-            onSubmit={handleSubmit}
-            sx={{ mt: 1 }}
+            onSubmit={handleSubmit(onSubmit)}
+            sx={{ mt: 3 }}
           >
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
-              autoFocus
-              value={formData.email}
-              onChange={handleChange}
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Password"
-              type="password"
-              id="password"
-              autoComplete="current-password"
-              value={formData.password}
-              onChange={handleChange}
-            />
-            <FormControlLabel
-              control={
-                <Checkbox
-                  name="rememberMe"
-                  color="primary"
-                  checked={formData.rememberMe}
-                  onChange={handleChange}
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <TextField
+                  label="Email Address"
+                  {...register("email", {
+                    required: "Email is required",
+                    pattern: {
+                      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                      message: "Invalid email format",
+                    },
+                  })}
+                  fullWidth
+                  autoComplete="email"
                 />
-              }
-              label="Remember me"
-            />
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-            >
-              Sign In
-            </Button>
+                {errors.email && (
+                  <p style={{ color: "red" }}>{errors.email.message}</p>
+                )}
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  label="Password"
+                  type="password"
+                  {...register("password", {
+                    required: "Password is required",
+                    minLength: {
+                      value: 6,
+                      message: "Password must be at least 6 characters long",
+                    },
+                  })}
+                  fullWidth
+                  autoComplete="new-password"
+                />
+                {errors.password && (
+                  <p style={{ color: "red" }}>{errors.password.message}</p>
+                )}
+              </Grid>
+              <Grid item xs={12}>
+                <FormControlLabel
+                  control={
+                    <Checkbox color="primary" {...register("rememberMe")} />
+                  }
+                  label="Remember me"
+                />
+                {errors.rememberMe && (
+                  <p style={{ color: "red" }}>{errors.rememberMe.message}</p>
+                )}
+              </Grid>
+            </Grid>
+            {isLoading ? (
+              <Grid
+                item
+                xs={12}
+                sx={{ display: "flex", justifyContent: "center", mt: 3, mb: 2 }}
+              >
+                <img src="/assets/icons/Loading.svg" alt="Loading" />
+              </Grid>
+            ) : (
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                sx={{ mt: 3, mb: 2 }}
+              >
+                Sign In
+              </Button>
+            )}
+
             <Grid container>
               <Grid item xs>
                 <Link href="/forgot-password" variant="body2">
@@ -169,7 +198,6 @@ const SignIn = () => {
             </Grid>
           </Box>
         </Box>
-
         <MiniFooter />
       </Grid>
     </Grid>

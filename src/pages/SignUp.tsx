@@ -17,32 +17,38 @@ import { RoutePath } from "@/@enums/router.enum";
 import { AccountModels } from "@/@types/account";
 import { AccountModelsType } from "@/@enums/account.enum";
 import _ from "lodash";
+import BlogLoginBg from "/assets/images/BlogLoginBg.jpg";
 
-export default function SignUp() {
+const SignUp = () => {
+  const { handleRedirect } = useRouter()!;
+  const { isLoading, setIsLoading, accountRepository } = useRepository()!;
   const {
     register,
     handleSubmit,
     setError,
     formState: { errors },
   } = useForm<AccountModels[AccountModelsType.USER_REGISTER]>();
-  const { accountRepository } = useRepository()!;
-  const { handleRedirect } = useRouter()!;
 
   const onSubmit: SubmitHandler<
     AccountModels[AccountModelsType.USER_REGISTER]
   > = async (data) => {
-    const userSignUpResponse: ApiResponse<string> =
-      await accountRepository.register(data);
-
-    if (typeof userSignUpResponse === "string") {
-      handleRedirect(RoutePath.LOGIN);
-    } else {
-      _.map(userSignUpResponse.errors, (error: ApiErrorLog) => {
-        setError(error.title as ErrorKey, {
-          message: error.message,
-        });
-      });
-    }
+    setIsLoading(true);
+    accountRepository
+      .register(data)
+      .then((userSignUpResponse: ApiResponse<string>) => {
+        if (typeof userSignUpResponse === "string") {
+          setIsLoading(false);
+          handleRedirect(RoutePath.LOGIN);
+        } else {
+          _.map(userSignUpResponse.errors, (error: ApiErrorLog) => {
+            setError(error.title as ErrorKey, {
+              message: error.message,
+            });
+          });
+        }
+      })
+      .catch((error) => console.error(error))
+      .finally(() => setIsLoading(false));
   };
 
   return (
@@ -54,16 +60,28 @@ export default function SignUp() {
         justifyContent: "space-between",
         padding: "0px !important",
         maxWidth: "100% !important",
+        backgroundImage: `url(${BlogLoginBg})`,
+        backgroundRepeat: "no-repeat",
+        backgroundColor: (t) =>
+          t.palette.mode === "light" ? t.palette.grey[50] : t.palette.grey[900],
+        backgroundSize: "cover",
+        backgroundPosition: "center",
       }}
     >
-      <Container maxWidth="xs">
+      <Container
+        maxWidth="xs"
+        sx={{
+          marginTop: 8,
+          backgroundColor: "rgba(255,255,255,0.9)",
+        }}
+      >
         <CssBaseline />
         <Box
           sx={{
-            marginTop: 8,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
+            padding: "2rem 0",
           }}
         >
           <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
@@ -89,7 +107,9 @@ export default function SignUp() {
                   autoComplete="given-name"
                   autoFocus
                 />
-                {errors.firstName && <p>{errors.firstName.message}</p>}
+                {errors.firstName && (
+                  <p style={{ color: "red" }}>{errors.firstName.message}</p>
+                )}
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
@@ -98,7 +118,9 @@ export default function SignUp() {
                   fullWidth
                   autoComplete="family-name"
                 />
-                {errors.lastName && <p>{errors.lastName.message}</p>}
+                {errors.lastName && (
+                  <p style={{ color: "red" }}>{errors.lastName.message}</p>
+                )}
               </Grid>
               <Grid item xs={12}>
                 <TextField
@@ -113,7 +135,9 @@ export default function SignUp() {
                   fullWidth
                   autoComplete="email"
                 />
-                {errors.email && <p>{errors.email.message}</p>}
+                {errors.email && (
+                  <p style={{ color: "red" }}>{errors.email.message}</p>
+                )}
               </Grid>
               <Grid item xs={12}>
                 <TextField
@@ -129,7 +153,9 @@ export default function SignUp() {
                   fullWidth
                   autoComplete="new-password"
                 />
-                {errors.password && <p>{errors.password.message}</p>}
+                {errors.password && (
+                  <p style={{ color: "red" }}>{errors.password.message}</p>
+                )}
               </Grid>
               <Grid item xs={12}>
                 <TextField
@@ -141,18 +167,30 @@ export default function SignUp() {
                   fullWidth
                 />
                 {errors.confirmPassword && (
-                  <p>{errors.confirmPassword.message}</p>
+                  <p style={{ color: "red" }}>
+                    {errors.confirmPassword.message}
+                  </p>
                 )}
               </Grid>
             </Grid>
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-            >
-              Sign Up
-            </Button>
+            {isLoading ? (
+              <Grid
+                item
+                xs={12}
+                sx={{ display: "flex", justifyContent: "center", mt: 3, mb: 2 }}
+              >
+                <img src="/assets/icons/Loading.svg" alt="Loading" />
+              </Grid>
+            ) : (
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                sx={{ mt: 3, mb: 2 }}
+              >
+                Sign Up
+              </Button>
+            )}
             <Grid container justifyContent="flex-end">
               <Grid item>
                 <Link href="/login" variant="body2">
@@ -166,4 +204,6 @@ export default function SignUp() {
       <MiniFooter />
     </Container>
   );
-}
+};
+
+export default SignUp;
