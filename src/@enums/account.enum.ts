@@ -12,3 +12,7 @@ export enum AccountModelsType {
   RESET_PASSWORD = "ResetPassword",
   USER_UPDATE = "UserUpdate",
 }
+
+export enum AccountEndpointPaths {
+  USER_REGISTER = "register",
+}

@@ -35,7 +35,6 @@ type UserRegister = {
   email: string; // Required field
   password: string; // Required field
   confirmPassword: string; // Required field
-  avatar?: ChangeEvent<HTMLInputElement>["target"]["files"][0]; // Optional field
 };
 
 // Structure for admin registration data

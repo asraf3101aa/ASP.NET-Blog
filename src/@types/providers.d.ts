@@ -1,3 +1,5 @@
+import { IAccountRepository } from "./repository";
+
 /**
  * ProviderProps: Represents props for a provider component.
  *
@@ -18,4 +20,14 @@ declare type ProviderProps = {
 declare type RouterProps = {
   handleReturn: () => void;
   handleRedirect: (route: string) => void;
+};
+
+/**
+ * RepositoryProps: Represents the props of the Repository context.
+ *
+ * Properties:
+ * - fetchAPI: An instance of IFetchAPI to handle API calls.
+ */
+declare type RepositoryProps = {
+  accountRepository: IAccountRepository;
 };

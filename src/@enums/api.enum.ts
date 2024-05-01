@@ -15,3 +15,9 @@ export enum HttpMethod {
   PUT = "PUT",
   DELETE = "DELETE",
 }
+
+export enum ApiEndpointPaths {
+  ACCOUNT = "account",
+  ADMIN = "admin",
+  BLOG = "blog",
+}

@@ -19,6 +19,13 @@ declare type ApiDataResponse<T> = {
   data: T;
 };
 
+declare type ErrorKey =
+  | "firstName"
+  | "lastName"
+  | "email"
+  | "password"
+  | "confirmPassword";
+
 declare type ApiResponseStatusWithErrors = {
   status: number;
   errors: ApiErrorLog[];
