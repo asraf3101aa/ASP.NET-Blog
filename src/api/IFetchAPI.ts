@@ -8,16 +8,16 @@ export interface IFetchAPI {
    * @param {U} data - The data to be sent to the server.
    * @returns {Promise<ApiResponse<T>>} A promise resolving to the response from the server.
    */
-  create<T, U>(path: string, data: U): Promise<ApiResponse<T>>;
+  post<T, U>(path: string, data: U): Promise<ApiResponse<T>>;
 
   /**
-   * Sends a GET request to read a resource.
+   * Sends a GET request to get a resource.
    *
    * @template T - The type of the response data expected from the server.
    * @param {string} path - The endpoint to which the request is sent.
    * @returns {Promise<ApiResponse<T>>} A promise resolving to the response from the server.
    */
-  read<T>(path: string): Promise<ApiResponse<T>>;
+  get<T>(path: string): Promise<ApiResponse<T>>;
 
   /**
    * Sends a PUT request to update an existing resource.

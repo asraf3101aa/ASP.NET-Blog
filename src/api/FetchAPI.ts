@@ -52,11 +52,11 @@ export class FetchAPI implements IFetchAPI {
     }
   };
 
-  create<T, U>(path: string, data: U): Promise<ApiResponse<T>> {
+  post<T, U>(path: string, data: U): Promise<ApiResponse<T>> {
     return this._sendRequest<T, U>(path, HttpMethod.POST, data);
   }
 
-  read<T>(path: string): Promise<ApiResponse<T>> {
+  get<T>(path: string): Promise<ApiResponse<T>> {
     return this._sendRequest<T, undefined>(path, HttpMethod.GET);
   }
 

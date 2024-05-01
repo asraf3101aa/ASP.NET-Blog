@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useForm, SubmitHandler } from "react-hook-form";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -9,54 +10,39 @@ import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-import { ChangeEvent, useState } from "react";
+import MiniFooter from "@/components/MiniFooter";
+import { useRepository } from "@/contexts/RepositoryContext";
+import { useRouter } from "@/contexts/RouterContext";
+import { RoutePath } from "@/@enums/router.enum";
 import { AccountModels } from "@/@types/account";
 import { AccountModelsType } from "@/@enums/account.enum";
-import MiniFooter from "@/components/MiniFooter";
+import _ from "lodash";
 
 export default function SignUp() {
-  const [formData, setFormData] = useState<
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors },
+  } = useForm<AccountModels[AccountModelsType.USER_REGISTER]>();
+  const { accountRepository } = useRepository()!;
+  const { handleRedirect } = useRouter()!;
+
+  const onSubmit: SubmitHandler<
     AccountModels[AccountModelsType.USER_REGISTER]
-  >({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
+  > = async (data) => {
+    const userSignUpResponse: ApiResponse<string> =
+      await accountRepository.register(data);
 
-  const [avatar, setAvatar] = useState<File | null>(null);
-
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value, files } = e.target;
-
-    if (name === "avatar" && files) {
-      setAvatar(files[0]);
+    if (typeof userSignUpResponse === "string") {
+      handleRedirect(RoutePath.LOGIN);
     } else {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
+      _.map(userSignUpResponse.errors, (error: ApiErrorLog) => {
+        setError(error.title as ErrorKey, {
+          message: error.message,
+        });
+      });
     }
-  };
-
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    if (formData.password !== formData.confirmPassword) {
-      console.error("Passwords do not match");
-      return;
-    }
-
-    const userData = {
-      firstName: formData.firstName,
-      lastName: formData.lastName,
-      email: formData.email,
-      password: formData.password,
-      avatar: avatar, // Optional
-    };
-
-    console.log(userData); // Replace with your submit logic
   };
 
   return (
@@ -89,79 +75,74 @@ export default function SignUp() {
           <Box
             component="form"
             noValidate
-            onSubmit={handleSubmit}
+            onSubmit={handleSubmit(onSubmit)}
             sx={{ mt: 3 }}
           >
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
                 <TextField
-                  autoComplete="given-name"
-                  name="firstName"
-                  required
-                  fullWidth
-                  id="firstName"
                   label="First Name"
+                  {...register("firstName", {
+                    required: "First Name is required",
+                  })}
+                  fullWidth
+                  autoComplete="given-name"
                   autoFocus
-                  value={formData.firstName}
-                  onChange={handleChange}
                 />
+                {errors.firstName && <p>{errors.firstName.message}</p>}
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
-                  fullWidth
-                  id="lastName"
                   label="Last Name"
-                  name="lastName"
+                  {...register("lastName")}
+                  fullWidth
                   autoComplete="family-name"
-                  value={formData.lastName}
-                  onChange={handleChange}
                 />
+                {errors.lastName && <p>{errors.lastName.message}</p>}
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  required
-                  fullWidth
-                  id="email"
                   label="Email Address"
-                  name="email"
+                  {...register("email", {
+                    required: "Email is required",
+                    pattern: {
+                      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                      message: "Invalid email format",
+                    },
+                  })}
+                  fullWidth
                   autoComplete="email"
-                  value={formData.email}
-                  onChange={handleChange}
                 />
+                {errors.email && <p>{errors.email.message}</p>}
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  required
-                  fullWidth
-                  name="password"
                   label="Password"
                   type="password"
-                  id="password"
+                  {...register("password", {
+                    required: "Password is required",
+                    minLength: {
+                      value: 6,
+                      message: "Password must be at least 6 characters long",
+                    },
+                  })}
+                  fullWidth
                   autoComplete="new-password"
-                  value={formData.password}
-                  onChange={handleChange}
                 />
+                {errors.password && <p>{errors.password.message}</p>}
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  required
-                  fullWidth
-                  name="confirmPassword"
                   label="Confirm Password"
                   type="password"
-                  id="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                Upload Avatar
-                <TextField
+                  {...register("confirmPassword", {
+                    required: "Please confirm your password",
+                  })}
                   fullWidth
-                  type="file"
-                  name="avatar"
-                  onChange={handleChange}
                 />
+                {errors.confirmPassword && (
+                  <p>{errors.confirmPassword.message}</p>
+                )}
               </Grid>
             </Grid>
             <Button

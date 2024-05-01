@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { RouterContext } from "@/contexts/RouterContext";
+import { ProviderProps, RouterProps } from "@/@types/providers";
 
 /**
  * RouterProvider: A component to provide router context to its children.

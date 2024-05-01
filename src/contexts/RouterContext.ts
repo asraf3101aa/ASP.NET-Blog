@@ -1,3 +1,4 @@
+import { RouterProps } from "@/@types/providers";
 import { createContext, useContext } from "react";
 
 /**
