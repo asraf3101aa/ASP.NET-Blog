@@ -4,8 +4,8 @@ import {
   getStatusWithErrorsFromException,
 } from "@/@utils/fetchUtils";
 import { IFetchAPI } from "./IFetchAPI";
-import { ILocalStorage } from "@/storage/ILocalStorage";
 import { HttpMethod } from "@/@enums/api.enum";
+import { ILocalStorage } from "@/storage/ILocalStorage";
 
 export class FetchAPI implements IFetchAPI {
   // Base URL from environment variable

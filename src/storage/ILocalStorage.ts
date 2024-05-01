@@ -1,4 +1,5 @@
-import { AuthToken } from "@/@types/account";
+import { AccountModels } from "@/@types/account";
+import { AccountModelsType } from "@/@enums/account.enum";
 
 /**
  * An interface defining methods for interacting with local storage.
@@ -14,9 +15,9 @@ export interface ILocalStorage {
   /**
    * Stores the access token in local storage.
    *
-   * @param {AuthToken} authToken - The token to store.
+   * @param {AccountModels[AccountModelsType.AUTH_TOKEN]} authToken - The token to store.
    */
-  setAccessToken(authToken: AuthToken): void;
+  setAccessToken(authToken: AccountModels[AccountModelsType.AUTH_TOKEN]): void;
 
   /**
    * Clears all data from local storage.

@@ -1,8 +1,8 @@
-import { AccountEndpointPaths, AccountModelsType } from "@/@enums/account.enum";
-import { ApiEndpointPaths } from "@/@enums/api.enum";
-import { AccountModels } from "@/@types/account";
-import { IAccountRepository } from "@/@types/repository";
 import { IFetchAPI } from "@/api/IFetchAPI";
+import { AccountModels } from "@/@types/account";
+import { ApiEndpointPaths } from "@/@enums/api.enum";
+import { IAccountRepository } from "@/@types/repository";
+import { AccountEndpointPaths, AccountModelsType } from "@/@enums/account.enum";
 
 export class AccountRepository implements IAccountRepository {
   private _fetchAPI: IFetchAPI;

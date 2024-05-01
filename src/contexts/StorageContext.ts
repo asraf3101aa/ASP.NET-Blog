@@ -1,5 +1,5 @@
-import { LocalStorage } from "@/storage/LocalStorage";
 import { createContext, useContext } from "react";
+import { LocalStorage } from "@/storage/LocalStorage";
 
 /**
  * StorageContext: A context for managing router-related functions.

@@ -1,23 +1,25 @@
 import * as React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
-import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
-import CssBaseline from "@mui/material/CssBaseline";
-import TextField from "@mui/material/TextField";
+
+import Box from "@mui/material/Box";
 import Link from "@mui/material/Link";
 import Grid from "@mui/material/Grid";
-import Box from "@mui/material/Box";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import Typography from "@mui/material/Typography";
+import Avatar from "@mui/material/Avatar";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
 import Container from "@mui/material/Container";
 import MiniFooter from "@/components/MiniFooter";
-import { useRepository } from "@/contexts/RepositoryContext";
-import { useRouter } from "@/contexts/RouterContext";
+import Typography from "@mui/material/Typography";
+import CssBaseline from "@mui/material/CssBaseline";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+
+import _ from "lodash";
 import { RoutePath } from "@/@enums/router.enum";
 import { AccountModels } from "@/@types/account";
-import { AccountModelsType } from "@/@enums/account.enum";
-import _ from "lodash";
+import { useRouter } from "@/contexts/RouterContext";
 import BlogLoginBg from "/assets/images/BlogLoginBg.jpg";
+import { AccountModelsType } from "@/@enums/account.enum";
+import { useRepository } from "@/contexts/RepositoryContext";
 
 const SignUp = () => {
   const { handleRedirect } = useRouter()!;
