@@ -5,6 +5,7 @@ import {
 } from "@/@utils/fetchUtils";
 import { IFetchAPI } from "./IFetchAPI";
 import { ILocalStorage } from "@/storage/ILocalStorage";
+import { HttpMethod } from "@/@enums/api.enum";
 
 export class FetchAPI implements IFetchAPI {
   // Base URL from environment variable
@@ -52,18 +53,18 @@ export class FetchAPI implements IFetchAPI {
   };
 
   create<T, U>(path: string, data: U): Promise<ApiResponse<T>> {
-    return this._sendRequest<T, U>(path, "POST", data);
+    return this._sendRequest<T, U>(path, HttpMethod.POST, data);
   }
 
   read<T>(path: string): Promise<ApiResponse<T>> {
-    return this._sendRequest<T, undefined>(path, "GET");
+    return this._sendRequest<T, undefined>(path, HttpMethod.GET);
   }
 
   update<T, U>(path: string, data: U): Promise<ApiResponse<T>> {
-    return this._sendRequest<T, U>(path, "PUT", data);
+    return this._sendRequest<T, U>(path, HttpMethod.PUT, data);
   }
 
   delete(path: string): Promise<ApiResponse<null>> {
-    return this._sendRequest<null, undefined>(path, "DELETE");
+    return this._sendRequest<null, undefined>(path, HttpMethod.DELETE);
   }
 }
