@@ -82,7 +82,6 @@ type UserUpdate = {
 
 // AccountModels type containing all other types
 export type AccountModels = {
-  IdentityUser: IdentityUser;
   User: User;
   PopularBlogger: PopularBlogger;
   AuthToken: AuthToken;
