@@ -1,7 +1,8 @@
-import { ProviderProps } from "@/@types/providers";
-import { RouterProvider } from "./RouterProvider";
 import TitleProvider from "./TitleProvider";
-import { RepositoryProvider } from "./RepositoryProvider";
+import RouterProvider from "./RouterProvider";
+import StorageProvider from "./StorageProvider";
+import { ProviderProps } from "@/@types/providers";
+import RepositoryProvider from "./RepositoryProvider";
 
 /**
  * Provider: A component that serves as a provider for its children components.
@@ -12,12 +13,16 @@ import { RepositoryProvider } from "./RepositoryProvider";
  * Providers Used:
  * - RouterProvider: Provides routing capabilities to its children components.
  */
-export const Provider = ({ children }: ProviderProps) => {
+const Provider = ({ children }: ProviderProps) => {
   return (
     <TitleProvider>
       <RepositoryProvider>
-        <RouterProvider>{children}</RouterProvider>
+        <StorageProvider>
+          <RouterProvider>{children}</RouterProvider>
+        </StorageProvider>
       </RepositoryProvider>
     </TitleProvider>
   );
 };
+
+export default Provider;

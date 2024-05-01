@@ -8,7 +8,7 @@ import { ProviderProps, RouterProps } from "@/@types/providers";
  * Props:
  * - children: React node representing the children components.
  */
-export const RouterProvider = ({ children }: ProviderProps) => {
+const RouterProvider = ({ children }: ProviderProps) => {
   // Access `navigate` instance from React's useNavigate hook
   const navigate = useNavigate();
 
@@ -28,3 +28,5 @@ export const RouterProvider = ({ children }: ProviderProps) => {
     <RouterContext.Provider value={shared}>{children}</RouterContext.Provider>
   );
 };
+
+export default RouterProvider;

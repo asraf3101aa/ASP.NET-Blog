@@ -26,7 +26,7 @@ export class AccountRepository implements IAccountRepository {
       AccountModels[AccountModelsType.AUTH_TOKEN],
       AccountModels[AccountModelsType.USER_LOGIN]
     >(
-      `${this._accountEndpointPath}/${AccountEndpointPaths.USER_REGISTER}`,
+      `${this._accountEndpointPath}/${AccountEndpointPaths.USER_LOGIN}`,
       userData
     );
   }

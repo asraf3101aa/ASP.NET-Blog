@@ -15,4 +15,5 @@ export enum AccountModelsType {
 
 export enum AccountEndpointPaths {
   USER_REGISTER = "register",
+  USER_LOGIN = "login",
 }

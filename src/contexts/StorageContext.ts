@@ -1,10 +1,10 @@
 import { LocalStorage } from "@/storage/LocalStorage";
 import { createContext, useContext } from "react";
 
-export const localStorageClient = new LocalStorage(localStorage);
 /**
  * StorageContext: A context for managing router-related functions.
  */
+export const localStorageClient = new LocalStorage(localStorage);
 export const StorageContext = createContext<LocalStorage | null>(null);
 
 /**

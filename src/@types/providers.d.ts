@@ -29,5 +29,7 @@ declare type RouterProps = {
  * - fetchAPI: An instance of IFetchAPI to handle API calls.
  */
 declare type RepositoryProps = {
+  isLoading: boolean;
+  setIsLoading: (loading: boolean) => void;
   accountRepository: IAccountRepository;
 };

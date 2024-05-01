@@ -7,7 +7,7 @@ import { StorageContext, localStorageClient } from "@/contexts/StorageContext";
  * Props:
  * - children: React node representing the children components.
  */
-export const StorageProvider = ({ children }: ProviderProps) => {
+const StorageProvider = ({ children }: ProviderProps) => {
   // Provide the context value to its children
   return (
     <StorageContext.Provider value={localStorageClient}>
@@ -15,3 +15,5 @@ export const StorageProvider = ({ children }: ProviderProps) => {
     </StorageContext.Provider>
   );
 };
+
+export default StorageProvider;
