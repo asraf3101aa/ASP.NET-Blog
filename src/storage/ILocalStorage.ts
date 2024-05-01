@@ -1,3 +1,6 @@
+import { AccountModels } from "@/@types/account";
+import { AccountModelsType } from "@/@enums/account.enum";
+
 /**
  * An interface defining methods for interacting with local storage.
  */
@@ -10,18 +13,11 @@ export interface ILocalStorage {
   getAccessToken(): string | null;
 
   /**
-   * Retrieves the refresh token from local storage.
+   * Stores the access token in local storage.
    *
-   * @returns {string | null} The stored refresh token, or null if not found.
+   * @param {AccountModels[AccountModelsType.AUTH_TOKEN]} authToken - The token to store.
    */
-  getRefreshToken(): string | null;
-
-  /**
-   * Stores the access and refresh tokens in local storage.
-   *
-   * @param {AuthTokens} authTokens - The tokens to store.
-   */
-  setAuthTokens(authTokens: AuthTokens): void;
+  setAccessToken(authToken: AccountModels[AccountModelsType.AUTH_TOKEN]): void;
 
   /**
    * Clears all data from local storage.

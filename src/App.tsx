@@ -1,16 +1,15 @@
-import Home from "@/pages/Home";
-import { Provider } from "@/providers/Provider";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Router from "@/routes/Router";
+import Provider from "@/providers/Provider";
+import { BrowserRouter } from "react-router-dom";
 
 const App = () => {
   return (
     <BrowserRouter>
       <Provider>
-        <Routes>
-          <Route path="/" element={<Home />} />
-        </Routes>
+        <Router />
       </Provider>
     </BrowserRouter>
   );
 };
+
 export default App;

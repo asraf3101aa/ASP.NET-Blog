@@ -4,6 +4,7 @@ import {
   getStatusWithErrorsFromException,
 } from "@/@utils/fetchUtils";
 import { IFetchAPI } from "./IFetchAPI";
+import { HttpMethod } from "@/@enums/api.enum";
 import { ILocalStorage } from "@/storage/ILocalStorage";
 
 export class FetchAPI implements IFetchAPI {
@@ -51,19 +52,19 @@ export class FetchAPI implements IFetchAPI {
     }
   };
 
-  create<T, U>(path: string, data: U): Promise<ApiResponse<T>> {
-    return this._sendRequest<T, U>(path, "POST", data);
+  post<T, U>(path: string, data: U): Promise<ApiResponse<T>> {
+    return this._sendRequest<T, U>(path, HttpMethod.POST, data);
   }
 
-  read<T>(path: string): Promise<ApiResponse<T>> {
-    return this._sendRequest<T, undefined>(path, "GET");
+  get<T>(path: string): Promise<ApiResponse<T>> {
+    return this._sendRequest<T, undefined>(path, HttpMethod.GET);
   }
 
   update<T, U>(path: string, data: U): Promise<ApiResponse<T>> {
-    return this._sendRequest<T, U>(path, "PUT", data);
+    return this._sendRequest<T, U>(path, HttpMethod.PUT, data);
   }
 
   delete(path: string): Promise<ApiResponse<null>> {
-    return this._sendRequest<null, undefined>(path, "DELETE");
+    return this._sendRequest<null, undefined>(path, HttpMethod.DELETE);
   }
 }

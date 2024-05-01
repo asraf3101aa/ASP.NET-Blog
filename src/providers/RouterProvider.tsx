@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { RouterContext } from "@/contexts/RouterContext";
+import { ProviderProps, RouterProps } from "@/@types/providers";
 
 /**
  * RouterProvider: A component to provide router context to its children.
@@ -7,7 +8,7 @@ import { RouterContext } from "@/contexts/RouterContext";
  * Props:
  * - children: React node representing the children components.
  */
-export const RouterProvider = ({ children }: ProviderProps) => {
+const RouterProvider = ({ children }: ProviderProps) => {
   // Access `navigate` instance from React's useNavigate hook
   const navigate = useNavigate();
 
@@ -27,3 +28,5 @@ export const RouterProvider = ({ children }: ProviderProps) => {
     <RouterContext.Provider value={shared}>{children}</RouterContext.Provider>
   );
 };
+
+export default RouterProvider;

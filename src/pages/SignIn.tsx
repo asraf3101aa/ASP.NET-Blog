@@ -1,0 +1,209 @@
+import * as React from "react";
+import { useForm, SubmitHandler } from "react-hook-form";
+
+import {
+  Avatar,
+  Button,
+  CssBaseline,
+  TextField,
+  FormControlLabel,
+  Checkbox,
+  Link,
+  Paper,
+  Box,
+  Grid,
+  Typography,
+} from "@mui/material";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+
+import MiniFooter from "@/components/MiniFooter";
+import { RoutePath } from "@/@enums/router.enum";
+import { AccountModels } from "@/@types/account";
+import { useRouter } from "@/contexts/RouterContext";
+import { useStorage } from "@/contexts/StorageContext";
+import BlogLoginBg from "/assets/images/BlogLoginBg.jpg";
+import { AccountModelsType } from "@/@enums/account.enum";
+import { useRepository } from "@/contexts/RepositoryContext";
+import { LocalStorageItemsKeys } from "@/@enums/storage.enum";
+
+const SignIn = () => {
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors },
+  } = useForm<AccountModels[AccountModelsType.USER_LOGIN]>();
+
+  const { handleRedirect } = useRouter()!;
+  const localStorageClient = useStorage()!;
+  const { isLoading, setIsLoading, accountRepository } = useRepository()!;
+
+  const onSubmit: SubmitHandler<
+    AccountModels[AccountModelsType.USER_LOGIN]
+  > = async (data) => {
+    setIsLoading(true);
+    accountRepository
+      .login(data)
+      .then(
+        (
+          userSignInResponse: ApiResponse<
+            AccountModels[AccountModelsType.AUTH_TOKEN]
+          >
+        ) => {
+          if (LocalStorageItemsKeys.ACCESS_TOKEN in userSignInResponse) {
+            localStorageClient.setAccessToken(userSignInResponse);
+            setIsLoading(false);
+            handleRedirect(RoutePath.HOME);
+          } else {
+            setError("rememberMe", {
+              message: userSignInResponse.errors[0].message,
+            });
+          }
+        }
+      )
+      .catch((error) => console.error(error))
+      .finally(() => setIsLoading(false));
+  };
+
+  return (
+    <Grid container sx={{ height: "100vh" }}>
+      <CssBaseline />
+      <Grid
+        item
+        xs={false}
+        sm={4}
+        md={8}
+        sx={{
+          backgroundImage: `url(${BlogLoginBg})`,
+          backgroundRepeat: "no-repeat",
+          backgroundColor: (t) =>
+            t.palette.mode === "light"
+              ? t.palette.grey[50]
+              : t.palette.grey[900],
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      />
+      <Grid
+        item
+        xs={12}
+        sm={8}
+        md={4}
+        component={Paper}
+        elevation={6}
+        square
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+        }}
+      >
+        <Box
+          sx={{
+            my: 8,
+            mx: 4,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
+            <LockOutlinedIcon />
+          </Avatar>
+          <Typography component="h1" variant="h5">
+            Sign in
+          </Typography>
+          <Box
+            component="form"
+            noValidate
+            onSubmit={handleSubmit(onSubmit)}
+            sx={{ mt: 3 }}
+          >
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <TextField
+                  label="Email Address"
+                  {...register("email", {
+                    required: "Email is required",
+                    pattern: {
+                      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                      message: "Invalid email format",
+                    },
+                  })}
+                  fullWidth
+                  autoComplete="email"
+                />
+                {errors.email && (
+                  <p style={{ color: "red" }}>{errors.email.message}</p>
+                )}
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  label="Password"
+                  type="password"
+                  {...register("password", {
+                    required: "Password is required",
+                    minLength: {
+                      value: 6,
+                      message: "Password must be at least 6 characters long",
+                    },
+                  })}
+                  fullWidth
+                  autoComplete="new-password"
+                />
+                {errors.password && (
+                  <p style={{ color: "red" }}>{errors.password.message}</p>
+                )}
+              </Grid>
+              <Grid item xs={12}>
+                <FormControlLabel
+                  control={
+                    <Checkbox color="primary" {...register("rememberMe")} />
+                  }
+                  label="Remember me"
+                />
+                {errors.rememberMe && (
+                  <p style={{ color: "red" }}>{errors.rememberMe.message}</p>
+                )}
+              </Grid>
+            </Grid>
+            {isLoading ? (
+              <Grid
+                item
+                xs={12}
+                sx={{ display: "flex", justifyContent: "center", mt: 3, mb: 2 }}
+              >
+                <img src="/assets/icons/Loading.svg" alt="Loading" />
+              </Grid>
+            ) : (
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                sx={{ mt: 3, mb: 2 }}
+              >
+                Sign In
+              </Button>
+            )}
+
+            <Grid container>
+              <Grid item xs>
+                <Link href="/forgot-password" variant="body2">
+                  Forgot password?
+                </Link>
+              </Grid>
+              <Grid item>
+                <Link href="/sign-up" variant="body2">
+                  {"Don't have an account? Sign Up"}
+                </Link>
+              </Grid>
+            </Grid>
+          </Box>
+        </Box>
+        <MiniFooter />
+      </Grid>
+    </Grid>
+  );
+};
+
+export default SignIn;

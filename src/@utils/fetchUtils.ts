@@ -5,7 +5,7 @@ import { ILocalStorage } from "@/storage/ILocalStorage";
  * Returns the headers required for an API request.
  *
  * @param {boolean} requiresAuth - Indicates whether the request requires authentication.
- * @param {ILocalStorage} localStorageClient - Represents an instance of `LocalStorage` for fetching `access_token` if `requiresAuth` is true.
+ * @param {ILocalStorage} localStorageClient - Represents an instance of `LocalStorage` for fetching `accessToken` if `requiresAuth` is true.
  * @returns {Record<string, string>} An object containing the headers for the API request.
  */
 export const getHeaders = (
@@ -16,9 +16,9 @@ export const getHeaders = (
     "Content-Type": "application/json",
   };
   if (requiresAuth) {
-    const access_token = localStorageClient.getAccessToken();
-    if (access_token) {
-      headers["Authorization"] = `Bearer ${access_token}`;
+    const accessToken = localStorageClient.getAccessToken();
+    if (accessToken) {
+      headers["Authorization"] = `Bearer ${accessToken}`;
     }
   }
   return headers;

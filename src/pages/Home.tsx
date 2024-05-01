@@ -1,4 +1,7 @@
+import Blog from "@/components/Blog";
+
 const Home = () => {
-  return <div>Hello World!</div>;
+  return <Blog />;
 };
+
 export default Home;
