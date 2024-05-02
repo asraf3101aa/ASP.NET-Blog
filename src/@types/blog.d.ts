@@ -62,6 +62,19 @@ type BlogStats = {
   commentCount: number; // Total comments across all blogs
 };
 
+type BlogsList = {
+  paginatedMetaData: PaginationMetaData;
+  blogs: Blog[];
+};
+
+// Interface representing the BlogDTO structure
+type BlogPartialData = {
+  title: string; // Corresponds to C# "Title", required field
+  body: string; // Corresponds to C# "Body", required field
+  categoryId?: number; // C# "CategoryId", optional field (default if not required)
+  images?: BlogImage[]; // Corresponds to C# "Images", optional field, can be an array of BlogImagesDTO
+};
+
 // Type for Blog models, gathering all other types
 export type BlogModels = {
   Category: Category;
@@ -70,4 +83,6 @@ export type BlogModels = {
   Comment: Comment;
   Blog: Blog;
   BlogStats: BlogStats;
+  BlogsList: BlogsList;
+  BlogPartialData: BlogPartialData;
 };

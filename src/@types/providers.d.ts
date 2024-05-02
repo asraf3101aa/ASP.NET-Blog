@@ -1,4 +1,8 @@
-import { IAccountRepository, IAdminRepository } from "./repository";
+import {
+  IAccountRepository,
+  IAdminRepository,
+  IBlogRepository,
+} from "./repository";
 
 /**
  * ProviderProps: Represents props for a provider component.
@@ -33,4 +37,5 @@ declare type RepositoryProps = {
   setIsLoading: (loading: boolean) => void;
   accountRepository: IAccountRepository;
   adminRepository: IAdminRepository;
+  blogRepository: IBlogRepository;
 };
