@@ -8,11 +8,13 @@ export enum BlogModelsType {
   BLOG_STATS = "BlogStats",
 }
 
+// Enum representing different image files
 export enum BlogImageType {
   Banner = 0,
   Body = 1,
 }
 
+// Enum representing different types of reactions
 export enum ReactionType {
   Upvote = 0,
   Downvote = 1,

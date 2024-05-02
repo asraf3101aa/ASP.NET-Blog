@@ -13,6 +13,7 @@ export enum AccountModelsType {
   USER_UPDATE = "UserUpdate",
 }
 
+// Enum representing different account module's api endpoints
 export enum AccountEndpointPaths {
   USER_REGISTER = "register",
   USER_LOGIN = "login",

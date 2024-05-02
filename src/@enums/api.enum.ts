@@ -1,3 +1,4 @@
+// Enum representing different api response statuses
 export enum ApiResponseStatus {
   OK = 200,
   CREATED = 201,
@@ -9,6 +10,7 @@ export enum ApiResponseStatus {
   INTERNAL_SERVER_ERROR = 500,
 }
 
+// Enum representing different types of HTTP methods during API calls
 export enum HttpMethod {
   GET = "GET",
   POST = "POST",
@@ -16,6 +18,7 @@ export enum HttpMethod {
   DELETE = "DELETE",
 }
 
+// Enum representing different api controllers
 export enum ApiEndpointPaths {
   ACCOUNT = "account",
   ADMIN = "admin",
