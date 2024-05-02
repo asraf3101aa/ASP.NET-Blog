@@ -3,8 +3,7 @@ import { ChangeEvent } from "react";
 // Base identity user type
 type IdentityUser = {
   id: string; // Unique identifier, typically a GUID string
-  userName?: string; // Optional user name
-  securityStamp?: string; // Optional security stamp
+  email: string;
 };
 
 // User type inheriting from IdentityUser
@@ -28,20 +27,17 @@ type AuthToken = {
   accessToken: string;
 };
 
-// Structure for user registration data
-type UserRegister = {
+// Structure for admin registration data
+type AccountRegister = {
   firstName: string; // Required field
   lastName?: string; // Optional field
   email: string; // Required field
-  password: string; // Required field
-  confirmPassword: string; // Required field
 };
 
-// Structure for admin registration data
-type AdminRegister = {
-  firstName: string; // Required field
-  lastName?: string; // Optional field
-  email: string; // Required field
+// Structure for user registration data
+type UserRegister = AccountRegister & {
+  password: string; // Required field
+  confirmPassword: string; // Required field
 };
 
 // Structure for user login data
@@ -85,7 +81,7 @@ export type AccountModels = {
   PopularBlogger: PopularBlogger;
   AuthToken: AuthToken;
   UserRegister: UserRegister;
-  AdminRegister: AdminRegister;
+  AccountRegister: AccountRegister;
   UserLogin: UserLogin;
   ChangePassword: ChangePassword;
   EmailModel: EmailModel;

@@ -64,7 +64,7 @@ export class FetchAPI implements IFetchAPI {
     return this._sendRequest<T, U>(path, HttpMethod.PUT, data);
   }
 
-  delete(path: string): Promise<ApiResponse<null>> {
-    return this._sendRequest<null, undefined>(path, HttpMethod.DELETE);
+  delete<T>(path: string): Promise<ApiResponse<T>> {
+    return this._sendRequest<T, undefined>(path, HttpMethod.DELETE);
   }
 }

@@ -5,7 +5,7 @@ export enum AccountModelsType {
   POPULAR_BLOGGER = "PopularBlogger",
   AUTH_TOKEN = "AuthToken",
   USER_REGISTER = "UserRegister",
-  ADMIN_REGISTER = "AdminRegister",
+  ACCOUNT_REGISTER = "AccountRegister",
   USER_LOGIN = "UserLogin",
   CHANGE_PASSWORD = "ChangePassword",
   EMAIL_MODEL = "EmailModel",
@@ -16,4 +16,13 @@ export enum AccountModelsType {
 export enum AccountEndpointPaths {
   USER_REGISTER = "register",
   USER_LOGIN = "login",
+  EMAIL_CONFIRM = "email/confirm",
+  FORGOT_PASSWORD = "password/forgot",
+  PASSWORD_RESET = "password/reset",
+  UPDATE = "update",
+  DELETE = "delete",
+  PROFILE = "profile",
+  EMAIL_CONFIRMATION_RESEND = "email/confirmation/resend",
+  EMAIL_UPDATE = "email/update",
+  PASSWORD_UPDATE = "password/update",
 }

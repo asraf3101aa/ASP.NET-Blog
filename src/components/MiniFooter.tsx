@@ -10,7 +10,7 @@ const MiniFooter = () => {
         justifyContent: "space-between", // Space between items
         alignItems: "center", // Align vertically
         p: 2,
-        backgroundColor: "rgba(255,255,255,0.9)", // Light gray background
+        backgroundColor: "lightgray", // Light gray background
       }}
     >
       <Typography variant="body1" component={Link} href="/" sx={{ mx: 2 }}>
