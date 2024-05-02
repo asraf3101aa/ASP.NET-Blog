@@ -30,4 +30,82 @@ export class AccountRepository implements IAccountRepository {
       userData
     );
   }
+
+  async confirmEmail(token: string, email: string) {
+    return await this._fetchAPI.post<string, null>(
+      `${this._accountEndpointPath}/${AccountEndpointPaths.EMAIL_CONFIRM}?token=${token}&email=${email}`,
+      null
+    );
+  }
+
+  async sendForgotPasswordRequest(email: string) {
+    return await this._fetchAPI.post<
+      string,
+      AccountModels[AccountModelsType.EMAIL_MODEL]
+    >(`${this._accountEndpointPath}/${AccountEndpointPaths.FORGOT_PASSWORD}`, {
+      email,
+    });
+  }
+
+  async resetPassword(
+    resetPasswordData: AccountModels[AccountModelsType.RESET_PASSWORD]
+  ) {
+    return await this._fetchAPI.post<
+      string,
+      AccountModels[AccountModelsType.RESET_PASSWORD]
+    >(
+      `${this._accountEndpointPath}/${AccountEndpointPaths.FORGOT_PASSWORD}`,
+      resetPasswordData
+    );
+  }
+
+  async userUpdate(updatedData: AccountModels[AccountModelsType.USER_UPDATE]) {
+    return await this._fetchAPI.update<
+      string,
+      AccountModels[AccountModelsType.USER_UPDATE]
+    >(
+      `${this._accountEndpointPath}/${AccountEndpointPaths.UPDATE}`,
+      updatedData
+    );
+  }
+
+  async deleteAccount() {
+    return await this._fetchAPI.delete<string>(
+      `${this._accountEndpointPath}/${AccountEndpointPaths.DELETE}`
+    );
+  }
+
+  async getProfile(pageNumber: number) {
+    return await this._fetchAPI.get<AccountModels[AccountModelsType.USER]>(
+      `${this._accountEndpointPath}/${AccountEndpointPaths.PROFILE}?pageNumber=${pageNumber}`
+    );
+  }
+
+  async resendEmailConfirmation() {
+    return await this._fetchAPI.post<string, undefined>(
+      `${this._accountEndpointPath}/${AccountEndpointPaths.EMAIL_CONFIRMATION_RESEND}`,
+      undefined
+    );
+  }
+
+  async updateEmail(email: string) {
+    return await this._fetchAPI.update<
+      string,
+      AccountModels[AccountModelsType.EMAIL_MODEL]
+    >(`${this._accountEndpointPath}/${AccountEndpointPaths.EMAIL_UPDATE}`, {
+      email,
+    });
+  }
+
+  async changePassword(
+    passwordUpdateData: AccountModels[AccountModelsType.CHANGE_PASSWORD]
+  ) {
+    return await this._fetchAPI.update<
+      string,
+      AccountModels[AccountModelsType.CHANGE_PASSWORD]
+    >(
+      `${this._accountEndpointPath}/${AccountEndpointPaths.PASSWORD_UPDATE}`,
+      passwordUpdateData
+    );
+  }
 }

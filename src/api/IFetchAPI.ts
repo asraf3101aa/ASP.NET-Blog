@@ -36,5 +36,5 @@ export interface IFetchAPI {
    * @param {string} path - The endpoint to which the request is sent.
    * @returns {Promise<ApiResponse<null>>} A promise resolving to the response from the server.
    */
-  delete(path: string): Promise<ApiResponse<null>>;
+  delete<T>(path: string): Promise<ApiResponse<T>>;
 }
