@@ -1,8 +1,9 @@
 import { useState } from "react";
 import {
-  RepositoryContext,
-  accountRepository,
+  blogRepository,
   adminRepository,
+  accountRepository,
+  RepositoryContext,
 } from "@/contexts/RepositoryContext";
 import { ProviderProps, RepositoryProps } from "@/@types/providers";
 
@@ -19,6 +20,7 @@ const RepositoryProvider = ({ children }: ProviderProps) => {
   const shared: RepositoryProps = {
     isLoading,
     setIsLoading,
+    blogRepository,
     adminRepository,
     accountRepository,
   };

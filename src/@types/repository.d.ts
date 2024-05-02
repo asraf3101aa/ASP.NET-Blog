@@ -1,6 +1,8 @@
 import { AccountModels } from "./account";
-import { AccountModelsType } from "@/@enums/account.enum";
+import { BlogModels } from "@/@types/blog";
 import { AdminDashboardData } from "./admin";
+import { AccountModelsType } from "@/@enums/account.enum";
+import { BlogModelsType, ReactionType } from "@/@enums/blog.enum";
 
 /**
  * Interface for managing user account-related operations.
@@ -118,4 +120,105 @@ export interface IAdminRepository {
     duration: string,
     month: number
   ) => Promise<ApiResponse<AdminDashboardData>>;
+}
+
+/**
+ * Interface for a blog repository, outlining the contract for interacting with blog-related data.
+ */
+export interface IBlogRepository {
+  /**
+   * Retrieves a list of blogs with sorting and pagination.
+   * @param sortBy - The field to sort by.
+   * @param pageNumber - The page number for pagination.
+   * @returns A promise resolving to a list of blogs wrapped in an ApiResponse.
+   */
+  getBlogs(
+    sortBy: string,
+    pageNumber: number
+  ): Promise<ApiResponse<BlogModels[BlogModelsType.BLOGS_LIST]>>;
+
+  /**
+   * Creates a new blog entry.
+   * @param blogData - The partial data for creating a new blog.
+   * @returns A promise resolving to the created blog wrapped in an ApiResponse.
+   */
+  createBlog(
+    blogData: BlogModels[BlogModelsType.BLOG_PARTIAL_DATA]
+  ): Promise<ApiResponse<BlogModels[BlogModelsType.BLOG]>>;
+
+  /**
+   * Gets the details of a specific blog by ID.
+   * @param id - The ID of the blog.
+   * @returns A promise resolving to the blog details wrapped in an ApiResponse.
+   */
+  getBlogDetails(
+    id: string
+  ): Promise<ApiResponse<BlogModels[BlogModelsType.BLOG]>>;
+
+  /**
+   * Retrieves all blog categories.
+   * @returns A promise resolving to a list of categories wrapped in an ApiResponse.
+   */
+  getCategories(): Promise<ApiResponse<BlogModels[BlogModelsType.CATEGORY][]>>;
+
+  /**
+   * Updates a specific blog by ID with new data.
+   * @param id - The ID of the blog to update.
+   * @param updatedData - The updated blog data.
+   * @returns A promise resolving to a confirmation message or updated blog wrapped in an ApiResponse.
+   */
+  updateBlog(
+    id: string,
+    updatedData: BlogModels[BlogModelsType.BLOG_PARTIAL_DATA]
+  ): Promise<ApiResponse<string>>;
+
+  /**
+   * Deletes a blog by ID.
+   * @param id - The ID of the blog to delete.
+   * @returns A promise resolving to a confirmation message wrapped in an ApiResponse.
+   */
+  deleteBlog(id: string): Promise<ApiResponse<string>>;
+
+  /**
+   * Adds a reaction to a specific blog.
+   * @param id - The ID of the blog to react on.
+   * @param reactionType - The type of reaction.
+   * @returns A promise resolving to a confirmation message wrapped in an ApiResponse.
+   */
+  reactOnBlog(
+    id: string,
+    reactionType: ReactionType
+  ): Promise<ApiResponse<string>>;
+
+  /**
+   * Adds a comment to a specific blog.
+   * @param id - The ID of the blog.
+   * @param text - The comment text.
+   * @returns A promise resolving to a confirmation message wrapped in an ApiResponse.
+   */
+  commentOnBlog(id: string, text: string): Promise<ApiResponse<string>>;
+
+  /**
+   * Updates a comment on a specific blog.
+   * @param blogId - The ID of the blog.
+   * @param commentId - The ID of the comment to update.
+   * @param text - The new comment text.
+   * @returns A promise resolving to a confirmation message wrapped in an ApiResponse.
+   */
+  updateBlogComment(
+    blogId: string,
+    commentId: string,
+    text: string
+  ): Promise<ApiResponse<string>>;
+
+  /**
+   * Deletes a comment from a specific blog.
+   * @param blogId - The ID of the blog.
+   * @param commentId - The ID of the comment to delete.
+   * @returns A promise resolving to a confirmation message wrapped in an ApiResponse.
+   */
+  deleteBlogComment(
+    blogId: string,
+    commentId: string
+  ): Promise<ApiResponse<string>>;
 }

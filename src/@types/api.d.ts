@@ -81,3 +81,23 @@ declare type ApiResponseStatusWithErrors = {
  * @property {T | ApiResponseStatusWithErrors} - Either the successful data or an error status with detailed errors.
  */
 declare type ApiResponse<T> = T | ApiResponseStatusWithErrors;
+
+/**
+ * Pagination metadata for paginated results.
+ * @property {string} sortBy - The field by which the data is sorted.
+ * @property {number} pageNumber - The current page number.
+ * @property {number} pageSize - The number of items per page.
+ * @property {number} totalPages - The total number of pages.
+ * @property {number} totalItems - The total number of items across all pages.
+ * @property {boolean} hasPreviousPage - Whether there's a previous page.
+ * @property {boolean} hasNextPage - Whether there's a next page.
+ */
+declare type PaginationMetaData = {
+  sortBy: string;
+  pageNumber: number;
+  pageSize: number;
+  totalPages: number;
+  totalItems: number;
+  hasPreviousPage: boolean;
+  hasNextPage: boolean;
+};
