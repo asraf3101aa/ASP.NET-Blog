@@ -1,3 +1,4 @@
+import _ from "lodash";
 import * as React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 
@@ -23,8 +24,9 @@ import { useStorage } from "@/contexts/StorageContext";
 import BlogLoginBg from "/assets/images/BlogLoginBg.jpg";
 import { AccountModelsType } from "@/@enums/account.enum";
 import { useRepository } from "@/contexts/RepositoryContext";
-import { LocalStorageItemsKeys } from "@/@enums/storage.enum";
+import { LocalStorageItemsKeys, UserRoles } from "@/@enums/storage.enum";
 import MiniFooter from "@/components/shared/navigation/MiniFooter";
+import { getRoleFromJwtToken } from "@/@utils/getRoleFromJwtToken";
 
 const SignIn = () => {
   const {
@@ -52,8 +54,14 @@ const SignIn = () => {
         ) => {
           if (LocalStorageItemsKeys.ACCESS_TOKEN in userSignInResponse) {
             localStorageClient.setAccessToken(userSignInResponse);
+            const role = getRoleFromJwtToken(userSignInResponse.accessToken);
+
             setIsLoading(false);
-            handleRedirect(RoutePath.HOME);
+            handleRedirect(
+              _.isEqual(role, UserRoles.ADMIN)
+                ? RoutePath.DASHBOARD
+                : RoutePath.HOME
+            );
           } else {
             setError("rememberMe", {
               message: userSignInResponse.errors[0].message,
