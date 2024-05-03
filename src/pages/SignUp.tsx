@@ -8,7 +8,6 @@ import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Container from "@mui/material/Container";
-import MiniFooter from "@/components/MiniFooter";
 import Typography from "@mui/material/Typography";
 import CssBaseline from "@mui/material/CssBaseline";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
@@ -20,6 +19,7 @@ import { useRouter } from "@/contexts/RouterContext";
 import BlogLoginBg from "/assets/images/BlogLoginBg.jpg";
 import { AccountModelsType } from "@/@enums/account.enum";
 import { useRepository } from "@/contexts/RepositoryContext";
+import MiniFooter from "@/components/shared/navigation/MiniFooter";
 
 const SignUp = () => {
   const { handleRedirect } = useRouter()!;

@@ -16,7 +16,6 @@ import {
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 
-import MiniFooter from "@/components/MiniFooter";
 import { RoutePath } from "@/@enums/router.enum";
 import { AccountModels } from "@/@types/account";
 import { useRouter } from "@/contexts/RouterContext";
@@ -25,6 +24,7 @@ import BlogLoginBg from "/assets/images/BlogLoginBg.jpg";
 import { AccountModelsType } from "@/@enums/account.enum";
 import { useRepository } from "@/contexts/RepositoryContext";
 import { LocalStorageItemsKeys } from "@/@enums/storage.enum";
+import MiniFooter from "@/components/shared/navigation/MiniFooter";
 
 const SignIn = () => {
   const {
