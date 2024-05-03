@@ -24,9 +24,25 @@ export enum ReactionType {
 
 // Enum representing different endpoints of blog controller
 export enum BlogEndpointPaths {
+  HOMEPAGE_BLOGS = "list",
   CATEGORIES = "categories",
-  UPDATE = "update",
-  DELETE = "delete",
   REACTION = "reaction",
   COMMENT = "comment",
+}
+
+export enum BlogStatsData {
+  BLOG_COUNT = "Blog Count",
+  COMMENT_COUNT = "Comment Count",
+  DOWN_VOTE_COUNT = "Downvote Count",
+  UP_VOTE_COUNT = "Upvote Count",
+}
+
+export enum BlogsDurationFilters {
+  ALL = "all",
+  MONTHLY = "monthly",
+}
+
+export enum BlogsSortingFilters {
+  ALL = "all",
+  RECENCY = "recency",
 }

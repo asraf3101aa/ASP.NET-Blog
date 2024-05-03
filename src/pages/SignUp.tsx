@@ -1,4 +1,3 @@
-import * as React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 
 import Box from "@mui/material/Box";
@@ -8,7 +7,6 @@ import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Container from "@mui/material/Container";
-import MiniFooter from "@/components/MiniFooter";
 import Typography from "@mui/material/Typography";
 import CssBaseline from "@mui/material/CssBaseline";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
@@ -20,9 +18,13 @@ import { useRouter } from "@/contexts/RouterContext";
 import BlogLoginBg from "/assets/images/BlogLoginBg.jpg";
 import { AccountModelsType } from "@/@enums/account.enum";
 import { useRepository } from "@/contexts/RepositoryContext";
+import MiniFooter from "@/components/shared/navigation/MiniFooter";
+import { useStorage } from "@/contexts/StorageContext";
+import { useEffect } from "react";
 
 const SignUp = () => {
   const { handleRedirect } = useRouter()!;
+  const localStorageClient = useStorage()!;
   const { isLoading, setIsLoading, accountRepository } = useRepository()!;
   const {
     register,
@@ -30,6 +32,13 @@ const SignUp = () => {
     setError,
     formState: { errors },
   } = useForm<AccountModels[AccountModelsType.USER_REGISTER]>();
+
+  useEffect(() => {
+    const accessToken = localStorageClient.getAccessToken();
+    if (accessToken) {
+      handleRedirect(RoutePath.PROFILE);
+    }
+  }, [handleRedirect, localStorageClient]);
 
   const onSubmit: SubmitHandler<
     AccountModels[AccountModelsType.USER_REGISTER]

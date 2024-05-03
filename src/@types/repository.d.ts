@@ -36,18 +36,18 @@ export interface IAccountRepository {
 
   /**
    * Sends a forgot password request.
-   * @param email - The email address to send the password reset link to.
+   * @param email - The email address to send the password confirm link to.
    * @returns A promise that resolves with an API response containing a success message.
    */
   sendForgotPasswordRequest: (email: string) => Promise<ApiResponse<string>>;
 
   /**
    * Resets the user's password.
-   * @param resetPasswordData - The data required to reset the password.
+   * @param confirmPasswordData - The data required to confirm the password.
    * @returns A promise that resolves with an API response containing a success message.
    */
-  resetPassword: (
-    resetPasswordData: AccountModels[AccountModelsType.RESET_PASSWORD]
+  confirmPassword: (
+    confirmPasswordData: AccountModels[AccountModelsType.CONFIRM_PASSWORD]
   ) => Promise<ApiResponse<string>>;
 
   /**
@@ -67,12 +67,9 @@ export interface IAccountRepository {
 
   /**
    * Retrieves the user's profile information.
-   * @param pageNumber - The page number for pagination.
    * @returns A promise that resolves with an API response containing the user's profile information.
    */
-  getProfile: (
-    pageNumber: number
-  ) => Promise<ApiResponse<AccountModels[AccountModelsType.USER]>>;
+  getProfile: () => Promise<ApiResponse<AccountModels[AccountModelsType.USER]>>;
 
   /**
    * Resends the email confirmation link.
@@ -89,11 +86,11 @@ export interface IAccountRepository {
 
   /**
    * Changes the user's password.
-   * @param passwordUpdateData - The data required to change the password.
+   * @param changePasswordData - The data required to change the password.
    * @returns A promise that resolves with an API response containing a success message.
    */
   changePassword: (
-    passwordUpdateData: AccountModels[AccountModelsType.CHANGE_PASSWORD]
+    changePasswordData: AccountModels[AccountModelsType.CHANGE_PASSWORD]
   ) => Promise<ApiResponse<string>>;
 }
 
@@ -112,7 +109,7 @@ export interface IAdminRepository {
 
   /**
    * Fetches the admin dashboard data.
-   * @param duration - The duration for the dashboard data (e.g., 'weekly', 'monthly').
+   * @param duration - The duration for the dashboard data (e.g., 'all', 'monthly').
    * @param month - The specific month for which to fetch data.
    * @returns A promise that resolves with an API response containing the admin dashboard data.
    */
@@ -127,12 +124,21 @@ export interface IAdminRepository {
  */
 export interface IBlogRepository {
   /**
-   * Retrieves a list of blogs with sorting and pagination.
-   * @param sortBy - The field to sort by.
+   * Retrieves a list of blogs with pagination for specific user.
    * @param pageNumber - The page number for pagination.
    * @returns A promise resolving to a list of blogs wrapped in an ApiResponse.
    */
   getBlogs(
+    pageNumber: number
+  ): Promise<ApiResponse<BlogModels[BlogModelsType.BLOGS_LIST]>>;
+
+  /**
+   * Retrieves a list of blogs with sorting and pagination for homepage.
+   * @param sortBy - The field to sort by.
+   * @param pageNumber - The page number for pagination.
+   * @returns A promise resolving to a list of blogs wrapped in an ApiResponse.
+   */
+  getHomepageBlogs(
     sortBy: string,
     pageNumber: number
   ): Promise<ApiResponse<BlogModels[BlogModelsType.BLOGS_LIST]>>;

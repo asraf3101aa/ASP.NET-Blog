@@ -3,7 +3,7 @@ import {
   BlogModelsType,
   ReactionType,
 } from "@/@enums/blog.enum";
-import { BlogModels } from "@/@types/blog";
+import { BlogModels, BlogsList } from "@/@types/blog";
 import { IFetchAPI } from "@/api/IFetchAPI";
 import { ApiEndpointPaths } from "@/@enums/api.enum";
 import { IBlogRepository } from "@/@types/repository";
@@ -15,9 +15,15 @@ export class BlogRepository implements IBlogRepository {
     this._fetchAPI = fetchAPI;
   }
 
-  async getBlogs(sortBy: string, pageNumber: number) {
+  async getHomepageBlogs(sortBy: string, pageNumber: number) {
     return await this._fetchAPI.get<BlogModels[BlogModelsType.BLOGS_LIST]>(
-      `${this._blogEndpointPath}?sortBy=${sortBy}&pageNumber=${pageNumber}`
+      `${this._blogEndpointPath}/${BlogEndpointPaths.HOMEPAGE_BLOGS}/?sortBy=${sortBy}&pageNumber=${pageNumber}`
+    );
+  }
+
+  async getBlogs(pageNumber: number): Promise<ApiResponse<BlogsList>> {
+    return await this._fetchAPI.get<BlogModels[BlogModelsType.BLOGS_LIST]>(
+      `${this._blogEndpointPath}?pageNumber=${pageNumber}`
     );
   }
 
@@ -47,15 +53,12 @@ export class BlogRepository implements IBlogRepository {
     return await this._fetchAPI.update<
       string,
       BlogModels[BlogModelsType.BLOG_PARTIAL_DATA]
-    >(
-      `${this._blogEndpointPath}/${id}/${BlogEndpointPaths.UPDATE}`,
-      updatedData
-    );
+    >(`${this._blogEndpointPath}/${id}`, updatedData);
   }
 
   async deleteBlog(id: string) {
     return await this._fetchAPI.delete<string>(
-      `${this._blogEndpointPath}/${id}/${BlogEndpointPaths.DELETE}`
+      `${this._blogEndpointPath}/${id}`
     );
   }
 
@@ -82,7 +85,7 @@ export class BlogRepository implements IBlogRepository {
 
   async deleteBlogComment(blogId: string, commentId: string) {
     return await this._fetchAPI.delete<string>(
-      `${this._blogEndpointPath}/${blogId}/${BlogEndpointPaths.DELETE}/${commentId}`
+      `${this._blogEndpointPath}/${blogId}/${BlogEndpointPaths.COMMENT}/${commentId}`
     );
   }
 }

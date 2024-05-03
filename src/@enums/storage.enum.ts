@@ -2,3 +2,8 @@
 export enum LocalStorageItemsKeys {
   ACCESS_TOKEN = "accessToken",
 }
+
+export enum UserRoles {
+  ADMIN = "Admin",
+  BLOGGER = "Blogger",
+}

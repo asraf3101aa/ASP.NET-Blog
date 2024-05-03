@@ -1,4 +1,4 @@
-import * as React from "react";
+import _ from "lodash";
 import { useForm, SubmitHandler } from "react-hook-form";
 
 import {
@@ -16,7 +16,6 @@ import {
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 
-import MiniFooter from "@/components/MiniFooter";
 import { RoutePath } from "@/@enums/router.enum";
 import { AccountModels } from "@/@types/account";
 import { useRouter } from "@/contexts/RouterContext";
@@ -24,7 +23,10 @@ import { useStorage } from "@/contexts/StorageContext";
 import BlogLoginBg from "/assets/images/BlogLoginBg.jpg";
 import { AccountModelsType } from "@/@enums/account.enum";
 import { useRepository } from "@/contexts/RepositoryContext";
-import { LocalStorageItemsKeys } from "@/@enums/storage.enum";
+import { LocalStorageItemsKeys, UserRoles } from "@/@enums/storage.enum";
+import MiniFooter from "@/components/shared/navigation/MiniFooter";
+import { getRoleFromJwtToken } from "@/@utils/getRoleFromJwtToken";
+import { useEffect } from "react";
 
 const SignIn = () => {
   const {
@@ -37,6 +39,13 @@ const SignIn = () => {
   const { handleRedirect } = useRouter()!;
   const localStorageClient = useStorage()!;
   const { isLoading, setIsLoading, accountRepository } = useRepository()!;
+
+  useEffect(() => {
+    const accessToken = localStorageClient.getAccessToken();
+    if (accessToken) {
+      handleRedirect(RoutePath.PROFILE);
+    }
+  }, [handleRedirect, localStorageClient]);
 
   const onSubmit: SubmitHandler<
     AccountModels[AccountModelsType.USER_LOGIN]
@@ -52,8 +61,14 @@ const SignIn = () => {
         ) => {
           if (LocalStorageItemsKeys.ACCESS_TOKEN in userSignInResponse) {
             localStorageClient.setAccessToken(userSignInResponse);
+            const role = getRoleFromJwtToken(userSignInResponse.accessToken);
+
             setIsLoading(false);
-            handleRedirect(RoutePath.HOME);
+            handleRedirect(
+              _.isEqual(role, UserRoles.ADMIN)
+                ? RoutePath.DASHBOARD
+                : RoutePath.PROFILE
+            );
           } else {
             setError("rememberMe", {
               message: userSignInResponse.errors[0].message,

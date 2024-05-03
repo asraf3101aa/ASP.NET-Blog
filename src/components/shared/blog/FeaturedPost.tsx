@@ -1,4 +1,3 @@
-import * as React from "react";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
@@ -16,7 +15,7 @@ interface FeaturedPostProps {
   };
 }
 
-export default function FeaturedPost(props: FeaturedPostProps) {
+const FeaturedPost = (props: FeaturedPostProps) => {
   const { post } = props;
 
   return (
@@ -47,4 +46,6 @@ export default function FeaturedPost(props: FeaturedPostProps) {
       </CardActionArea>
     </Grid>
   );
-}
+};
+
+export default FeaturedPost;

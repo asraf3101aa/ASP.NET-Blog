@@ -2,10 +2,10 @@ import * as React from "react";
 import CssBaseline from "@mui/material/CssBaseline";
 import Grid from "@mui/material/Grid";
 import Container from "@mui/material/Container";
-import Header from "./Header.tsx";
-import MainFeaturedPost from "./MainFeaturedPost.tsx";
-import FeaturedPost from "./FeaturedPost.tsx";
-import Footer from "./Footer.tsx";
+import Header from "./shared/navigation/Header.tsx";
+import MainFeaturedPost from "./shared/blog/MainFeaturedPost.tsx";
+import FeaturedPost from "./shared/blog/FeaturedPost.tsx";
+import Footer from "./shared/navigation/Footer.tsx";
 
 const headerTitle = import.meta.env.VITE_BLOG_APP_HEADER_TITLE;
 

@@ -10,15 +10,11 @@ export class AccountRepository implements IAccountRepository {
   constructor(fetchAPI: IFetchAPI) {
     this._fetchAPI = fetchAPI;
   }
-
   async register(userData: AccountModels[AccountModelsType.USER_REGISTER]) {
     return await this._fetchAPI.post<
       string,
       AccountModels[AccountModelsType.USER_REGISTER]
-    >(
-      `${this._accountEndpointPath}/${AccountEndpointPaths.USER_REGISTER}`,
-      userData
-    );
+    >(this._accountEndpointPath, userData);
   }
 
   async login(userData: AccountModels[AccountModelsType.USER_LOGIN]) {
@@ -42,20 +38,20 @@ export class AccountRepository implements IAccountRepository {
     return await this._fetchAPI.post<
       string,
       AccountModels[AccountModelsType.EMAIL_MODEL]
-    >(`${this._accountEndpointPath}/${AccountEndpointPaths.FORGOT_PASSWORD}`, {
+    >(`${this._accountEndpointPath}/${AccountEndpointPaths.PASSWORD_FORGOT}`, {
       email,
     });
   }
 
-  async resetPassword(
-    resetPasswordData: AccountModels[AccountModelsType.RESET_PASSWORD]
+  async confirmPassword(
+    confirmPasswordData: AccountModels[AccountModelsType.CONFIRM_PASSWORD]
   ) {
     return await this._fetchAPI.post<
       string,
-      AccountModels[AccountModelsType.RESET_PASSWORD]
+      AccountModels[AccountModelsType.CONFIRM_PASSWORD]
     >(
-      `${this._accountEndpointPath}/${AccountEndpointPaths.FORGOT_PASSWORD}`,
-      resetPasswordData
+      `${this._accountEndpointPath}/${AccountEndpointPaths.PASSWORD_CONFIRM}`,
+      confirmPasswordData
     );
   }
 
@@ -63,27 +59,22 @@ export class AccountRepository implements IAccountRepository {
     return await this._fetchAPI.update<
       string,
       AccountModels[AccountModelsType.USER_UPDATE]
-    >(
-      `${this._accountEndpointPath}/${AccountEndpointPaths.UPDATE}`,
-      updatedData
-    );
+    >(this._accountEndpointPath, updatedData);
   }
 
   async deleteAccount() {
-    return await this._fetchAPI.delete<string>(
-      `${this._accountEndpointPath}/${AccountEndpointPaths.DELETE}`
-    );
+    return await this._fetchAPI.delete<string>(this._accountEndpointPath);
   }
 
-  async getProfile(pageNumber: number) {
+  async getProfile() {
     return await this._fetchAPI.get<AccountModels[AccountModelsType.USER]>(
-      `${this._accountEndpointPath}/${AccountEndpointPaths.PROFILE}?pageNumber=${pageNumber}`
+      this._accountEndpointPath
     );
   }
 
   async resendEmailConfirmation() {
     return await this._fetchAPI.post<string, undefined>(
-      `${this._accountEndpointPath}/${AccountEndpointPaths.EMAIL_CONFIRMATION_RESEND}`,
+      `${this._accountEndpointPath}/${AccountEndpointPaths.EMAIL_CONFIRM}`,
       undefined
     );
   }
@@ -104,7 +95,7 @@ export class AccountRepository implements IAccountRepository {
       string,
       AccountModels[AccountModelsType.CHANGE_PASSWORD]
     >(
-      `${this._accountEndpointPath}/${AccountEndpointPaths.PASSWORD_UPDATE}`,
+      `${this._accountEndpointPath}/${AccountEndpointPaths.CHANGE_PASSWORD}`,
       passwordUpdateData
     );
   }

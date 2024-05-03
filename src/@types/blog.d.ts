@@ -71,7 +71,7 @@ type BlogsList = {
 type BlogPartialData = {
   title: string; // Corresponds to C# "Title", required field
   body: string; // Corresponds to C# "Body", required field
-  categoryId?: number; // C# "CategoryId", optional field (default if not required)
+  categoryId?: string; // "CategoryId", optional field (default if not required)
   images?: BlogImage[]; // Corresponds to C# "Images", optional field, can be an array of BlogImagesDTO
 };
 

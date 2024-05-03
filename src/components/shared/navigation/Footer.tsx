@@ -22,7 +22,7 @@ interface FooterProps {
   title: string;
 }
 
-export default function Footer(props: FooterProps) {
+const Footer = (props: FooterProps) => {
   const { description, title } = props;
 
   return (
@@ -43,4 +43,5 @@ export default function Footer(props: FooterProps) {
       </Container>
     </Box>
   );
-}
+};
+export default Footer;
