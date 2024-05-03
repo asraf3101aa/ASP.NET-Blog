@@ -1,8 +1,10 @@
 ﻿using Bislerium.Application.Common.Interfaces;
 using Bislerium.Application.DTOs.BlogDTOs;
 using Bislerium.Domain.Entities;
+using Bislerium.Infrastructure.Hubs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using System.Security.Claims;
 using X.PagedList;
 
@@ -16,12 +18,16 @@ namespace Bislerium.Presentation.Controllers
         private readonly IBlogService _blogService;
         private readonly IAccountService _accountService;
         private readonly IResponseService _responseService;
-        public BlogController(IResponseService responseService, IBlogService blogService, IFileService fileService, IAccountService accountService)
+        private readonly IHubContext<NotificationHub> _hubContext;
+
+        public BlogController(IHubContext<NotificationHub> hubContext, IResponseService responseService, IBlogService blogService, IFileService fileService, IAccountService accountService)
         {
             _blogService = blogService;
             _fileService = fileService;
             _accountService = accountService;
             _responseService = responseService;
+            _hubContext = hubContext;
+
         }
 
         private IQueryable<Blog> SortBlogs(string sortBy)
@@ -38,11 +44,12 @@ namespace Bislerium.Presentation.Controllers
                     return _blogService.GetQueryableRecentBlogAsync();
             }
         }
-
+   
         [HttpGet]
-        public async Task<IActionResult> Index([FromQuery] string sortBy = "recency", [FromQuery] int page = 1, [FromQuery] int pageSize = 9)
+        [Route("List")]
+        public async Task<IActionResult> Index([FromQuery] string sortBy = "recency", [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 9)
         {
-            int currentPage = page;
+            int currentPage = pageNumber;
             // Sort the blogs
             var blogs = SortBlogs(sortBy);
 
@@ -67,7 +74,32 @@ namespace Bislerium.Presentation.Controllers
 
             return Ok(_responseService.SuccessResponse(response));
         }
+        [HttpGet]
+        public async Task<IActionResult> UserBlogs(int pageNumber = 1, int pageSize = 10)
+        {
+            var user = await _accountService.GetUserByClaimsAsync(User);
+            var queryableBlogs = _blogService.GetQueryableAuthorBlogsAsync(user);
 
+            // Using X.PagedList to paginate the queryable blogs
+            var pagedBlogs = await queryableBlogs.ToPagedListAsync(pageNumber, pageSize);
+
+            // Creating a response object that includes pagination metadata
+            var response = new
+            {
+                Blogs = pagedBlogs, // The paged list of blogs
+                PaginationMetaData = new
+                {
+                    TotalItems = pagedBlogs.TotalItemCount,
+                    PageNumber = pagedBlogs.PageNumber,
+                    PageSize = pagedBlogs.PageSize,
+                    TotalPages = pagedBlogs.PageCount,
+                    HasPreviousPage = pagedBlogs.HasPreviousPage,
+                    HasNextPage = pagedBlogs.HasNextPage
+                }
+            };
+
+            return Ok(_responseService.SuccessResponse(response));
+        }
 
         [HttpGet]
         [Route("{id}")]
@@ -90,7 +122,7 @@ namespace Bislerium.Presentation.Controllers
         [HttpPost]
         [Authorize]
         [RequireConfirmedEmail]
-        public async Task<IActionResult> Create(BlogDTO newblog)
+        public async Task<IActionResult> Create([FromBody] BlogDTO ? newblog)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -111,12 +143,12 @@ namespace Bislerium.Presentation.Controllers
             }
             var user = await _accountService.GetUserByClaimsAsync(User);
             var blog = await _blogService.CreateAsync(newblog, user, blogImages);
-            return Ok(_responseService.SuccessResponse(blog));
+            return Ok("Blog Created Successfully.");
         }
 
         [HttpPut]
-        [Route("{id}/update")]
-        public async Task<IActionResult> Update([FromQuery] int id, BlogDTO blogUpdate)
+        [Route("{id}")]
+        public async Task<IActionResult> Update([FromRoute] int id, BlogDTO blogUpdate)
         {
             var blog = await _blogService.FindByIdAsync(id);
             if (blog == null || blog.AuthorId != User.FindFirstValue(ClaimTypes.NameIdentifier))
@@ -144,7 +176,7 @@ namespace Bislerium.Presentation.Controllers
 
 
         [HttpDelete]
-        [Route("{id}/Delete")]
+        [Route("{id}")]
         [RequireConfirmedEmail]
         public async Task<IActionResult> Delete(int id)
         {
@@ -162,10 +194,14 @@ namespace Bislerium.Presentation.Controllers
             var blog = await _blogService.FindByIdAsync(id);
             if (blog == null)
                 return NotFound(_responseService.CustomErrorResponse("Blog", "Blog not found"));
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            await _blogService.ReactOnBlogAsync(blog, userId, reactionType);
+            var user = await _accountService.GetUserByClaimsAsync(User);
+            await _blogService.ReactOnBlogAsync(blog, user.Id, reactionType);
+            if (reactionType == ReactionType.Upvote)
+            {
+                string notificationMessage = $"{user.FirstName} {user.LastName} upvoted your blog\n{blog.Title}";
+                await _hubContext.Clients.User(blog.AuthorId).SendAsync("ReceiveNotification", notificationMessage);
+            }
             return Ok();
-
         }
 
         [HttpPost]
@@ -176,8 +212,10 @@ namespace Bislerium.Presentation.Controllers
             if (blog == null)
                 return NotFound(_responseService.CustomErrorResponse("Blog", "Blog not found"));
 
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            await _blogService.AddCommentAsync(commentDto, blog.Id, userId);
+            var user = await _accountService.GetUserByClaimsAsync(User);
+            await _blogService.AddCommentAsync(commentDto, blog.Id, user.Id);
+            string notificationMessage = $"{user.FirstName} {user.LastName} commented on your blog\n{blog.Title}";
+            await _hubContext.Clients.User(blog.AuthorId).SendAsync("ReceiveNotification", notificationMessage);
             return Ok();
         }
 

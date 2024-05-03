@@ -28,7 +28,6 @@ namespace Bislerium.Presentation.Controllers
         }
 
         [HttpPost]
-        [Route("Register")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Register(AdminRegisterDTO adminRegister)
         {
@@ -67,7 +66,6 @@ namespace Bislerium.Presentation.Controllers
         
         [Authorize(Roles = "Admin")]
         [HttpGet]
-        [Route("Dashboard")]
         public IActionResult Dashboard([FromQuery] string duration, [FromQuery] int? month)
         {
             var queryableBlogs = _blogService.GetQueryableBlogs();

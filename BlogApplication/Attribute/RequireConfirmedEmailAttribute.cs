@@ -13,21 +13,30 @@ public class RequireConfirmedEmailAttribute : TypeFilterAttribute
 
 public class RequireConfirmedEmailFilter : IAsyncAuthorizationFilter
 {
-    private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly UserManager<User> _userManager;
 
-    public RequireConfirmedEmailFilter(IHttpContextAccessor httpContextAccessor, UserManager<User> userManager)
+    public RequireConfirmedEmailFilter(UserManager<User> userManager)
     {
-        _httpContextAccessor = httpContextAccessor;
         _userManager = userManager;
     }
 
     public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
     {
-        var user = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);
+        var user = await _userManager.GetUserAsync(context.HttpContext.User);
         if (user != null && !user.EmailConfirmed)
         {
-            context.Result = new ForbidResult();
+            var errorResponse = new ErrorResponse
+            {
+                Errors = new List<ErrorResponse.ErrorDetail>
+                {
+                    new ErrorResponse.ErrorDetail
+                    {
+                        Title = "Email Confirmation Required",
+                        Message = "Your email address has not been confirmed."
+                    }
+                }
+            };
+            context.Result = new BadRequestObjectResult(errorResponse);
         }
     }
 }

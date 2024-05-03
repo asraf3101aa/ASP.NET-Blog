@@ -89,7 +89,6 @@ namespace Bislerium.Infrastructure.Services
         {
             user.FirstName = updateUser.FirstName ?? user.FirstName;
             user.LastName = updateUser.LastName ?? user.LastName;
-            user.Avatar = updateUser.Avatar ?? user.Avatar;
             return await _userManager.UpdateAsync(user);
         }
         public async Task<IdentityResult> DeleteAsync(User user)

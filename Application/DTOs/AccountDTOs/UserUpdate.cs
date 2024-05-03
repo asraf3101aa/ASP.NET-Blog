@@ -9,6 +9,5 @@ namespace Bislerium.Application.DTOs.AccountDTOs
         public string FirstName { get; set; }
         public string? LastName { get; set; }
         public IFormFile? Image { get; set; }
-        public string? Avatar { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 using Bislerium.Infrastructure.DI;
+using Bislerium.Infrastructure.Hubs;
 using Bislerium.Infrastructure.Persistence.Configuration;
 using Microsoft.OpenApi.Models;
 
@@ -50,7 +51,8 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllers();
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -77,7 +79,7 @@ app.UseAuthorization();
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
-    //endpoints.MapHub<SignalRHub>("/signalRHub");
+    endpoints.MapHub<NotificationHub>("/notificationHub");
 });
 
 app.MapControllers();

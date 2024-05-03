@@ -81,7 +81,7 @@ namespace Bislerium.Infrastructure.Services
                 Body = newBlog.Body,
                 CategoryId = newBlog.CategoryId,
                 CreatedAt = DateTime.UtcNow,
-                Author = author,
+                AuthorId = author.Id,
                 Images = blogImages
             };
             await _context.Blogs.AddAsync(blog);

@@ -1,7 +1,6 @@
 ﻿using Bislerium.Application.Common.Interfaces;
 using Bislerium.Application.DTOs.AccountDTOs;
 using Bislerium.Application.DTOs.Extensions;
-using Bislerium.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using X.PagedList;
@@ -31,7 +30,7 @@ namespace Bislerium.Presentation.Controllers
         }
 
 
-        [HttpPost("Register")]
+        [HttpPost]
         public async Task<IActionResult> Register(UserRegisterDTO userRegister)
         {
             if (!ModelState.IsValid)
@@ -64,7 +63,7 @@ namespace Bislerium.Presentation.Controllers
         }
 
         [HttpPost]
-        [Route("Email/Confirm")]
+        [Route("Confirm")]
         public async Task<IActionResult> ConfirmEmail(string token, string email)
         {
             var user = await _accountService.FindByEmailAsync(email);
@@ -114,7 +113,7 @@ namespace Bislerium.Presentation.Controllers
         }
 
         [HttpPost]
-        [Route("Password/Reset")]
+        [Route("Password/Confirm")]
         public async Task<IActionResult> ResetPassword(ResetPassword resetPasswordModel)
         {
             if (!ModelState.IsValid)
@@ -130,7 +129,6 @@ namespace Bislerium.Presentation.Controllers
 
         [HttpPut]
         [Authorize]
-        [Route("Update")]
         [RequireConfirmedEmail]
         public async Task<IActionResult> Update(UserUpdate userUpdate)
         {
@@ -141,15 +139,14 @@ namespace Bislerium.Presentation.Controllers
             {
                 var (filePath, error) = _fileService.UploadFile(userUpdate.Image);
                 if (error != string.Empty)
-                    return BadRequest(_responseService.CustomErrorResponse(nameof(userUpdate.Image), error));
-                    
-                userUpdate.Avatar = filePath;
+                    return BadRequest(_responseService.CustomErrorResponse(nameof(userUpdate.Image), error));  
+                user.Avatar = filePath;
             }
             var result = await _accountService.UpdateAsync(user, userUpdate);
             return result.Succeeded ? Ok() : BadRequest(_responseService.IdentityResultErrorResponse(result));
         }
 
-        [HttpDelete("Delete")]
+        [HttpDelete]
         [Authorize]
         public async Task<IActionResult> Delete()
         {
@@ -158,37 +155,16 @@ namespace Bislerium.Presentation.Controllers
             return result.Succeeded ? Ok() : BadRequest(_responseService.IdentityResultErrorResponse(result));
         }
 
-        [HttpGet("Profile")]
+        [HttpGet]
         [Authorize]
-        public async Task<IActionResult> Profile(int pageNumber = 1, int pageSize = 10)
+        public async Task<IActionResult> Profile()
         {
             var user = await _accountService.GetUserByClaimsAsync(User);
-            var queryableBlogs = _blogService.GetQueryableAuthorBlogsAsync(user);
-
-            // Using X.PagedList to paginate the queryable blogs
-            var pagedBlogs = await queryableBlogs.ToPagedListAsync(pageNumber, pageSize);
-
-            // Creating a response object that includes pagination metadata
-            var response = new
-            {
-                User = user,
-                Blogs = pagedBlogs, // The paged list of blogs
-                PaginationMetaData = new
-                {
-                    TotalItems = pagedBlogs.TotalItemCount,
-                    PageNumber = pagedBlogs.PageNumber,
-                    PageSize = pagedBlogs.PageSize,
-                    TotalPages = pagedBlogs.PageCount,
-                    HasPreviousPage = pagedBlogs.HasPreviousPage,
-                    HasNextPage = pagedBlogs.HasNextPage
-                }
-            };
-
-            return Ok(_responseService.SuccessResponse(response));
+            return Ok(_responseService.SuccessResponse(user));
         }
 
-        [HttpPost]
-        [Route("Email/Confirmation/Resend")]
+        [HttpGet]
+        [Route("Confirm")]
         [Authorize]
         public async Task<IActionResult> ResendEmailConfirmation()
         {
@@ -201,7 +177,7 @@ namespace Bislerium.Presentation.Controllers
         }
    
         [HttpPut]
-        [Route("Email/Update")]
+        [Route("Email")]
         [Authorize]
         public async Task<IActionResult> UpdateEmail(EmailModel emailModel)
         {
@@ -221,18 +197,33 @@ namespace Bislerium.Presentation.Controllers
                 clientOrigin = $"{Request.Scheme}://{Request.Host}";
 
             // Construct the confirmation link with the client's origin URL
-            var confirmationLink = $"{clientOrigin}/confirm-email?token={token}&email={user.Email}";
+            var confirmationLink = $"{clientOrigin}/change-email?token={token}&email={user.Email}";
 
             var message = new Message(new string[] { emailModel.Email }, "Email change request", confirmationLink, null);
-            var result = await _accountService.SetEmailAsync(user, emailModel.Email);
+            //var result = await _accountService.SetEmailAsync(user, emailModel.Email);
+            //if (!result.Succeeded)
+            //    return BadRequest(_responseService.IdentityResultErrorResponse(result));
+
+            await _emailService.SendEmailAsync(message);
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("Email/Confirm")]
+        public async Task<IActionResult> ConfirmEmailChange(string token, string newEmail)
+        {
+            var user = await _accountService.GetUserByClaimsAsync(User);
+
+            // Confirm the email change token
+            var result = await _accountService.ChangeEmailAsync(user, newEmail, token);
+
             if (!result.Succeeded)
                 return BadRequest(_responseService.IdentityResultErrorResponse(result));
 
-            await _emailService.SendEmailAsync(message);
-            return Accepted();
+            return Ok("Your email has been updated successfully.");
         }
 
-        [HttpPost("Password/Update")]
+        [HttpPut("Password")]
         [Authorize]
         public async Task<IActionResult> ChangePassword(ChangePassword changePassword)
         {

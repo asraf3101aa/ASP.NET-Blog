@@ -5,7 +5,7 @@ using Bislerium.Infrastructure.Persistence.Configuration;
 
 namespace Bislerium.Infrastructure.Persistence
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class ApplicationDbContext : IdentityDbContext<User>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -28,7 +28,6 @@ namespace Bislerium.Infrastructure.Persistence
                 .HasForeignKey(c => c.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
-        public DbSet<User> Users { get; set; }
         public DbSet<Blog> Blogs { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<BlogImage> BlogImages { get; set; }
