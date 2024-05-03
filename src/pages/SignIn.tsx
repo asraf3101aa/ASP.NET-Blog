@@ -1,5 +1,4 @@
 import _ from "lodash";
-import * as React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 
 import {
@@ -27,6 +26,7 @@ import { useRepository } from "@/contexts/RepositoryContext";
 import { LocalStorageItemsKeys, UserRoles } from "@/@enums/storage.enum";
 import MiniFooter from "@/components/shared/navigation/MiniFooter";
 import { getRoleFromJwtToken } from "@/@utils/getRoleFromJwtToken";
+import { useEffect } from "react";
 
 const SignIn = () => {
   const {
@@ -39,6 +39,13 @@ const SignIn = () => {
   const { handleRedirect } = useRouter()!;
   const localStorageClient = useStorage()!;
   const { isLoading, setIsLoading, accountRepository } = useRepository()!;
+
+  useEffect(() => {
+    const accessToken = localStorageClient.getAccessToken();
+    if (accessToken) {
+      handleRedirect(RoutePath.PROFILE);
+    }
+  }, [handleRedirect, localStorageClient]);
 
   const onSubmit: SubmitHandler<
     AccountModels[AccountModelsType.USER_LOGIN]
@@ -60,7 +67,7 @@ const SignIn = () => {
             handleRedirect(
               _.isEqual(role, UserRoles.ADMIN)
                 ? RoutePath.DASHBOARD
-                : RoutePath.HOME
+                : RoutePath.PROFILE
             );
           } else {
             setError("rememberMe", {

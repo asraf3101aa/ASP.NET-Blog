@@ -4,7 +4,8 @@ import SignUp from "@/pages/SignUp";
 import ProtectedRoutes from "./ProtectedRoutes";
 import { RoutePath } from "@/@enums/router.enum";
 import { Route, Routes } from "react-router-dom";
-import Dashboard from "@/components/Dashboard";
+import Dashboard from "@/pages/Dashboard";
+import Profile from "@/pages/Profile";
 
 const Router = () => {
   return (
@@ -14,6 +15,7 @@ const Router = () => {
       <Route path={RoutePath.HOME} element={<Home />} />
       <Route element={<ProtectedRoutes />}>
         <Route path={RoutePath.DASHBOARD} element={<Dashboard />} />
+        <Route path={RoutePath.PROFILE} element={<Profile />} />
       </Route>
     </Routes>
   );

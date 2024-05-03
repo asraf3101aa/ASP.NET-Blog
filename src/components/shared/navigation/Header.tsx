@@ -1,4 +1,3 @@
-import * as React from "react";
 import Toolbar from "@mui/material/Toolbar";
 import Button from "@mui/material/Button";
 import Link from "@mui/material/Link";
@@ -6,8 +5,9 @@ import Typography from "@mui/material/Typography";
 import { useStorage } from "@/contexts/StorageContext";
 import { useRouter } from "@/contexts/RouterContext";
 import { RoutePath } from "@/@enums/router.enum";
+import { Fragment } from "react";
 
-export default function Header(props: { title: string }) {
+const Header = (props: { title: string }) => {
   const localStorageClient = useStorage()!;
   const { handleRedirect } = useRouter()!;
 
@@ -16,7 +16,7 @@ export default function Header(props: { title: string }) {
     handleRedirect(RoutePath.LOGIN);
   };
   return (
-    <React.Fragment>
+    <Fragment>
       <Toolbar sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Typography
           component="h2"
@@ -40,6 +40,7 @@ export default function Header(props: { title: string }) {
           </Button>
         )}
       </Toolbar>
-    </React.Fragment>
+    </Fragment>
   );
-}
+};
+export default Header;

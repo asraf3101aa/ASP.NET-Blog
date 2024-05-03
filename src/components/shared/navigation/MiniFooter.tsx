@@ -1,7 +1,8 @@
 import { Link, Box, Typography } from "@mui/material";
+import TwitterIcon from "@mui/icons-material/Twitter";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import InstagramIcon from "@mui/icons-material/Instagram";
-import TwitterIcon from "@mui/icons-material/Twitter";
+
 const MiniFooter = () => {
   return (
     <Box
