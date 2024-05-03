@@ -4,6 +4,7 @@ export enum RoutePath {
   LOGIN = "/login",
   SIGN_UP = "/sign-up",
   DASHBOARD = "/dashboard",
+  PROFILE = "/profile",
 }
 
 // Enum representing different route titles
@@ -12,4 +13,5 @@ export enum RouteTitle {
   LOGIN = "Login",
   SIGN_UP = "Sign Up",
   DASHBOARD = "Dashboard",
+  PROFILE = "Profile",
 }

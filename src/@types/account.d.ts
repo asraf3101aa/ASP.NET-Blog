@@ -60,7 +60,7 @@ type EmailModel = {
 };
 
 // Structure for the reset password model
-type ResetPassword = {
+type ConfirmPassword = {
   password: string; // Required field, should be a valid password
   confirmPassword?: string; // Should match password, optional
   email?: string; // Optional, represents the email of the user
@@ -85,6 +85,6 @@ export type AccountModels = {
   UserLogin: UserLogin;
   ChangePassword: ChangePassword;
   EmailModel: EmailModel;
-  ResetPassword: ResetPassword;
+  ConfirmPassword: ConfirmPassword;
   UserUpdate: UserUpdate;
 };

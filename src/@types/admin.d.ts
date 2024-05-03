@@ -7,5 +7,5 @@ import { BlogModelsType } from "@/@enums/blog.enum";
 export type AdminDashboardData = {
   blogStats: BlogModels[BlogModelsType.BLOG_STATS];
   popularBlogs: BlogModels[BlogModelsType.BLOG][];
-  popularBlogger: AccountModels[AccountModelsType.POPULAR_BLOGGER];
+  popularBlogger: AccountModels[AccountModelsType.POPULAR_BLOGGER][];
 };

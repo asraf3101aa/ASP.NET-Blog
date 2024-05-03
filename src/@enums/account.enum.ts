@@ -9,21 +9,17 @@ export enum AccountModelsType {
   USER_LOGIN = "UserLogin",
   CHANGE_PASSWORD = "ChangePassword",
   EMAIL_MODEL = "EmailModel",
-  RESET_PASSWORD = "ResetPassword",
+  CONFIRM_PASSWORD = "ConfirmPassword",
   USER_UPDATE = "UserUpdate",
 }
 
 // Enum representing different account module's api endpoints
 export enum AccountEndpointPaths {
-  USER_REGISTER = "register",
+  ACCOUNT_CONFIRM = "confirm",
   USER_LOGIN = "login",
+  PASSWORD_FORGOT = "password/forgot",
+  PASSWORD_CONFIRM = "password/confirm",
+  EMAIL_UPDATE = "email",
   EMAIL_CONFIRM = "email/confirm",
-  FORGOT_PASSWORD = "password/forgot",
-  PASSWORD_RESET = "password/reset",
-  UPDATE = "update",
-  DELETE = "delete",
-  PROFILE = "profile",
-  EMAIL_CONFIRMATION_RESEND = "email/confirmation/resend",
-  EMAIL_UPDATE = "email/update",
-  PASSWORD_UPDATE = "password/update",
+  CHANGE_PASSWORD = "password",
 }
