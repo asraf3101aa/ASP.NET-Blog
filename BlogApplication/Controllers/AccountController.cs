@@ -64,7 +64,6 @@ namespace Bislerium.Presentation.Controllers
             var message = new Message(new string[] { user.Email }, "Confirmation email link", confirmationLink, null);
             await _emailService.SendEmailAsync(message);                
             return Ok(_responseService.SuccessResponse("Registration successful"));
-            
         }
 
         [HttpPost]
@@ -150,14 +149,14 @@ namespace Bislerium.Presentation.Controllers
         {
             var user = await _accountService.GetUserByClaimsAsync(User);
             var result = await _accountService.DeleteAsync(user);
-            return result.Succeeded ? Ok() : BadRequest(_responseService.IdentityResultErrorResponse(result));
+            return result.Succeeded ? Ok(_responseService.SuccessResponse("Account deleted successfully.")) : BadRequest(_responseService.IdentityResultErrorResponse(result));
         }
 
         [HttpGet]
         [Authorize]
         public async Task<IActionResult> Profile()
         {
-            var user = await _accountService.GetUserByClaimsAsync(User);
+            var user = await _accountService.FindByEmailAsync("asraf.ansari@truenary.com");
             return Ok(_responseService.SuccessResponse(user));
         }
 
