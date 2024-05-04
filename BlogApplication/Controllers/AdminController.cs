@@ -66,7 +66,7 @@ namespace Bislerium.Presentation.Controllers
         
         [Authorize(Roles = "Admin")]
         [HttpGet]
-        public IActionResult Dashboard([FromQuery] string duration, [FromQuery] int? month)
+        public IActionResult Dashboard([FromQuery] string ? duration, [FromQuery] int? month)
         {
             var queryableBlogs = _blogService.GetQueryableBlogs();
 

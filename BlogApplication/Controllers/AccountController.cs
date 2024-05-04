@@ -157,6 +157,8 @@ namespace Bislerium.Presentation.Controllers
         public async Task<IActionResult> Profile()
         {
             var user = await _accountService.GetUserByClaimsAsync(User);
+            if (user==null)
+                return NotFound(_responseService.CustomErrorResponse("Not found", "User not found."));
             return Ok(_responseService.SuccessResponse(user));
         }
 
