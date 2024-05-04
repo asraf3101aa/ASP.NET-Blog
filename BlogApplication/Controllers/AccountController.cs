@@ -1,8 +1,10 @@
 ﻿using Bislerium.Application.Common.Interfaces;
 using Bislerium.Application.DTOs.AccountDTOs;
 using Bislerium.Application.DTOs.Extensions;
+using Bislerium.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using X.PagedList;
 
 
@@ -40,9 +42,13 @@ namespace Bislerium.Presentation.Controllers
                 return BadRequest(_responseService.CustomErrorResponse("Email", "Email is already registered."));
 
             var (signUpResult, user) = await _accountService.SignUpAsync(userRegister);
-            if (!signUpResult.Succeeded)
-                return BadRequest(_responseService.IdentityResultErrorResponse(signUpResult));
-            
+                if (!signUpResult.Succeeded)
+                    return BadRequest(_responseService.IdentityResultErrorResponse(signUpResult));
+
+            var roleAddResult = await _accountService.AddToRoleAsync(user, "Blogger");
+            if (!roleAddResult.Succeeded)
+                return BadRequest(_responseService.IdentityResultErrorResponse(roleAddResult));
+
             var token = await _accountService.GenerateEmailConfirmationTokenAsync(user);
 
             // Get the client's origin URL
@@ -58,8 +64,9 @@ namespace Bislerium.Presentation.Controllers
             var message = new Message(new string[] { user.Email }, "Confirmation email link", confirmationLink, null);
             await _emailService.SendEmailAsync(message);
 
-            var resultAddResult = await _accountService.AddToRoleAsync(user, "Blogger");
-            return Ok(_responseService.SuccessResponse("Registration successful"));
+                
+            return Ok("Registration successful");
+            
         }
 
         [HttpPost]
@@ -80,17 +87,10 @@ namespace Bislerium.Presentation.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-
-            var (result, user) = await _accountService.SignInAsync(userModel);
-            return result.Succeeded ? Ok(_responseService.SuccessResponse(new AccessTokenDTO { AccessToken = await _jwtTokenService.GenerateTokenAsync(user) })) : BadRequest(_responseService.SignInResultErrorResponse(result));
-        }
-
-        [HttpPost("Logout")]
-        [Authorize]
-        public async Task<IActionResult> Logout()
-        {
-            await _accountService.SignOutAsync();
-            return Ok();
+            var user = await _accountService.FindByEmailAsync(userModel.Email);
+            if (user != null && await _accountService.SignInAsync(user, userModel.Password))
+                return Ok(_responseService.SuccessResponse(new { AccessToken = await _jwtTokenService.GenerateTokenAsync(user) }));
+            return BadRequest(_responseService.CustomErrorResponse("Login Failed", "Invalid Email or Password"));
         }
 
         [HttpPost]

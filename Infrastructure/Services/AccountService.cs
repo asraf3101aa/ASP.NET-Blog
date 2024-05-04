@@ -49,21 +49,13 @@ namespace Bislerium.Infrastructure.Services
         }
         public async Task<IEnumerable<string>> GetRolesAsync(User user)
         {
-            return await _userManager.GetRolesAsync(user);
+            var roles = await _userManager.GetRolesAsync(user);
+            return roles;
         }
-        public async Task<(SignInResult, User)> SignInAsync(UserLogin signInRequest)
+        public async Task<bool> SignInAsync(User user, string password)
         {
-            var result = await _signInManager.PasswordSignInAsync(signInRequest.Email, signInRequest.Password, signInRequest.RememberMe, false);
-            if (result.Succeeded)
-            {
-                var user = await FindByEmailAsync(signInRequest.Email);
-                return (result, user);
-            }
-            return (result, null);
-        }
-        public async Task SignOutAsync()
-        {
-            await _signInManager.SignOutAsync();
+            var result = await _userManager.CheckPasswordAsync(user, password);
+            return result;
         }
         public async Task<IdentityResult> ConfirmEmailAsync(User user, string token)
         {
@@ -93,7 +85,6 @@ namespace Bislerium.Infrastructure.Services
         }
         public async Task<IdentityResult> DeleteAsync(User user)
         {
-            await SignOutAsync();
             return await _userManager.DeleteAsync(user);
         }
         public async Task<IdentityResult> SetEmailAsync(User user, string newEmail)

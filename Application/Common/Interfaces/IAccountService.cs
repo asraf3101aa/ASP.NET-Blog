@@ -7,14 +7,12 @@ namespace Bislerium.Application.Common.Interfaces
 {
     public interface IAccountService
     {
-        public Task<(SignInResult, User)> SignInAsync(UserLogin signInRequest);
+        public Task<bool> SignInAsync(User user, string password);
         public Task<(IdentityResult, User)> SignUpAsync(UserRegisterDTO signUpRequest);
         public Task<IdentityResult> AddToRoleAsync(User user, string RoleName);
         public Task<string> GenerateEmailConfirmationTokenAsync(User user);
         public Task<string> GenerateChangeEmailTokenAsync(User user, string email);
         public Task<IdentityResult> ChangeEmailAsync(User user, string email, string token);
-
-        public Task SignOutAsync();
         public Task<User> FindByEmailAsync(string email);
         public Task<IdentityResult> ConfirmEmailAsync(User user, string token);
         public Task<string> GeneratePasswordResetTokenAsync(User user);
