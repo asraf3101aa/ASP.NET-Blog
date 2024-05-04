@@ -75,7 +75,8 @@ namespace Bislerium.Infrastructure.Services
         }
         public async Task<User> GetUserByClaimsAsync(ClaimsPrincipal userClaims)
         {
-            return await _userManager.GetUserAsync(userClaims);
+            var userId = userClaims.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return await _userManager.FindByIdAsync(userId);
         }
         public async Task<IdentityResult> UpdateAsync(User user, UserUpdate updateUser)
         {

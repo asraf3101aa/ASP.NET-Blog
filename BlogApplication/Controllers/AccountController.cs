@@ -156,7 +156,7 @@ namespace Bislerium.Presentation.Controllers
         [Authorize]
         public async Task<IActionResult> Profile()
         {
-            var user = await _accountService.FindByEmailAsync("asraf.ansari@truenary.com");
+            var user = await _accountService.GetUserByClaimsAsync(User);
             return Ok(_responseService.SuccessResponse(user));
         }
 
