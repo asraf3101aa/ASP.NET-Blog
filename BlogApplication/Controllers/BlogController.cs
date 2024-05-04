@@ -5,6 +5,7 @@ using Bislerium.Infrastructure.Hubs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using System.Data;
 using System.Security.Claims;
 using X.PagedList;
 
@@ -120,7 +121,7 @@ namespace Bislerium.Presentation.Controllers
         }
 
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "Blogger")]
         [RequireConfirmedEmail]
         public async Task<IActionResult> Create([FromBody] BlogDTO ? newblog)
         {
@@ -143,7 +144,7 @@ namespace Bislerium.Presentation.Controllers
             }
             var user = await _accountService.GetUserByClaimsAsync(User);
             var blog = await _blogService.CreateAsync(newblog, user, blogImages);
-            return Ok("Blog Created Successfully.");
+            return Ok(_responseService.SuccessResponse("Blog Created Successfully."));
         }
 
         [HttpPut]
