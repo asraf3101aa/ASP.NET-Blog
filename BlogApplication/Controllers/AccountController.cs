@@ -62,10 +62,8 @@ namespace Bislerium.Presentation.Controllers
             var confirmationLink = $"{clientOrigin}/confirm-email?token={token}&email={user.Email}";
 
             var message = new Message(new string[] { user.Email }, "Confirmation email link", confirmationLink, null);
-            await _emailService.SendEmailAsync(message);
-
-                
-            return Ok("Registration successful");
+            await _emailService.SendEmailAsync(message);                
+            return Ok(_responseService.SuccessResponse("Registration successful"));
             
         }
 
@@ -79,7 +77,7 @@ namespace Bislerium.Presentation.Controllers
             if (user.EmailConfirmed)
                 return BadRequest(_responseService.CustomErrorResponse("User", "Email already confirmed"));
             var result = await _accountService.ConfirmEmailAsync(user, token);
-            return result.Succeeded ? Ok() : BadRequest(_responseService.IdentityResultErrorResponse(result));
+            return result.Succeeded ? Ok(_responseService.SuccessResponse("Email Confirmed")) : BadRequest(_responseService.IdentityResultErrorResponse(result));
         }
 
         [HttpPost("Login")]
@@ -109,7 +107,7 @@ namespace Bislerium.Presentation.Controllers
 
             var message = new Message(new string[] { user.Email }, "Reset password token", callback, null);
             await _emailService.SendEmailAsync(message);
-            return Ok();
+            return Ok(_responseService.SuccessResponse("Password reset token sent in email."));
         }
 
         [HttpPost]

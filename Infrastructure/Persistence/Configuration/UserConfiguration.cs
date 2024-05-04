@@ -11,7 +11,8 @@ namespace Bislerium.Infrastructure.Persistence.Configuration
             builder.HasData(
             new User
             {
-                FirstName = "Blog Admin",
+                FirstName = "Admin",
+                LastName = "User",
                 Email = "asraf3101aa@gmail.com",
                 UserName = "asraf3101aa@gmail.com",
                 EmailConfirmed = true
