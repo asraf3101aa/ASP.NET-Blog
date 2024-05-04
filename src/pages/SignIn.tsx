@@ -1,4 +1,3 @@
-import _ from "lodash";
 import { useForm, SubmitHandler } from "react-hook-form";
 
 import {
@@ -23,9 +22,8 @@ import { useStorage } from "@/contexts/StorageContext";
 import BlogLoginBg from "/assets/images/BlogLoginBg.jpg";
 import { AccountModelsType } from "@/@enums/account.enum";
 import { useRepository } from "@/contexts/RepositoryContext";
-import { LocalStorageItemsKeys, UserRoles } from "@/@enums/storage.enum";
+import { LocalStorageItemsKeys } from "@/@enums/storage.enum";
 import MiniFooter from "@/components/shared/navigation/MiniFooter";
-import { getRoleFromJwtToken } from "@/@utils/getRoleFromJwtToken";
 import { useEffect } from "react";
 
 const SignIn = () => {
@@ -43,7 +41,7 @@ const SignIn = () => {
   useEffect(() => {
     const accessToken = localStorageClient.getAccessToken();
     if (accessToken) {
-      handleRedirect(RoutePath.PROFILE);
+      handleRedirect(RoutePath.HOME);
     }
   }, [handleRedirect, localStorageClient]);
 
@@ -61,14 +59,8 @@ const SignIn = () => {
         ) => {
           if (LocalStorageItemsKeys.ACCESS_TOKEN in userSignInResponse) {
             localStorageClient.setAccessToken(userSignInResponse);
-            const role = getRoleFromJwtToken(userSignInResponse.accessToken);
-
             setIsLoading(false);
-            handleRedirect(
-              _.isEqual(role, UserRoles.ADMIN)
-                ? RoutePath.DASHBOARD
-                : RoutePath.PROFILE
-            );
+            handleRedirect(RoutePath.HOME);
           } else {
             setError("rememberMe", {
               message: userSignInResponse.errors[0].message,

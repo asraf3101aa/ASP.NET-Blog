@@ -46,6 +46,7 @@ export class FetchAPI implements IFetchAPI {
 
     try {
       const response = await fetch(apiEndpoint, options);
+      console.log(response);
       return getApiResponse<T>(response);
     } catch (error: unknown) {
       return getStatusWithErrorsFromException(error);

@@ -25,13 +25,16 @@ import { useEffect, useState } from "react";
 import { getRoleFromJwtToken } from "@/@utils/getRoleFromJwtToken";
 import { UserRoles } from "@/@enums/storage.enum";
 import _ from "lodash";
-import { RoutePath } from "@/@enums/router.enum";
+import { RoutePath, RouteTitle } from "@/@enums/router.enum";
 import { useRepository } from "@/contexts/RepositoryContext";
 import { AdminDashboardData } from "@/@types/admin";
 import { BlogStatsData, BlogsDurationFilters } from "@/@enums/blog.enum";
 import PopularBloggers from "../components/shared/dashboard/PopularBloggers";
 import { AppBar, Drawer } from "@/components/shared/navigation/AppBar";
 import DashboardTile from "@/components/shared/dashboard/DashboardTile";
+import { Home, Logout } from "@mui/icons-material";
+import { handleLogout } from "@/@utils/handleLogout";
+import { Tooltip } from "@mui/material";
 
 const Dashboard = () => {
   const [open, setOpen] = useState(true);
@@ -41,13 +44,13 @@ const Dashboard = () => {
 
   const { handleRedirect } = useRouter()!;
   const localStorageClient = useStorage()!;
-  const { adminRepository, isLoading, setIsLoading } = useRepository()!;
-  const [data, setData] = useState<AdminDashboardData | null>(null);
-
-  const handleLogout = () => {
-    localStorageClient.clearLocalStorage();
-    handleRedirect(RoutePath.LOGIN);
-  };
+  const {
+    adminRepository,
+    isLoading,
+    setIsLoading,
+    dashboardData,
+    setDashboardData,
+  } = useRepository()!;
 
   useEffect(() => {
     const accessToken = localStorageClient.getAccessToken();
@@ -62,13 +65,20 @@ const Dashboard = () => {
           .then((dashboardDataResponse: ApiResponse<AdminDashboardData>) => {
             if ("errors" in dashboardDataResponse) {
               console.log(dashboardDataResponse);
-            } else setData(dashboardDataResponse);
+            } else setDashboardData(dashboardDataResponse);
           })
           .catch((error) => console.error(error))
           .finally(() => setIsLoading(false));
       }
     }
-  }, [adminRepository, handleRedirect, localStorageClient, setIsLoading]);
+  }, [
+    adminRepository,
+    handleRedirect,
+    localStorageClient,
+    setIsLoading,
+    dashboardData,
+    setDashboardData,
+  ]);
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -127,30 +137,40 @@ const Dashboard = () => {
               sx={{ backgroundColor: "lightgray" }}
               onClick={() => handleRedirect(RoutePath.DASHBOARD)}
             >
-              <ListItemIcon>
-                <DashboardIcon />
-              </ListItemIcon>
+              <Tooltip title={RouteTitle.DASHBOARD} arrow placement="top-start">
+                <ListItemIcon>
+                  <DashboardIcon />
+                </ListItemIcon>
+              </Tooltip>
               <ListItemText primary="Dashboard" />
             </ListItemButton>
             <ListItemButton onClick={() => handleRedirect(RoutePath.PROFILE)}>
-              <ListItemIcon>
-                <Person />
-              </ListItemIcon>
+              <Tooltip title={RouteTitle.PROFILE} arrow placement="top-start">
+                <ListItemIcon>
+                  <Person />
+                </ListItemIcon>
+              </Tooltip>
               <ListItemText primary="Profile" />
             </ListItemButton>
 
             <Divider sx={{ my: 1 }} />
 
             <ListItemButton onClick={() => handleRedirect(RoutePath.HOME)}>
-              <ListItemIcon>
-                <DashboardIcon />
-              </ListItemIcon>
+              <Tooltip title={RouteTitle.HOME} arrow placement="top-start">
+                <ListItemIcon>
+                  <Home />
+                </ListItemIcon>
+              </Tooltip>
               <ListItemText primary="Home" />
             </ListItemButton>
-            <ListItemButton onClick={handleLogout}>
-              <ListItemIcon>
-                <Person />
-              </ListItemIcon>
+            <ListItemButton
+              onClick={() => handleLogout(localStorageClient, handleRedirect)}
+            >
+              <Tooltip title="Logout" arrow placement="top-start">
+                <ListItemIcon>
+                  <Logout />
+                </ListItemIcon>
+              </Tooltip>
               <ListItemText primary="Logout" />
             </ListItemButton>
           </Fragment>
@@ -180,7 +200,7 @@ const Dashboard = () => {
         >
           {isLoading ? (
             <img src="/assets/icons/Loading.svg" />
-          ) : data ? (
+          ) : dashboardData ? (
             <>
               <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
                 <Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
@@ -191,25 +211,25 @@ const Dashboard = () => {
                     <Grid item xs={12} md={6} lg={2.5}>
                       <DashboardTile
                         title={BlogStatsData.BLOG_COUNT}
-                        value={data.blogStats.blogCount.toString()}
+                        value={dashboardData.blogStats.blogCount.toString()}
                       />
                     </Grid>
                     <Grid item xs={12} md={6} lg={2.5}>
                       <DashboardTile
                         title={BlogStatsData.COMMENT_COUNT}
-                        value={data.blogStats.commentCount.toString()}
+                        value={dashboardData.blogStats.commentCount.toString()}
                       />
                     </Grid>
                     <Grid item xs={12} md={6} lg={2.5}>
                       <DashboardTile
                         title={BlogStatsData.UP_VOTE_COUNT}
-                        value={data.blogStats.upvoteCount.toString()}
+                        value={dashboardData.blogStats.upvoteCount.toString()}
                       />
                     </Grid>
                     <Grid item xs={12} md={6} lg={2.5}>
                       <DashboardTile
                         title={BlogStatsData.DOWN_VOTE_COUNT}
-                        value={data.blogStats.downvoteCount.toString()}
+                        value={dashboardData.blogStats.downvoteCount.toString()}
                       />
                     </Grid>
                   </Grid>
@@ -220,7 +240,7 @@ const Dashboard = () => {
                   <Paper
                     sx={{ p: 2, display: "flex", flexDirection: "column" }}
                   >
-                    <PopularBlogs popularBlogs={data.popularBlogs} />
+                    <PopularBlogs popularBlogs={dashboardData.popularBlogs} />
                   </Paper>
                 </Grid>
               </Container>
@@ -229,7 +249,9 @@ const Dashboard = () => {
                   <Paper
                     sx={{ p: 2, display: "flex", flexDirection: "column" }}
                   >
-                    <PopularBloggers popularBloggers={data.popularBlogger} />
+                    <PopularBloggers
+                      popularBloggers={dashboardData.popularBlogger}
+                    />
                   </Paper>
                 </Grid>
               </Container>

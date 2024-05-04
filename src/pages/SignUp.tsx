@@ -36,7 +36,7 @@ const SignUp = () => {
   useEffect(() => {
     const accessToken = localStorageClient.getAccessToken();
     if (accessToken) {
-      handleRedirect(RoutePath.PROFILE);
+      handleRedirect(RoutePath.HOME);
     }
   }, [handleRedirect, localStorageClient]);
 
@@ -211,8 +211,8 @@ const SignUp = () => {
             </Grid>
           </Box>
         </Box>
+        <MiniFooter />
       </Container>
-      <MiniFooter />
     </Container>
   );
 };
