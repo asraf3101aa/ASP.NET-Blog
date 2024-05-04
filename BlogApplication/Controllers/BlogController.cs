@@ -56,7 +56,17 @@ namespace Bislerium.Presentation.Controllers
 
             // Using X.PagedList to paginate the sorted blogs
             var pagedBlogs = await blogs.ToPagedListAsync(currentPage, pageSize);
-
+            var user = await _accountService.GetUserByClaimsAsync(User);
+            // Check if user is not null before adding reaction data
+            var blogsListWithReactions = pagedBlogs.Select(blog => new
+            {
+                Blog = blog,
+                Reaction = user != null ? new
+                {
+                    Upvoted = blog.Reactions.Any(r => r.Type == ReactionType.Upvote && r.UserId == user.Id),
+                    Downvoted = blog.Reactions.Any(r => r.Type == ReactionType.Downvote && r.UserId == user.Id)
+                } : null // If user is null, no reaction data is added
+            }).ToList();
             // Creating a response object that includes pagination metadata
             var response = new
             {
@@ -70,11 +80,12 @@ namespace Bislerium.Presentation.Controllers
                     HasPreviousPage = pagedBlogs.HasPreviousPage,
                     HasNextPage = pagedBlogs.HasNextPage
                 },
-                Blogs = pagedBlogs // The paged list of blogs
+                Blogs = blogsListWithReactions // The paged list of blogs
             };
 
             return Ok(_responseService.SuccessResponse(response));
         }
+
         [HttpGet]
         public async Task<IActionResult> UserBlogs(int pageNumber = 1, int pageSize = 10)
         {
