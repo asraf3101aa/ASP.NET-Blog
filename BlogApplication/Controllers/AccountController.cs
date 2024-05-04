@@ -68,7 +68,7 @@ namespace Bislerium.Presentation.Controllers
 
         [HttpPost]
         [Route("Confirm")]
-        public async Task<IActionResult> ConfirmEmail(string token, string email)
+        public async Task<IActionResult> ConfirmEmail([FromQuery] string token, [FromQuery] string email)
         {
             var user = await _accountService.FindByEmailAsync(email);
             if (user == null)
