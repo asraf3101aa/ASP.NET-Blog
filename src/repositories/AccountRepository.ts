@@ -14,7 +14,7 @@ export class AccountRepository implements IAccountRepository {
     return await this._fetchAPI.post<
       string,
       AccountModels[AccountModelsType.USER_REGISTER]
-    >(this._accountEndpointPath, userData);
+    >(this._accountEndpointPath, userData, false);
   }
 
   async login(userData: AccountModels[AccountModelsType.USER_LOGIN]) {
@@ -23,14 +23,14 @@ export class AccountRepository implements IAccountRepository {
       AccountModels[AccountModelsType.USER_LOGIN]
     >(
       `${this._accountEndpointPath}/${AccountEndpointPaths.USER_LOGIN}`,
-      userData
+      userData,
+      false
     );
   }
 
   async confirmEmail(token: string, email: string) {
-    return await this._fetchAPI.post<string, null>(
-      `${this._accountEndpointPath}/${AccountEndpointPaths.EMAIL_CONFIRM}?token=${token}&email=${email}`,
-      null
+    return await this._fetchAPI.get<string>(
+      `${this._accountEndpointPath}/${AccountEndpointPaths.ACCOUNT_CONFIRM}?token=${token}&email=${email}`
     );
   }
 

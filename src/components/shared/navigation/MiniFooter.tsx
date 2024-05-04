@@ -2,6 +2,7 @@ import { Link, Box, Typography } from "@mui/material";
 import TwitterIcon from "@mui/icons-material/Twitter";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import InstagramIcon from "@mui/icons-material/Instagram";
+import { Home } from "@mui/icons-material";
 
 const MiniFooter = () => {
   return (
@@ -10,27 +11,38 @@ const MiniFooter = () => {
         display: "flex", // Align horizontally
         justifyContent: "space-between", // Space between items
         alignItems: "center", // Align vertically
-        p: 2,
-        backgroundColor: "lightgray", // Light gray background
+        px: 2,
+        py: 3,
+        backgroundColor: "transparent", // Light gray background
       }}
     >
-      <Typography variant="body1" component={Link} href="/" sx={{ mx: 2 }}>
-        Return Home
+      <Typography
+        variant="body1"
+        component={Link}
+        href="/"
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 1,
+          color: "black",
+          textDecoration: "none",
+          ":hover": {
+            color: "#1976d2",
+          },
+        }}
+      >
+        <Home /> HOME
       </Typography>
-      <Typography variant="body2">&copy; Islington Blog 2024</Typography>
       <Box
         sx={{
           display: "flex",
-          flexDirection: "column",
           alignItems: "center",
+          gap: 2,
         }}
       >
-        <Typography variant="body2">Coming Soon</Typography>
-        <Box>
-          <FacebookIcon sx={{ mx: 1 }} />
-          <InstagramIcon sx={{ mx: 1 }} />
-          <TwitterIcon sx={{ mx: 1 }} />
-        </Box>
+        <FacebookIcon />
+        <InstagramIcon />
+        <TwitterIcon />
       </Box>
     </Box>
   );

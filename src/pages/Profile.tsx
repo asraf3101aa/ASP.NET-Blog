@@ -20,17 +20,18 @@ import Person from "@mui/icons-material/Person";
 import { Fragment } from "react";
 import { useRouter } from "@/contexts/RouterContext";
 import { useStorage } from "@/contexts/StorageContext";
-import { useEffect, useState } from "react";
-import { RoutePath } from "@/@enums/router.enum";
+import { useState } from "react";
+import { RoutePath, RouteTitle } from "@/@enums/router.enum";
 import { useRepository } from "@/contexts/RepositoryContext";
-import { AccountModels } from "@/@types/account";
-import { AccountModelsType } from "@/@enums/account.enum";
 import UserDetails from "@/components/shared/profile/UserDetails";
-import { BlogModels } from "@/@types/blog";
-import { BlogModelsType } from "@/@enums/blog.enum";
 import PopularBlogs from "@/components/shared/dashboard/PopularBlogs";
 import CreateBlogModal from "@/components/shared/blog/CreateBlogModal";
 import { AppBar, Drawer } from "@/components/shared/navigation/AppBar";
+import { Home, Logout } from "@mui/icons-material";
+import { handleLogout } from "@/@utils/handleLogout";
+import { Tooltip } from "@mui/material";
+import { getRoleFromJwtToken } from "@/@utils/getRoleFromJwtToken";
+import { UserRoles } from "@/@enums/storage.enum";
 
 const Profile = () => {
   const [open, setOpen] = useState(true);
@@ -40,59 +41,12 @@ const Profile = () => {
 
   const { handleRedirect } = useRouter()!;
   const localStorageClient = useStorage()!;
-  const { accountRepository, blogRepository, isLoading, setIsLoading } =
-    useRepository()!;
-
-  const handleLogout = () => {
-    localStorageClient.clearLocalStorage();
-    handleRedirect(RoutePath.LOGIN);
-  };
-
-  const [data, setData] = useState<
-    AccountModels[AccountModelsType.USER] | null
-  >(null);
-
-  const [blogs, setBlogs] = useState<BlogModels[BlogModelsType.BLOG][]>([]);
-  useEffect(() => {
-    setIsLoading(true);
-    accountRepository
-      .getProfile()
-      .then(
-        (
-          profileDataResponse: ApiResponse<
-            AccountModels[AccountModelsType.USER]
-          >
-        ) => {
-          if ("errors" in profileDataResponse) {
-            console.error(profileDataResponse);
-          } else {
-            setData(profileDataResponse);
-            blogRepository
-              .getBlogs(1)
-              .then(
-                (
-                  blogsData: ApiResponse<BlogModels[BlogModelsType.BLOGS_LIST]>
-                ) => {
-                  if ("errors" in blogsData) {
-                    console.error(blogsData);
-                  } else {
-                    setBlogs(blogsData.blogs);
-                  }
-                }
-              );
-          }
-        }
-      )
-      .catch((error) => console.error(error))
-      .finally(() => setIsLoading(false));
-  }, [
-    blogRepository,
-    accountRepository,
-    localStorageClient,
-    setIsLoading,
-    handleRedirect,
-  ]);
-
+  const { isLoading, user, blogs } = useRepository()!;
+  const accessToken = localStorageClient.getAccessToken();
+  let userRole = "";
+  if (accessToken) {
+    userRole = getRoleFromJwtToken(accessToken);
+  }
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
@@ -146,34 +100,49 @@ const Profile = () => {
         <Divider />
         <List component="nav">
           <Fragment>
-            <ListItemButton onClick={() => handleRedirect(RoutePath.DASHBOARD)}>
-              <ListItemIcon>
-                <DashboardIcon />
-              </ListItemIcon>
+            <ListItemButton
+              sx={{ display: userRole !== UserRoles.ADMIN ? "none" : "block" }}
+              onClick={() => handleRedirect(RoutePath.DASHBOARD)}
+            >
+              <Tooltip title={RouteTitle.DASHBOARD} arrow placement="top-start">
+                <ListItemIcon>
+                  <DashboardIcon />
+                </ListItemIcon>
+              </Tooltip>
               <ListItemText primary="Dashboard" />
             </ListItemButton>
             <ListItemButton
               sx={{ backgroundColor: "lightgray" }}
               onClick={() => handleRedirect(RoutePath.PROFILE)}
             >
-              <ListItemIcon>
-                <Person />
-              </ListItemIcon>
+              <Tooltip title={RouteTitle.PROFILE} arrow placement="top-start">
+                <ListItemIcon>
+                  <Person />
+                </ListItemIcon>
+              </Tooltip>
               <ListItemText primary="Profile" />
             </ListItemButton>
+
             <Divider sx={{ my: 1 }} />
+
             <ListItemButton onClick={() => handleRedirect(RoutePath.HOME)}>
-              <ListItemIcon>
-                <DashboardIcon />
-              </ListItemIcon>
+              <Tooltip title={RouteTitle.HOME} arrow placement="top-start">
+                <ListItemIcon>
+                  <Home />
+                </ListItemIcon>
+              </Tooltip>
               <ListItemText primary="Home" />
             </ListItemButton>
-            <ListItemButton onClick={handleLogout}>
-              <ListItemIcon>
-                <Person />
-              </ListItemIcon>
+            <ListItemButton
+              onClick={() => handleLogout(localStorageClient, handleRedirect)}
+            >
+              <Tooltip title="Logout" arrow placement="top-start">
+                <ListItemIcon>
+                  <Logout />
+                </ListItemIcon>
+              </Tooltip>
               <ListItemText primary="Logout" />
-            </ListItemButton>{" "}
+            </ListItemButton>
           </Fragment>
         </List>
       </Drawer>
@@ -190,28 +159,28 @@ const Profile = () => {
         }}
       >
         <Toolbar />
-        <CreateBlogModal />
         <Container
           sx={{
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
-            height: "90%",
+            minHeight: "80vh",
+            px: 4,
+            py: 2,
           }}
         >
           {isLoading ? (
-            <img src="/assets/icons/Loading.svg" />
-          ) : data ? (
+            <img src="/assets/icons/Loading.svg" alt="LoadingIcon" />
+          ) : user ? (
             <>
               <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
                 <Grid item xs={12}>
-                  <Paper
-                    sx={{ p: 2, display: "flex", flexDirection: "column" }}
-                  >
-                    <UserDetails user={data} />
-                  </Paper>
+                  <UserDetails user={user} />
                 </Grid>
+              </Container>
+              <Container>
+                <CreateBlogModal />
               </Container>
               <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
                 <Grid item xs={12}>

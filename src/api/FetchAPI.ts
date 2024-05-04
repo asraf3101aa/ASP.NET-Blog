@@ -1,6 +1,5 @@
 import {
   getApiResponse,
-  getHeaders,
   getStatusWithErrorsFromException,
 } from "@/@utils/fetchUtils";
 import { IFetchAPI } from "./IFetchAPI";
@@ -34,16 +33,21 @@ export class FetchAPI implements IFetchAPI {
     requiresAuth: boolean = true
   ): Promise<ApiResponse<T>> => {
     const apiEndpoint = `${this._baseURL}/${path}`;
-    const options: RequestOptions = {
-      method,
-      headers: getHeaders(requiresAuth, this._localStorageClient),
-    };
 
+    const headers = new Headers();
+    headers.set("Content-Type", "application/json");
+    if (requiresAuth) {
+      const accessToken = this._localStorageClient.getAccessToken();
+      headers.set("Authorization", `Bearer ${accessToken}`);
+    }
+    const options: RequestInit = {
+      method,
+      headers,
+    };
     if (data) {
       // Include data in request body
       options.body = JSON.stringify(data);
     }
-
     try {
       const response = await fetch(apiEndpoint, options);
       return getApiResponse<T>(response);
@@ -52,12 +56,21 @@ export class FetchAPI implements IFetchAPI {
     }
   };
 
-  post<T, U>(path: string, data: U): Promise<ApiResponse<T>> {
-    return this._sendRequest<T, U>(path, HttpMethod.POST, data);
+  post<T, U>(
+    path: string,
+    data: U,
+    requiresAuth?: boolean
+  ): Promise<ApiResponse<T>> {
+    return this._sendRequest<T, U>(path, HttpMethod.POST, data, requiresAuth);
   }
 
-  get<T>(path: string): Promise<ApiResponse<T>> {
-    return this._sendRequest<T, undefined>(path, HttpMethod.GET);
+  get<T>(path: string, requiresAuth?: boolean): Promise<ApiResponse<T>> {
+    return this._sendRequest<T, undefined>(
+      path,
+      HttpMethod.GET,
+      undefined,
+      requiresAuth
+    );
   }
 
   update<T, U>(path: string, data: U): Promise<ApiResponse<T>> {

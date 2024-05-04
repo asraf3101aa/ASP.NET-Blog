@@ -9,6 +9,7 @@ type IdentityUser = {
 // User type inheriting from IdentityUser
 type User = IdentityUser & {
   firstName: string; // Required field
+  emailVerified: boolean;
   lastName?: string; // Optional field
   avatar?: string; // Optional field, represents an image URL or similar
 };

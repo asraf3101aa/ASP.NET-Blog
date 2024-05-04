@@ -1,7 +1,9 @@
 import React from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import { AccountModels } from "@/@types/account";
 import { AccountModelsType } from "@/@enums/account.enum";
+import { useStorage } from "@/contexts/StorageContext";
+import { getRoleFromJwtToken } from "@/@utils/getRoleFromJwtToken";
 
 // A function to display a single detail
 const UserDetail = ({ title, value }: { title: string; value: string }) => (
@@ -20,20 +22,31 @@ const UserDetails = ({
   user,
 }: {
   user: AccountModels[AccountModelsType.USER];
-}) => (
-  <Box
-    padding={2}
-    border={1}
-    borderRadius={2}
-    borderColor="grey.300"
-    bgcolor="grey.100"
-  >
-    <UserDetail title="ID" value={user.id} />
-    <UserDetail title="Email" value={user.email} />
-    <UserDetail title="First Name" value={user.firstName} />
-    {user.lastName && <UserDetail title="Last Name" value={user.lastName} />}
-    {user.avatar && <UserDetail title="Avatar" value={user.avatar} />}
-  </Box>
-);
+}) => {
+  const localStorageClient = useStorage()!;
+  const role = getRoleFromJwtToken(localStorageClient.getAccessToken()!);
+  const handleResendMail = () => {};
+  return (
+    <Box
+      key={user.id}
+      padding={2}
+      border={1}
+      borderRadius={2}
+      borderColor="lightgray"
+      sx={{ display: "flex", flexDirection: "column", gap: 1 }}
+    >
+      <UserDetail title="Name" value={`${user.firstName} ${user.lastName}`} />
+      <UserDetail title="Role" value={role} />
+      <UserDetail title="Email" value={user.email} />
+      <UserDetail
+        title="Email Status"
+        value={user.emailVerified ? "Verified" : "Unverified"}
+      />
+      <Box>
+        <Button onClick={handleResendMail}>Resend Verification Mail</Button>
+      </Box>
+    </Box>
+  );
+};
 
 export default UserDetails;

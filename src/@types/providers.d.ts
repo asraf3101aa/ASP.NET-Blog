@@ -1,8 +1,13 @@
+import { AccountModelsType } from "@/@enums/account.enum";
+import { AccountModels } from "./account";
 import {
   IAccountRepository,
   IAdminRepository,
   IBlogRepository,
 } from "./repository";
+import { BlogModels } from "./blog";
+import { BlogModelsType } from "@/@enums/blog.enum";
+import { AdminDashboardData } from "./admin";
 
 /**
  * ProviderProps: Represents props for a provider component.
@@ -35,6 +40,19 @@ declare type RouterProps = {
 declare type RepositoryProps = {
   isLoading: boolean;
   setIsLoading: (loading: boolean) => void;
+  user: AccountModels[AccountModelsType.USER] | null;
+  setUser: (user: AccountModels[AccountModelsType.USER]) => void;
+  blogs: BlogModels[BlogModelsType.BLOG][];
+  setBlogs: (blogs: BlogModels[BlogModelsType.BLOG[]]) => void;
+  dashboardData: AdminDashboardData | null;
+  setDashboardData: (data: AdminDashboardData) => void;
+  homepageBlogsData: BlogModels[BlogModelsType.BLOGS_LIST] | null;
+  setHomepageBlogsData: (blogs: BlogModels[BlogModelsType.BLOGS_LIST]) => void;
+  blogDetails: BlogModels[BlogModelsType.BLOG] | null;
+  setBlogDetails: (blog: BlogModels[BlogModelsType.BLOG]) => void;
+  categories: BlogModels[BlogModelsType.CATEGORY][];
+  setCategories: (categories: BlogModels[BlogModelsType.CATEGORY][]) => void;
+
   accountRepository: IAccountRepository;
   adminRepository: IAdminRepository;
   blogRepository: IBlogRepository;
