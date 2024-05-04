@@ -66,7 +66,7 @@ namespace Bislerium.Presentation.Controllers
             return Ok(_responseService.SuccessResponse("Registration successful"));
         }
 
-        [HttpPost]
+        [HttpGet]
         [Route("Confirm")]
         public async Task<IActionResult> ConfirmEmail([FromQuery] string token, [FromQuery] string email)
         {
@@ -163,7 +163,7 @@ namespace Bislerium.Presentation.Controllers
         }
 
         [HttpGet]
-        [Route("Confirm")]
+        [Route("EmailConfirm")]
         [Authorize]
         public async Task<IActionResult> ResendEmailConfirmation()
         {
@@ -209,7 +209,7 @@ namespace Bislerium.Presentation.Controllers
 
         [HttpPost]
         [Route("Email/Confirm")]
-        public async Task<IActionResult> ConfirmEmailChange(string token, string newEmail)
+        public async Task<IActionResult> ConfirmEmailChange([FromQuery] string token,[FromQuery] string newEmail)
         {
             var user = await _accountService.GetUserByClaimsAsync(User);
 
