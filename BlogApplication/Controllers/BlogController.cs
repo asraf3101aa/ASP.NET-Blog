@@ -48,7 +48,7 @@ namespace Bislerium.Presentation.Controllers
    
         [HttpGet]
         [Route("List")]
-        public async Task<IActionResult> Index([FromQuery] string sortBy = "recency", [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 9)
+        public async Task<IActionResult> Index([FromQuery] string sortBy = "recency", [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             int currentPage = pageNumber;
             // Sort the blogs
