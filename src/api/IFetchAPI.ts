@@ -6,18 +6,24 @@ export interface IFetchAPI {
    * @template U - The type of the data sent to the server.
    * @param {string} path - The endpoint to which the request is sent.
    * @param {U} data - The data to be sent to the server.
+   * @param {boolean} requiresAuth - The flag representing if request is authorized or not..
    * @returns {Promise<ApiResponse<T>>} A promise resolving to the response from the server.
    */
-  post<T, U>(path: string, data: U): Promise<ApiResponse<T>>;
+  post<T, U>(
+    path: string,
+    data: U,
+    requiresAuth?: boolean
+  ): Promise<ApiResponse<T>>;
 
   /**
    * Sends a GET request to get a resource.
    *
    * @template T - The type of the response data expected from the server.
    * @param {string} path - The endpoint to which the request is sent.
+   * @param {boolean} requiresAuth - The flag representing if request is authorized or not..
    * @returns {Promise<ApiResponse<T>>} A promise resolving to the response from the server.
    */
-  get<T>(path: string): Promise<ApiResponse<T>>;
+  get<T>(path: string, requiresAuth?: boolean): Promise<ApiResponse<T>>;
 
   /**
    * Sends a PUT request to update an existing resource.

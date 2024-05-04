@@ -30,6 +30,9 @@ const TitleProvider = ({ children }: { children: React.ReactNode }) => {
       case RoutePath.PROFILE:
         pageTitle = RouteTitle.PROFILE;
         break;
+      case RoutePath.DETAILS:
+        pageTitle = RouteTitle.DETAILS;
+        break;
       default:
         pageTitle = appTitle ?? "Blog";
     }

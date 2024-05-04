@@ -12,7 +12,9 @@ import { getRoleFromJwtToken } from "@/@utils/getRoleFromJwtToken";
 import _ from "lodash";
 import { UserRoles } from "@/@enums/storage.enum";
 
-const Header = (props: { title: string }) => {
+const Header = () => {
+  const headerTitle = import.meta.env.VITE_BLOG_APP_HEADER_TITLE;
+
   const localStorageClient = useStorage()!;
   const accessToken = localStorageClient.getAccessToken();
   let userRole = null;
@@ -31,7 +33,7 @@ const Header = (props: { title: string }) => {
           noWrap
           sx={{ flex: 1, letterSpacing: 1 }}
         >
-          {props.title?.toUpperCase()}
+          {headerTitle?.toUpperCase()}
         </Typography>
         {accessToken ? (
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>

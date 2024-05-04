@@ -17,7 +17,8 @@ export class BlogRepository implements IBlogRepository {
 
   async getHomepageBlogs(sortBy: string, pageNumber: number) {
     return await this._fetchAPI.get<BlogModels[BlogModelsType.BLOGS_LIST]>(
-      `${this._blogEndpointPath}/${BlogEndpointPaths.HOMEPAGE_BLOGS}/?sortBy=${sortBy}&pageNumber=${pageNumber}`
+      `${this._blogEndpointPath}/${BlogEndpointPaths.HOMEPAGE_BLOGS}/?sortBy=${sortBy}&pageNumber=${pageNumber}`,
+      false
     );
   }
 

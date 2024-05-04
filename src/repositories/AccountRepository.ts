@@ -14,7 +14,7 @@ export class AccountRepository implements IAccountRepository {
     return await this._fetchAPI.post<
       string,
       AccountModels[AccountModelsType.USER_REGISTER]
-    >(this._accountEndpointPath, userData);
+    >(this._accountEndpointPath, userData, false);
   }
 
   async login(userData: AccountModels[AccountModelsType.USER_LOGIN]) {
@@ -23,7 +23,8 @@ export class AccountRepository implements IAccountRepository {
       AccountModels[AccountModelsType.USER_LOGIN]
     >(
       `${this._accountEndpointPath}/${AccountEndpointPaths.USER_LOGIN}`,
-      userData
+      userData,
+      false
     );
   }
 

@@ -8,28 +8,33 @@ import { BlogModels } from "@/@types/blog";
 import _ from "lodash";
 import moment from "moment";
 import { Fragment } from "react";
+import { Typography } from "@mui/material";
 
-const PopularBlogs = (popularBlogs: {
+const PopularBlogs = (props: {
   popularBlogs: BlogModels[BlogModelsType.BLOG][];
 }) => {
+  const popularBlogs = props.popularBlogs;
   return (
     <Fragment>
-      <div>Recent PopularBlogs</div>
-      <Table size="small">
-        <TableHead>
-          <TableRow>
-            <TableCell>Author</TableCell>
-            <TableCell>Title</TableCell>
-            <TableCell>Description</TableCell>
-            <TableCell>Category</TableCell>
-            <TableCell>Posted on</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {_.isEmpty(popularBlogs) ? (
-            <div>No blogs posted yet.</div>
-          ) : (
-            _.map(popularBlogs, (blog: BlogModels[BlogModelsType.BLOG]) => (
+      <Typography variant="h6" pb={1}>
+        Recent Popular Blogs
+      </Typography>
+
+      {_.isEmpty(popularBlogs) ? (
+        <Typography variant="body1">No blogs posted yet.</Typography>
+      ) : (
+        <Table size="small">
+          <TableHead>
+            <TableRow>
+              <TableCell>Author</TableCell>
+              <TableCell>Title</TableCell>
+              <TableCell>Description</TableCell>
+              <TableCell>Category</TableCell>
+              <TableCell>Posted on</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {_.map(popularBlogs, (blog: BlogModels[BlogModelsType.BLOG]) => (
               <TableRow key={blog.id}>
                 <TableCell>{blog.author}</TableCell>
                 <TableCell>{blog.title}</TableCell>
@@ -39,10 +44,10 @@ const PopularBlogs = (popularBlogs: {
                   {moment(blog.createdAt).format("DD MMM YYYY")}
                 </TableCell>
               </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
+            ))}
+          </TableBody>
+        </Table>
+      )}
     </Fragment>
   );
 };
