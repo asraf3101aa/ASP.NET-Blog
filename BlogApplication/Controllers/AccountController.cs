@@ -163,7 +163,7 @@ namespace Bislerium.Presentation.Controllers
         }
 
         [HttpGet]
-        [Route("EmailConfirm")]
+        [Route("Confirm/Resend")]
         [Authorize]
         public async Task<IActionResult> ResendEmailConfirmation()
         {
