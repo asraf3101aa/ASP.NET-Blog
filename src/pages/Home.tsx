@@ -1,111 +1,119 @@
-import { AccountModelsType } from "@/@enums/account.enum";
-import { BlogsDurationFilters, BlogsSortingFilters } from "@/@enums/blog.enum";
-import { UserRoles } from "@/@enums/storage.enum";
-import { AccountModels } from "@/@types/account";
-import { AdminDashboardData } from "@/@types/admin";
-import { getRoleFromJwtToken } from "@/@utils/getRoleFromJwtToken";
-import Blog from "@/components/Blog";
+import CssBaseline from "@mui/material/CssBaseline";
+import Grid from "@mui/material/Grid";
+import Container from "@mui/material/Container";
+import Header from "@/components/shared/navigation/Header.tsx";
+import MainFeaturedPost from "@/components/shared/blog/MainFeaturedPost.tsx";
+import FeaturedPost from "@/components/shared/blog/FeaturedPost.tsx";
+import Footer from "@/components/shared/navigation/Footer.tsx";
 import { useRepository } from "@/contexts/RepositoryContext";
-import { useStorage } from "@/contexts/StorageContext";
+import { useEffect, useState } from "react";
 import _ from "lodash";
-import { useEffect } from "react";
+import { Button, Typography } from "@mui/material";
 
-const Home = () => {
-  const localStorageClient = useStorage()!;
-  const {
-    isLoading,
-    blogRepository,
-    adminRepository,
-    accountRepository,
-    setUser,
-    setBlogs,
-    setIsLoading,
-    setCategories,
-    setHomepageBlogs,
-    setDashboardData,
-  } = useRepository()!;
-
-  useEffect(() => {
-    const accessToken = localStorageClient.getAccessToken();
-    if (accessToken) {
-      setIsLoading(true);
-      accountRepository
-        .getProfile()
-        .then(
-          (
-            profileDataResponse: ApiResponse<
-              AccountModels[AccountModelsType.USER]
-            >
-          ) => {
-            if ("errors" in profileDataResponse) {
-              console.error(profileDataResponse);
-            } else {
-              setUser(profileDataResponse);
-
-              blogRepository
-                .getHomepageBlogs(BlogsSortingFilters.RECENCY, 1)
-                .then((blogs) => {
-                  if ("errors" in blogs) {
-                    console.error(blogs);
-                  } else {
-                    setHomepageBlogs(blogs);
-                  }
-                })
-                .catch((error) => console.error(error));
-
-              blogRepository
-                .getCategories()
-                .then((categories) => {
-                  if ("errors" in categories) {
-                    console.error(categories);
-                  } else setCategories(categories);
-                })
-                .catch((error) => console.error(error));
-
-              const userRole = getRoleFromJwtToken(accessToken);
-              if (_.isEqual(userRole, UserRoles.BLOGGER)) {
-                blogRepository
-                  .getBlogs(1)
-                  .then((blogs) => {
-                    if ("errors" in blogs) {
-                      console.error(blogs);
-                    } else setBlogs(blogs);
-                  })
-                  .catch((error) => console.error(error));
-              } else {
-                adminRepository
-                  .getDashboardData(BlogsDurationFilters.MONTHLY, 3)
-                  .then((data: ApiResponse<AdminDashboardData>) => {
-                    if ("errors" in data) {
-                      console.error(data);
-                    } else setDashboardData(data);
-                  })
-                  .catch((error) => console.error(error));
-              }
-            }
-          }
-        )
-        .catch((error) => console.error(error))
-        .finally(() => setIsLoading(false));
-    }
-  }, [
-    accountRepository,
-    adminRepository,
-    blogRepository,
-    localStorageClient,
-    setBlogs,
-    setCategories,
-    setDashboardData,
-    setHomepageBlogs,
-    setIsLoading,
-    setUser,
-  ]);
-
-  return isLoading ? (
-    <img src="/assets/icons/Loading.svg" alt="LoadingIcon" />
-  ) : (
-    <Blog />
-  );
+const mainFeaturedPost = {
+  title: "Embrace the joy of learning",
+  image: "https://source.unsplash.com/random?wallpapers",
+  imageText: "main image description",
 };
 
-export default Home;
+export default function Blog() {
+  const {
+    isLoading,
+    setIsLoading,
+    homepageBlogsData,
+    setHomepageBlogsData,
+    blogRepository,
+  } = useRepository()!;
+
+  const [currentPageNumber, setCurrentPageNumber] = useState<number>(
+    homepageBlogsData?.paginationMetaData?.pageNumber ?? 1
+  );
+
+  useEffect(() => {
+    setIsLoading(true);
+    blogRepository
+      .getHomepageBlogs("recency", currentPageNumber)
+      .then((blogsResponse) => {
+        if ("errors" in blogsResponse) {
+          console.error(blogsResponse);
+        } else {
+          setHomepageBlogsData(blogsResponse);
+          document.documentElement.scrollTo({ top: 0, left: 0 });
+        }
+      })
+      .catch((error) => console.error(error))
+      .finally(() => setIsLoading(false));
+  }, [blogRepository, currentPageNumber, setHomepageBlogsData, setIsLoading]);
+
+  const handleNextPageChange = () => {
+    if (homepageBlogsData?.paginationMetaData?.hasNextPage) {
+      setCurrentPageNumber(currentPageNumber + 1);
+    }
+  };
+  const handlePreviousPageChange = () => {
+    if (homepageBlogsData?.paginationMetaData?.hasPreviousPage) {
+      setCurrentPageNumber(currentPageNumber - 1);
+    }
+  };
+
+  return (
+    <Container
+      sx={{
+        height: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        padding: "0px !important",
+        maxWidth: "100% !important",
+      }}
+    >
+      <CssBaseline />
+      <Container>
+        <Header />
+        <main>
+          <MainFeaturedPost post={mainFeaturedPost} />
+          {isLoading ? (
+            <Container
+              sx={{
+                height: "50vh",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <img src="/assets/icons/Loading.svg" alt="LoadingIcon" />
+            </Container>
+          ) : homepageBlogsData && homepageBlogsData.blogs.length > 0 ? (
+            <Grid container spacing={4}>
+              {_.map(homepageBlogsData.blogs, (blog) => (
+                <FeaturedPost blog={blog} key={blog.id} />
+              ))}
+              <Container sx={{ display: "flex", py: 2, gap: 2 }}>
+                <Button
+                  disabled={
+                    !homepageBlogsData?.paginationMetaData?.hasPreviousPage
+                  }
+                  variant="outlined"
+                  sx={{ ml: 1 }}
+                  onClick={handlePreviousPageChange}
+                >
+                  Previous
+                </Button>
+                <Button
+                  disabled={!homepageBlogsData?.paginationMetaData?.hasNextPage}
+                  variant="outlined"
+                  onClick={handleNextPageChange}
+                >
+                  Next
+                </Button>
+              </Container>
+            </Grid>
+          ) : (
+            <Typography variant="h6">No blogs posted yet.</Typography>
+          )}
+        </main>
+      </Container>
+      <Footer />
+    </Container>
+  );
+}

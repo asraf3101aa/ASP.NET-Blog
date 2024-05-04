@@ -29,9 +29,8 @@ export class AccountRepository implements IAccountRepository {
   }
 
   async confirmEmail(token: string, email: string) {
-    return await this._fetchAPI.post<string, null>(
-      `${this._accountEndpointPath}/${AccountEndpointPaths.EMAIL_CONFIRM}?token=${token}&email=${email}`,
-      null
+    return await this._fetchAPI.get<string>(
+      `${this._accountEndpointPath}/${AccountEndpointPaths.ACCOUNT_CONFIRM}?token=${token}&email=${email}`
     );
   }
 

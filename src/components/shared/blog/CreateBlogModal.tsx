@@ -14,6 +14,9 @@ import { useForm, Controller } from "react-hook-form";
 import { BlogModels } from "@/@types/blog";
 import { BlogModelsType } from "@/@enums/blog.enum";
 import { useRepository } from "@/contexts/RepositoryContext";
+import _ from "lodash";
+import { useRouter } from "@/contexts/RouterContext";
+import { RoutePath } from "@/@enums/router.enum";
 
 const CreateBlogModal = () => {
   const [open, setOpen] = useState(false);
@@ -30,10 +33,19 @@ const CreateBlogModal = () => {
     setOpen(false);
   };
 
-  const { isLoading, setIsLoading, blogRepository } = useRepository()!;
+  const { isLoading, categories, setIsLoading, blogRepository } =
+    useRepository()!;
+
+  const { handleRedirect } = useRouter()!;
 
   const onSubmit = (data: BlogModels[BlogModelsType.BLOG_PARTIAL_DATA]) => {
     setIsLoading(true);
+    data.images = data.images
+      ? typeof data.images === "object"
+        ? data.images
+        : [data.images]
+      : [];
+
     blogRepository
       .createBlog(data)
       .then((blogResponse: ApiResponse<BlogModels[BlogModelsType.BLOG]>) => {
@@ -41,8 +53,7 @@ const CreateBlogModal = () => {
       })
       .catch((error) => console.error(error))
       .finally(() => {
-        handleClose();
-        setIsLoading(false);
+        handleRedirect(RoutePath.PROFILE);
       });
   };
 
@@ -119,9 +130,11 @@ const CreateBlogModal = () => {
                 <FormControl fullWidth margin="normal">
                   <InputLabel>Category ID</InputLabel>
                   <Select {...field} label="Category ID" defaultValue="">
-                    <MenuItem value={"1"}>Category 1</MenuItem>
-                    <MenuItem value={"2"}>Category 2</MenuItem>
-                    <MenuItem value={"3"}>Category 3</MenuItem>
+                    {_.map(categories, (category) => (
+                      <MenuItem value={category.id.toString()}>
+                        {category.name}
+                      </MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
               )}

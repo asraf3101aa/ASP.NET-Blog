@@ -20,20 +20,18 @@ import Person from "@mui/icons-material/Person";
 import { Fragment } from "react";
 import { useRouter } from "@/contexts/RouterContext";
 import { useStorage } from "@/contexts/StorageContext";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { RoutePath, RouteTitle } from "@/@enums/router.enum";
 import { useRepository } from "@/contexts/RepositoryContext";
-import { AccountModels } from "@/@types/account";
-import { AccountModelsType } from "@/@enums/account.enum";
 import UserDetails from "@/components/shared/profile/UserDetails";
-import { BlogModels } from "@/@types/blog";
-import { BlogModelsType } from "@/@enums/blog.enum";
 import PopularBlogs from "@/components/shared/dashboard/PopularBlogs";
 import CreateBlogModal from "@/components/shared/blog/CreateBlogModal";
 import { AppBar, Drawer } from "@/components/shared/navigation/AppBar";
 import { Home, Logout } from "@mui/icons-material";
 import { handleLogout } from "@/@utils/handleLogout";
 import { Tooltip } from "@mui/material";
+import { getRoleFromJwtToken } from "@/@utils/getRoleFromJwtToken";
+import { UserRoles } from "@/@enums/storage.enum";
 
 const Profile = () => {
   const [open, setOpen] = useState(true);
@@ -43,59 +41,12 @@ const Profile = () => {
 
   const { handleRedirect } = useRouter()!;
   const localStorageClient = useStorage()!;
-  const {
-    accountRepository,
-    blogRepository,
-    isLoading,
-    setIsLoading,
-    user,
-    setUser,
-    blogs,
-    setBlogs,
-  } = useRepository()!;
-
-  useEffect(() => {
-    setIsLoading(true);
-    accountRepository
-      .getProfile()
-      .then(
-        (
-          profileDataResponse: ApiResponse<
-            AccountModels[AccountModelsType.USER]
-          >
-        ) => {
-          if ("errors" in profileDataResponse) {
-            console.error(profileDataResponse);
-          } else {
-            setUser(profileDataResponse);
-            blogRepository
-              .getBlogs(1)
-              .then(
-                (
-                  blogsData: ApiResponse<BlogModels[BlogModelsType.BLOGS_LIST]>
-                ) => {
-                  if ("errors" in blogsData) {
-                    console.error(blogsData);
-                  } else {
-                    setBlogs(blogsData.blogs);
-                  }
-                }
-              );
-          }
-        }
-      )
-      .catch((error) => console.error(error))
-      .finally(() => setIsLoading(false));
-  }, [
-    blogRepository,
-    accountRepository,
-    localStorageClient,
-    setUser,
-    setBlogs,
-    setIsLoading,
-    handleRedirect,
-  ]);
-
+  const { isLoading, user, blogs } = useRepository()!;
+  const accessToken = localStorageClient.getAccessToken();
+  let userRole = "";
+  if (accessToken) {
+    userRole = getRoleFromJwtToken(accessToken);
+  }
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
@@ -149,7 +100,10 @@ const Profile = () => {
         <Divider />
         <List component="nav">
           <Fragment>
-            <ListItemButton onClick={() => handleRedirect(RoutePath.DASHBOARD)}>
+            <ListItemButton
+              sx={{ display: userRole !== UserRoles.ADMIN ? "none" : "block" }}
+              onClick={() => handleRedirect(RoutePath.DASHBOARD)}
+            >
               <Tooltip title={RouteTitle.DASHBOARD} arrow placement="top-start">
                 <ListItemIcon>
                   <DashboardIcon />
@@ -217,11 +171,7 @@ const Profile = () => {
           }}
         >
           {isLoading ? (
-            <img
-              src="/assets/icons/Loading.svg"
-              alt="LoadingIcon"
-              style={{ width: "30px" }}
-            />
+            <img src="/assets/icons/Loading.svg" alt="LoadingIcon" />
           ) : user ? (
             <>
               <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>

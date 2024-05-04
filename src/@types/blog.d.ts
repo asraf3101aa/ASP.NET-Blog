@@ -63,7 +63,7 @@ type BlogStats = {
 };
 
 type BlogsList = {
-  paginatedMetaData: PaginationMetaData;
+  paginationMetaData: PaginationMetaData;
   blogs: Blog[];
 };
 

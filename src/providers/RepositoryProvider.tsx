@@ -27,9 +27,9 @@ const RepositoryProvider = ({ children }: ProviderProps) => {
   const [dashboardData, setDashboardData] = useState<AdminDashboardData | null>(
     null
   );
-  const [homepageBlogs, setHomepageBlogs] = useState<
-    BlogModels[BlogModelsType.BLOG][]
-  >([]);
+  const [homepageBlogsData, setHomepageBlogsData] = useState<
+    BlogModels[BlogModelsType.BLOGS_LIST] | null
+  >(null);
   const [blogDetails, setBlogDetails] = useState<
     BlogModels[BlogModelsType.BLOG] | null
   >(null);
@@ -41,8 +41,8 @@ const RepositoryProvider = ({ children }: ProviderProps) => {
   const shared: RepositoryProps = {
     isLoading,
     setIsLoading,
-    homepageBlogs,
-    setHomepageBlogs,
+    homepageBlogsData,
+    setHomepageBlogsData,
     user,
     setUser,
     blogs,

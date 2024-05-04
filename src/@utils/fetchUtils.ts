@@ -1,28 +1,4 @@
 import { ApiResponseStatus } from "@/@enums/api.enum";
-import { ILocalStorage } from "@/storage/ILocalStorage";
-
-/**
- * Returns the headers required for an API request.
- *
- * @param {boolean} requiresAuth - Indicates whether the request requires authentication.
- * @param {ILocalStorage} localStorageClient - Represents an instance of `LocalStorage` for fetching `accessToken` if `requiresAuth` is true.
- * @returns {Record<string, string>} An object containing the headers for the API request.
- */
-export const getHeaders = (
-  requiresAuth: boolean,
-  localStorageClient: ILocalStorage
-): Record<string, string> => {
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-  };
-  if (requiresAuth) {
-    const accessToken = localStorageClient.getAccessToken();
-    if (accessToken) {
-      headers["Authorization"] = `Bearer ${accessToken}`;
-    }
-  }
-  return headers;
-};
 
 /**
  * Processes the API response, parsing the JSON data if the response is OK,

@@ -21,14 +21,10 @@ import Person from "@mui/icons-material/Person";
 import { Fragment } from "react";
 import { useRouter } from "@/contexts/RouterContext";
 import { useStorage } from "@/contexts/StorageContext";
-import { useEffect, useState } from "react";
-import { getRoleFromJwtToken } from "@/@utils/getRoleFromJwtToken";
-import { UserRoles } from "@/@enums/storage.enum";
-import _ from "lodash";
+import { useState } from "react";
 import { RoutePath, RouteTitle } from "@/@enums/router.enum";
 import { useRepository } from "@/contexts/RepositoryContext";
-import { AdminDashboardData } from "@/@types/admin";
-import { BlogStatsData, BlogsDurationFilters } from "@/@enums/blog.enum";
+import { BlogStatsData } from "@/@enums/blog.enum";
 import PopularBloggers from "../components/shared/dashboard/PopularBloggers";
 import { AppBar, Drawer } from "@/components/shared/navigation/AppBar";
 import DashboardTile from "@/components/shared/dashboard/DashboardTile";
@@ -44,41 +40,7 @@ const Dashboard = () => {
 
   const { handleRedirect } = useRouter()!;
   const localStorageClient = useStorage()!;
-  const {
-    adminRepository,
-    isLoading,
-    setIsLoading,
-    dashboardData,
-    setDashboardData,
-  } = useRepository()!;
-
-  useEffect(() => {
-    const accessToken = localStorageClient.getAccessToken();
-    if (accessToken) {
-      const userRole = getRoleFromJwtToken(accessToken);
-      if (_.isEqual(userRole, UserRoles.BLOGGER)) {
-        handleRedirect(RoutePath.PROFILE);
-      } else {
-        setIsLoading(true);
-        adminRepository
-          .getDashboardData(BlogsDurationFilters.MONTHLY, 5)
-          .then((dashboardDataResponse: ApiResponse<AdminDashboardData>) => {
-            if ("errors" in dashboardDataResponse) {
-              console.log(dashboardDataResponse);
-            } else setDashboardData(dashboardDataResponse);
-          })
-          .catch((error) => console.error(error))
-          .finally(() => setIsLoading(false));
-      }
-    }
-  }, [
-    adminRepository,
-    handleRedirect,
-    localStorageClient,
-    setIsLoading,
-    dashboardData,
-    setDashboardData,
-  ]);
+  const { isLoading, dashboardData } = useRepository()!;
 
   return (
     <Box sx={{ display: "flex" }}>

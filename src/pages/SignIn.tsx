@@ -41,7 +41,7 @@ const SignIn = () => {
   useEffect(() => {
     const accessToken = localStorageClient.getAccessToken();
     if (accessToken) {
-      handleRedirect(RoutePath.HOME);
+      handleRedirect(RoutePath.PROFILE);
     }
   }, [handleRedirect, localStorageClient]);
 
@@ -60,7 +60,7 @@ const SignIn = () => {
           if (LocalStorageItemsKeys.ACCESS_TOKEN in userSignInResponse) {
             localStorageClient.setAccessToken(userSignInResponse);
             setIsLoading(false);
-            handleRedirect(RoutePath.HOME);
+            handleRedirect(RoutePath.PROFILE);
           } else {
             setError("rememberMe", {
               message: userSignInResponse.errors[0].message,

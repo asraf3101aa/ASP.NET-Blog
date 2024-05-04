@@ -46,8 +46,8 @@ declare type RepositoryProps = {
   setBlogs: (blogs: BlogModels[BlogModelsType.BLOG[]]) => void;
   dashboardData: AdminDashboardData | null;
   setDashboardData: (data: AdminDashboardData) => void;
-  homepageBlogs: BlogModels[BlogModelsType.BLOG][];
-  setHomepageBlogs: (blogs: BlogModels[BlogModelsType.BLOG[]]) => void;
+  homepageBlogsData: BlogModels[BlogModelsType.BLOGS_LIST] | null;
+  setHomepageBlogsData: (blogs: BlogModels[BlogModelsType.BLOGS_LIST]) => void;
   blogDetails: BlogModels[BlogModelsType.BLOG] | null;
   setBlogDetails: (blog: BlogModels[BlogModelsType.BLOG]) => void;
   categories: BlogModels[BlogModelsType.CATEGORY][];

@@ -1,15 +1,12 @@
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
-import Link from "@mui/material/Link";
 import Box from "@mui/material/Box";
 
 interface MainFeaturedPostProps {
   post: {
-    description: string;
     image: string;
     imageText: string;
-    linkText: string;
     title: string;
   };
 }
@@ -49,7 +46,7 @@ const MainFeaturedPost = (props: MainFeaturedPostProps) => {
         }}
       />
       <Grid container>
-        <Grid item md={6}>
+        <Grid item md={10}>
           <Box
             sx={{
               position: "relative",
@@ -65,12 +62,6 @@ const MainFeaturedPost = (props: MainFeaturedPostProps) => {
             >
               {post.title}
             </Typography>
-            <Typography variant="h5" color="inherit" paragraph>
-              {post.description}
-            </Typography>
-            <Link variant="subtitle1" href="#">
-              {post.linkText}
-            </Link>
           </Box>
         </Grid>
       </Grid>
