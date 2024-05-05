@@ -53,10 +53,8 @@ namespace Bislerium.Presentation.Controllers
             // Sort the blogs
             var blogs = SortBlogs(sortBy);
 
-            int actualPageSize = blogs.Count() < pageSize ? blogs.Count() : pageSize;
-
             // Using X.PagedList to paginate the sorted blogs
-            var pagedBlogs = await blogs.ToPagedListAsync(currentPage, actualPageSize);
+            var pagedBlogs = await blogs.ToPagedListAsync(currentPage, pageSize);
 
             // Creating a response object that includes pagination metadata
             var response = new
@@ -82,10 +80,9 @@ namespace Bislerium.Presentation.Controllers
         {
             var user = await _accountService.GetUserByClaimsAsync(User);
             var queryableBlogs = _blogService.GetQueryableAuthorBlogsAsync(user);
-            int actualPageSize = queryableBlogs.Count() < pageSize ? queryableBlogs.Count() : pageSize;
 
             // Using X.PagedList to paginate the queryable blogs
-            var pagedBlogs = await queryableBlogs.ToPagedListAsync(pageNumber, actualPageSize);
+            var pagedBlogs = await queryableBlogs.ToPagedListAsync(pageNumber, pageSize);
 
             // Creating a response object that includes pagination metadata
             var response = new
