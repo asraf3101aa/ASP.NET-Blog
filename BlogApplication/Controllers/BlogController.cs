@@ -111,6 +111,7 @@ namespace Bislerium.Presentation.Controllers
         }
 
         [Authorize]
+        [RequireConfirmedEmail]
         [HttpGet]
         [Route("Categories")]
         public async Task<IActionResult> GetCategories()
@@ -121,6 +122,7 @@ namespace Bislerium.Presentation.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Blogger")]
+        [RequireConfirmedEmail]
         public async Task<IActionResult> Create([FromBody] BlogDTO ? newblog)
         {
             if (!ModelState.IsValid)

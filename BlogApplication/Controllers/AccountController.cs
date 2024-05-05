@@ -66,16 +66,18 @@ namespace Bislerium.Presentation.Controllers
             return Ok(_responseService.SuccessResponse("Registration successful"));
         }
 
-        [HttpGet]
+        [HttpPut]
         [Route("Confirm")]
-        public async Task<IActionResult> ConfirmEmail([FromQuery] string token, [FromQuery] string email)
+        public async Task<IActionResult> ConfirmEmail(TokenEmailDTO tokenEmail)
         {
-            var user = await _accountService.FindByEmailAsync(email);
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
+            var user = await _accountService.FindByEmailAsync(tokenEmail.Email);
             if (user == null)
                 return BadRequest(_responseService.CustomErrorResponse("User", "User not found"));
             if (user.EmailConfirmed)
                 return BadRequest(_responseService.CustomErrorResponse("User", "Email already confirmed"));
-            var result = await _accountService.ConfirmEmailAsync(user, token);
+            var result = await _accountService.ConfirmEmailAsync(user, tokenEmail.Token);
             return result.Succeeded ? Ok(_responseService.SuccessResponse("Email Confirmed")) : BadRequest(_responseService.IdentityResultErrorResponse(result));
         }
 
@@ -92,7 +94,7 @@ namespace Bislerium.Presentation.Controllers
 
         [HttpPost]
         [Route("Password/Forgot")]
-        public async Task<IActionResult> ForgotPassword(EmailModel forgotPasswordModel)
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordDTO forgotPasswordModel)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -109,7 +111,7 @@ namespace Bislerium.Presentation.Controllers
             return Ok(_responseService.SuccessResponse("Password reset token sent in email."));
         }
 
-        [HttpPost]
+        [HttpPut]
         [Route("Password/Confirm")]
         public async Task<IActionResult> ResetPassword(ResetPassword resetPasswordModel)
         {
@@ -175,10 +177,10 @@ namespace Bislerium.Presentation.Controllers
             return Ok();
         }
    
-        [HttpPut]
-        [Route("Email")]
+        [HttpPost]
+        [Route("UpdateEmail")]
         [Authorize]
-        public async Task<IActionResult> UpdateEmail(EmailModel emailModel)
+        public async Task<IActionResult> UpdateEmail(EmailBaseDTO emailModel)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -207,14 +209,14 @@ namespace Bislerium.Presentation.Controllers
             return Ok();
         }
 
-        [HttpPost]
-        [Route("Email/Confirm")]
-        public async Task<IActionResult> ConfirmEmailChange([FromQuery] string token,[FromQuery] string newEmail)
+        [HttpPut]
+        [Route("UpdateEmail/Confirm")]
+        public async Task<IActionResult> ConfirmEmailChange(TokenEmailDTO tokenEmail)
         {
             var user = await _accountService.GetUserByClaimsAsync(User);
 
             // Confirm the email change token
-            var result = await _accountService.ChangeEmailAsync(user, newEmail, token);
+            var result = await _accountService.ChangeEmailAsync(user, tokenEmail.Email, tokenEmail.Token);
 
             if (!result.Succeeded)
                 return BadRequest(_responseService.IdentityResultErrorResponse(result));

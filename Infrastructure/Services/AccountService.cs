@@ -10,13 +10,11 @@ namespace Bislerium.Infrastructure.Services
     public class AccountService : IAccountService
     {
         private readonly UserManager<User> _userManager;
-        private readonly SignInManager<User> _signInManager;
         private readonly ApplicationDbContext _context;
 
-        public AccountService(SignInManager<User> signInManager, UserManager<User> userManager, ApplicationDbContext context)
+        public AccountService(UserManager<User> userManager, ApplicationDbContext context)
         {
             _userManager = userManager;
-            _signInManager = signInManager;
             _context = context;
         }
 

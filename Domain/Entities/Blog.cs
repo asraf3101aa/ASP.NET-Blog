@@ -1,4 +1,6 @@
-﻿namespace Bislerium.Domain.Entities
+﻿using Microsoft.AspNetCore.Http;
+
+namespace Bislerium.Domain.Entities
 {
     public class Category
     {
@@ -15,7 +17,22 @@
         public int Id { get; set; }
         public int BlogId { get; set; }
         public Blog Blog { get; set; }
-        public string Path { get; set; }
+
+        private string? _path;
+        public string? Path
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_path))
+                    return null;
+                var httpContextAccessor = new HttpContextAccessor();
+                var request = httpContextAccessor.HttpContext?.Request;
+                var baseUrl = $"{request?.Scheme}://{request?.Host.Value}";
+
+                return $"{baseUrl}/{_path}";
+            }
+            set => _path = value;
+        }
         public BlogImageType ImageType { get; set; }
     }
     public class Blog

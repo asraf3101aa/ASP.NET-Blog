@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Bislerium.Application.DTOs.AccountDTOs
+namespace Bislerium.Application.DTOs.Extensions
 {
-    public class EmailModel
+    public class EmailBaseDTO
     {
         [Required]
         [EmailAddress]

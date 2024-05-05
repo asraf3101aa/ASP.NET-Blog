@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Bislerium.Application.DTOs.AccountDTOs
 {
-    public class ResetPassword
+    public class ResetPassword : TokenEmailDTO
     {
         [Required]
         [DataType(DataType.Password)]
@@ -13,8 +13,5 @@ namespace Bislerium.Application.DTOs.AccountDTOs
         [DataType(DataType.Password)]
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
-
-        public string Email { get; set; }
-        public string Token { get; set; }
     }
 }

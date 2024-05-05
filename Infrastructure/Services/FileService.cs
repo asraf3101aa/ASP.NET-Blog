@@ -1,15 +1,20 @@
 ﻿using Bislerium.Application.Common.Interfaces;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.StaticFiles;
 
 namespace Bislerium.Infrastructure.Services
 {
     public class FileService : IFileService
     {
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
         private readonly IWebHostEnvironment _webHostEnvironment;
-        public FileService(IWebHostEnvironment webHostEnvironment)
+        public FileService(IWebHostEnvironment webHostEnvironment, IHttpContextAccessor httpContextAccessor)
         {
             _webHostEnvironment = webHostEnvironment;
+            _httpContextAccessor = httpContextAccessor;
+
         }
         private (string, string) CheckFileExtension(IFormFile file)
         {
