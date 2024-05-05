@@ -111,7 +111,5 @@ namespace Bislerium.Infrastructure.Services
         {
             return await _userManager.ChangePasswordAsync(user, changePassword.CurrentPassword, changePassword.NewPassword);
         }
-
     }
-
 }

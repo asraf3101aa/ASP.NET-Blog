@@ -8,6 +8,6 @@ namespace Bislerium.Application.DTOs.AccountDTOs
         [Required]
         public string FirstName { get; set; }
         public string? LastName { get; set; }
-        public IFormFile? Image { get; set; }
+        public IFormFile? Avatar { get; set; }
     }
 }

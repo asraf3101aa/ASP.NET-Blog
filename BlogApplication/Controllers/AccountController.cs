@@ -136,11 +136,11 @@ namespace Bislerium.Presentation.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             var user = await _accountService.GetUserByClaimsAsync(User);
-            if (userUpdate.Image != null)
+            if (userUpdate.Avatar != null)
             {
-                var (filePath, error) = _fileService.UploadFile(userUpdate.Image);
+                var (filePath, error) = _fileService.UploadFile(userUpdate.Avatar);
                 if (error != string.Empty)
-                    return BadRequest(_responseService.CustomErrorResponse(nameof(userUpdate.Image), error));  
+                    return BadRequest(_responseService.CustomErrorResponse(nameof(userUpdate.Avatar), error));  
                 user.Avatar = filePath;
             }
             var result = await _accountService.UpdateAsync(user, userUpdate);
