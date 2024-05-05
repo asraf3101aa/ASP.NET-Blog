@@ -188,7 +188,7 @@ namespace Bislerium.Presentation.Controllers
         }
    
         [HttpPost]
-        [Route("UpdateEmail")]
+        [Route("Email")]
         [Authorize]
         public async Task<IActionResult> UpdateEmail(EmailBaseDTO emailModel)
         {
@@ -220,7 +220,7 @@ namespace Bislerium.Presentation.Controllers
         }
 
         [HttpPut]
-        [Route("UpdateEmail/Confirm")]
+        [Route("Email")]
         public async Task<IActionResult> ConfirmEmailChange(TokenEmailDTO tokenEmail)
         {
             var user = await _accountService.GetUserByClaimsAsync(User);
