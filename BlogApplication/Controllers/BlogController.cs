@@ -75,6 +75,7 @@ namespace Bislerium.Presentation.Controllers
 
             return Ok(_responseService.SuccessResponse(response));
         }
+
         [HttpGet]
         public async Task<IActionResult> UserBlogs(int pageNumber = 1, int pageSize = 10)
         {
@@ -149,6 +150,8 @@ namespace Bislerium.Presentation.Controllers
 
         [HttpPut]
         [Route("{id}")]
+        [Authorize(Roles = "Blogger")]
+        [RequireConfirmedEmail]
         public async Task<IActionResult> Update([FromRoute] int id, BlogDTO blogUpdate)
         {
             var blog = await _blogService.FindByIdAsync(id);

@@ -71,9 +71,9 @@ namespace Bislerium.Presentation.Controllers
                 return BadRequest(ModelState);
             var user = await _accountService.FindByEmailAsync(tokenEmail.Email);
             if (user == null)
-                return BadRequest(_responseService.CustomErrorResponse("User", "User not found"));
+                return NotFound(_responseService.CustomErrorResponse("Not Found", "User not found"));
             if (user.EmailConfirmed)
-                return BadRequest(_responseService.CustomErrorResponse("User", "Email already confirmed"));
+                return BadRequest(_responseService.CustomErrorResponse("Email", "Email already confirmed"));
             var result = await _accountService.ConfirmEmailAsync(user, tokenEmail.Token);
             return result.Succeeded ? Ok(_responseService.SuccessResponse("Email Confirmed")) : BadRequest(_responseService.IdentityResultErrorResponse(result));
         }
