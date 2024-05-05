@@ -17,7 +17,7 @@ namespace Bislerium.Application.Common.Interfaces
         public IQueryable<Blog> GetQueryableAuthorBlogsAsync(User user);
         public IQueryable<Blog> GetQueryableBlogs();
         public int CalculatePopularity(Blog blog);
-        public Task ReactOnBlogAsync(Blog blog, string userId, ReactionType reactionType);
+        public Task ReactAsync(Blog ? blog, Comment ? comment,string userId, ReactionType reactionType);
         public Task<Comment> GetCommentByIdAsync(int id);
         public Task DeleteCommentAsync(Comment comment);
         public Task UpdateCommentAsync(Comment comment, CommentDTO updateComment);

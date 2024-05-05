@@ -199,7 +199,7 @@ namespace Bislerium.Presentation.Controllers
             if (blog == null)
                 return NotFound(_responseService.CustomErrorResponse("Blog", "Blog not found"));
             var user = await _accountService.GetUserByClaimsAsync(User);
-            await _blogService.ReactOnBlogAsync(blog, user.Id, reactionType);
+            await _blogService.ReactAsync(blog, null,user.Id, reactionType);
             if (reactionType == ReactionType.Upvote)
             {
                 string notificationMessage = $"{user.FirstName} {user.LastName} upvoted your blog\n{blog.Title}";
@@ -246,7 +246,7 @@ namespace Bislerium.Presentation.Controllers
         {
             var blog = await _blogService.FindByIdAsync(blogId);
             if (blog == null)
-                return NotFound(_responseService.CustomErrorResponse("Blog", "Blog not found"));
+                return NotFound(_responseService.CustomErrorResponse("Not Found", "Blog not found"));
 
             var comment = blog.Comments.FirstOrDefault(c => c.Id == commentId);
             //var comment = await _blogService.GetCommentByIdAsync(commentId);
@@ -254,6 +254,29 @@ namespace Bislerium.Presentation.Controllers
                 return NotFound(_responseService.CustomErrorResponse("Comment", "Comment not found"));
             await _blogService.DeleteCommentAsync(comment);
             return Ok(_responseService.SuccessResponse("Comment deleted successfully"));
+        }
+
+        [HttpPost]
+        [Route("{blogId}/Comment/{commentId}/Reaction")]
+        public async Task<IActionResult> AddReaction(int blogId, int commentId, [FromBody] ReactionType reactionType)
+        {
+            var blog = await _blogService.FindByIdAsync(blogId);
+            if (blog == null)
+                return NotFound(_responseService.CustomErrorResponse("Not found", "Blog not found"));
+
+            var comment = blog.Comments.FirstOrDefault(c => c.Id == commentId);
+            //var comment = await _blogService.GetCommentByIdAsync(commentId);
+            if (comment == null)
+                return NotFound(_responseService.CustomErrorResponse("Not found", "Comment not found"));
+
+            var user = await _accountService.GetUserByClaimsAsync(User);
+            await _blogService.ReactAsync(null, comment, user.Id, reactionType);
+            if (reactionType == ReactionType.Upvote)
+            {
+                string notificationMessage = $"{user.FirstName} {user.LastName} upvoted your blog\n{blog.Title}";
+                await _hubContext.Clients.User(blog.AuthorId).SendAsync("ReceiveNotification", notificationMessage);
+            }
+            return Ok(_responseService.SuccessResponse("Reacted successfully"));
         }
     }
 }

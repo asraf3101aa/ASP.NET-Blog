@@ -3,6 +3,7 @@ using Bislerium.Application.DTOs.BlogDTOs;
 using Bislerium.Domain.Entities;
 using Bislerium.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Metadata;
 
 namespace Bislerium.Infrastructure.Services
 {
@@ -105,30 +106,57 @@ namespace Bislerium.Infrastructure.Services
             return existingBlog;
         }
 
-        public async Task ReactOnBlogAsync(Blog blog, string userId, ReactionType reactionType)
+        public async Task ReactAsync(Blog ? blog, Comment ? comment, string userId, ReactionType reactionType)
         {
-            var existingReaction = blog.Reactions.FirstOrDefault(r => r.UserId == userId);
+            if (blog != null)
+            {
+                var existingReaction = blog.Reactions.FirstOrDefault(r => r.UserId == userId);
 
-            if (existingReaction != null)
-            {
-                if (existingReaction.Type == reactionType)
-                    _context.Reactions.Remove(existingReaction);
-                else
-                    existingReaction.Type = reactionType;
-            }
-            else
-            {
-                var reaction = new Reaction
+                if (existingReaction != null)
                 {
-                    Type = reactionType,
-                    UserId = userId,
-                    BlogId = blog.Id,
-                };
+                    if (existingReaction.Type == reactionType)
+                        _context.Reactions.Remove(existingReaction);
+                    else
+                        existingReaction.Type = reactionType;
+                }
+                else
+                {
+                    var reaction = new Reaction
+                    {
+                        Type = reactionType,
+                        UserId = userId,
+                        BlogId = blog.Id,
+                    };
 
-                _context.Reactions.Add(reaction);
+                    _context.Reactions.Add(reaction);
+                }
+                await _context.SaveChangesAsync();
+            }
+            if (comment != null)
+            {
+                var existingReaction = comment.Reactions.FirstOrDefault(r => r.UserId == userId);
+
+                if (existingReaction != null)
+                {
+                    if (existingReaction.Type == reactionType)
+                        _context.Reactions.Remove(existingReaction);
+                    else
+                        existingReaction.Type = reactionType;
+                }
+                else
+                {
+                    var reaction = new Reaction
+                    {
+                        Type = reactionType,
+                        UserId = userId,
+                        CommentId = comment.Id,
+                    };
+
+                    _context.Reactions.Add(reaction);
+                }
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
         }
 
         public async Task<Comment> GetCommentByIdAsync(int id)
