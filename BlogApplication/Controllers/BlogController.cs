@@ -76,6 +76,7 @@ namespace Bislerium.Presentation.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> UserBlogs(int pageNumber = 1, int pageSize = 10)
         {
             var user = await _accountService.GetUserByClaimsAsync(User);
