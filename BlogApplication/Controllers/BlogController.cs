@@ -47,7 +47,7 @@ namespace Bislerium.Presentation.Controllers
    
         [HttpGet]
         [Route("List")]
-        public async Task<IActionResult> Index([FromQuery] string sortBy = "recency", [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        public async Task<IActionResult> List([FromQuery] string sortBy = "recency", [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             int currentPage = pageNumber;
             // Sort the blogs
@@ -99,7 +99,6 @@ namespace Bislerium.Presentation.Controllers
                     HasNextPage = pagedBlogs.HasNextPage
                 }
             };
-
             return Ok(_responseService.SuccessResponse(response));
         }
 
