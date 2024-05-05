@@ -1,12 +1,8 @@
 ﻿using Bislerium.Application.Common.Interfaces;
 using Bislerium.Application.DTOs.AccountDTOs;
 using Bislerium.Application.DTOs.Extensions;
-using Bislerium.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using X.PagedList;
-
 
 namespace Bislerium.Presentation.Controllers
 {
@@ -104,8 +100,15 @@ namespace Bislerium.Presentation.Controllers
                 return BadRequest(_responseService.CustomErrorResponse("User", "User with this email not found."));
 
             var token = await _accountService.GeneratePasswordResetTokenAsync(user);
-            var callback = Url.Action(nameof(ResetPassword), "Account", new { token, email = user.Email }, Request.Scheme);
+            // Get the client's origin URL
+            var clientOrigin = Request.Headers["Origin"].ToString();
 
+            // If the client origin is not present, fallback to the current request URL
+            if (string.IsNullOrEmpty(clientOrigin))
+                clientOrigin = $"{Request.Scheme}://{Request.Host}";
+
+            // Construct the confirmation link with the client's origin URL
+            var callback = $"{clientOrigin}/reset-password?token={token}&email={user.Email}";
             var message = new Message(new string[] { user.Email }, "Reset password token", callback, null);
             await _emailService.SendEmailAsync(message);
             return Ok(_responseService.SuccessResponse("Password reset token sent in email."));
@@ -123,7 +126,7 @@ namespace Bislerium.Presentation.Controllers
                 return BadRequest(_responseService.CustomErrorResponse("User", "User with this email not found."));
 
             var resetPassResult = await _accountService.ResetPasswordAsync(user, resetPasswordModel);
-            return resetPassResult.Succeeded? Ok():BadRequest(_responseService.IdentityResultErrorResponse(resetPassResult));
+            return resetPassResult.Succeeded? Ok(_responseService.SuccessResponse("Password changed successfully.")) :BadRequest(_responseService.IdentityResultErrorResponse(resetPassResult));
         }
 
         [HttpPut]
@@ -142,7 +145,7 @@ namespace Bislerium.Presentation.Controllers
                 user.Avatar = filePath;
             }
             var result = await _accountService.UpdateAsync(user, userUpdate);
-            return result.Succeeded ? Ok() : BadRequest(_responseService.IdentityResultErrorResponse(result));
+            return result.Succeeded ? Ok(_responseService.SuccessResponse("User details updated successfully.")) : BadRequest(_responseService.IdentityResultErrorResponse(result));
         }
 
         [HttpDelete]
@@ -171,10 +174,18 @@ namespace Bislerium.Presentation.Controllers
         {
             var user = await _accountService.GetUserByClaimsAsync(User);
             var token = await _accountService.GenerateEmailConfirmationTokenAsync(user);
-            var confirmationLink = Url.Action(nameof(ConfirmEmail), "Account", new { token, email = user.Email }, Request.Scheme);
+            // Get the client's origin URL
+            var clientOrigin = Request.Headers["Origin"].ToString();
+
+            // If the client origin is not present, fallback to the current request URL
+            if (string.IsNullOrEmpty(clientOrigin))
+                clientOrigin = $"{Request.Scheme}://{Request.Host}";
+
+            // Construct the confirmation link with the client's origin URL
+            var confirmationLink = $"{clientOrigin}/confirm-email?token={token}&email={user.Email}";
             var message = new Message(new string[] { user.Email }, "Confirmation email link", confirmationLink, null);
             await _emailService.SendEmailAsync(message);
-            return Ok();
+            return Ok(_responseService.SuccessResponse("Confirmation email sent successfully."));
         }
    
         [HttpPost]
@@ -206,7 +217,7 @@ namespace Bislerium.Presentation.Controllers
             //    return BadRequest(_responseService.IdentityResultErrorResponse(result));
 
             await _emailService.SendEmailAsync(message);
-            return Ok();
+            return Ok(_responseService.SuccessResponse("Check email for confirmation mail."));
         }
 
         [HttpPut]
@@ -221,7 +232,7 @@ namespace Bislerium.Presentation.Controllers
             if (!result.Succeeded)
                 return BadRequest(_responseService.IdentityResultErrorResponse(result));
 
-            return Ok("Your email has been updated successfully.");
+            return Ok(_responseService.SuccessResponse("Your email has been updated successfully."));
         }
 
         [HttpPut("Password")]
@@ -232,7 +243,7 @@ namespace Bislerium.Presentation.Controllers
                 return BadRequest(ModelState);
             var user = await _accountService.GetUserByClaimsAsync(User);
             var resetPassResult = await _accountService.ChangePasswordAsync(user, changePassword);
-            return resetPassResult.Succeeded ? Ok() : BadRequest(_responseService.IdentityResultErrorResponse(resetPassResult));
+            return resetPassResult.Succeeded ? Ok(_responseService.SuccessResponse("Your password has been updated successfully.")) : BadRequest(_responseService.IdentityResultErrorResponse(resetPassResult));
         }
     }
 }
