@@ -12,18 +12,16 @@ namespace Bislerium.Presentation.Controllers
     public class AccountController : ControllerBase
     {
         private readonly IAccountService _accountService;
-        private readonly IBlogService _blogService;
         private readonly IEmailService _emailService;
         private readonly IFileService _fileService;
         private readonly IJWTTokenService _jwtTokenService;
         private readonly IResponseService _responseService;
 
-        public AccountController(IResponseService responseService,IFileService fileService, IAccountService accountService, IEmailService emailService, IBlogService blogService, IJWTTokenService jwtTokenService)
+        public AccountController(IResponseService responseService, IFileService fileService, IAccountService accountService, IEmailService emailService, IBlogService blogService, IJWTTokenService jwtTokenService)
         {
             _accountService = accountService;
             _emailService = emailService;
             _fileService = fileService;
-            _blogService = blogService;
             _jwtTokenService = jwtTokenService;
             _responseService = responseService;
         }

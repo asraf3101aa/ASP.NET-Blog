@@ -6,6 +6,7 @@ using Bislerium.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PasswordGenerator;
+using System.Globalization;
 using System.Web;
 
 namespace Bislerium.Presentation.Controllers
@@ -132,8 +133,10 @@ namespace Bislerium.Presentation.Controllers
 
             var popularBlogger = queryablePopularBloggers.Take(10).ToList();
             return Ok(_responseService.SuccessResponse(
-                new AdminDashboardDTO
+                new
                 {
+                    Duration = duration,
+                    Month = month,
                     BlogStats = blogStats,
                     PopularBlogger = popularBlogger,
                     PopularBlogs = popularBlogs
