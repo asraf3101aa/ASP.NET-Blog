@@ -185,7 +185,7 @@ namespace Bislerium.Presentation.Controllers
             if (blog == null || blog.AuthorId != User.FindFirstValue(ClaimTypes.NameIdentifier))
                 return NotFound(_responseService.CustomErrorResponse("Blog", "Blog not found"));
             await _blogService.DeleteBlogAsync(blog);
-            return Ok();
+            return Ok(_responseService.SuccessResponse("Blog deleted successfully"));
         }
 
         [HttpPost]
@@ -202,7 +202,7 @@ namespace Bislerium.Presentation.Controllers
                 string notificationMessage = $"{user.FirstName} {user.LastName} upvoted your blog\n{blog.Title}";
                 await _hubContext.Clients.User(blog.AuthorId).SendAsync("ReceiveNotification", notificationMessage);
             }
-            return Ok();
+            return Ok(_responseService.SuccessResponse("Reacted successfully"));
         }
 
         [HttpPost]
@@ -217,7 +217,7 @@ namespace Bislerium.Presentation.Controllers
             await _blogService.AddCommentAsync(commentDto, blog.Id, user.Id);
             string notificationMessage = $"{user.FirstName} {user.LastName} commented on your blog\n{blog.Title}";
             await _hubContext.Clients.User(blog.AuthorId).SendAsync("ReceiveNotification", notificationMessage);
-            return Ok();
+            return Ok(_responseService.SuccessResponse("Comment added successfully"));
         }
 
         [HttpPut]
@@ -234,7 +234,7 @@ namespace Bislerium.Presentation.Controllers
 
             await _blogService.UpdateCommentAsync(comment, commentDto);
 
-            return Ok();
+            return Ok(_responseService.SuccessResponse("Comment updated successfully"));
         }
 
         [HttpDelete]
@@ -250,7 +250,7 @@ namespace Bislerium.Presentation.Controllers
             if (comment == null)
                 return NotFound(_responseService.CustomErrorResponse("Comment", "Comment not found"));
             await _blogService.DeleteCommentAsync(comment);
-            return Ok();
+            return Ok(_responseService.SuccessResponse("Comment deleted successfully"));
         }
     }
 }

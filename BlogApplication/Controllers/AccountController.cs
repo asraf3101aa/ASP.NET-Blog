@@ -3,6 +3,7 @@ using Bislerium.Application.DTOs.AccountDTOs;
 using Bislerium.Application.DTOs.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Web;
 
 namespace Bislerium.Presentation.Controllers
 {
@@ -45,7 +46,7 @@ namespace Bislerium.Presentation.Controllers
             if (!roleAddResult.Succeeded)
                 return BadRequest(_responseService.IdentityResultErrorResponse(roleAddResult));
 
-            var token = await _accountService.GenerateEmailConfirmationTokenAsync(user);
+            var token = HttpUtility.UrlEncode(await _accountService.GenerateEmailConfirmationTokenAsync(user));
 
             // Get the client's origin URL
             var clientOrigin = Request.Headers["Origin"].ToString();
@@ -99,7 +100,7 @@ namespace Bislerium.Presentation.Controllers
             if (user == null)
                 return BadRequest(_responseService.CustomErrorResponse("User", "User with this email not found."));
 
-            var token = await _accountService.GeneratePasswordResetTokenAsync(user);
+            var token = HttpUtility.UrlEncode(await _accountService.GeneratePasswordResetTokenAsync(user));
             // Get the client's origin URL
             var clientOrigin = Request.Headers["Origin"].ToString();
 
@@ -173,7 +174,7 @@ namespace Bislerium.Presentation.Controllers
         public async Task<IActionResult> ResendEmailConfirmation()
         {
             var user = await _accountService.GetUserByClaimsAsync(User);
-            var token = await _accountService.GenerateEmailConfirmationTokenAsync(user);
+            var token = HttpUtility.UrlEncode(await _accountService.GenerateEmailConfirmationTokenAsync(user));
             // Get the client's origin URL
             var clientOrigin = Request.Headers["Origin"].ToString();
 
@@ -200,7 +201,7 @@ namespace Bislerium.Presentation.Controllers
             if (emailModel.Email == user.Email || existingUser!= null)
                 return BadRequest(_responseService.CustomErrorResponse("Email", "Please provide a different email"));
 
-            var token = await _accountService.GenerateChangeEmailTokenAsync(user, emailModel.Email);
+            var token = HttpUtility.UrlEncode(await _accountService.GenerateChangeEmailTokenAsync(user, emailModel.Email));
             // Get the client's origin URL
             var clientOrigin = Request.Headers["Origin"].ToString();
 

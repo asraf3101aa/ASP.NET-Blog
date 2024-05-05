@@ -6,6 +6,7 @@ using Bislerium.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PasswordGenerator;
+using System.Web;
 
 namespace Bislerium.Presentation.Controllers
 {
@@ -53,7 +54,7 @@ namespace Bislerium.Presentation.Controllers
           
             // Confirm the email for the admin user
             var confirmEmailResult = await _accountService.ConfirmEmailAsync(user, await _accountService.GenerateEmailConfirmationTokenAsync(user));
-            var token = await _accountService.GeneratePasswordResetTokenAsync(user);
+            var token = HttpUtility.UrlEncode(await _accountService.GeneratePasswordResetTokenAsync(user));
 
             // Construct the password reset link
             var resetLink = Url.Action(nameof(ResetPassword), "Account", new { token, email = user.Email }, Request.Scheme);
