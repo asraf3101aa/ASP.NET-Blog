@@ -44,7 +44,7 @@ export class FetchAPI implements IFetchAPI {
       method,
       headers,
     };
-    if (data) {
+    if (data || data === 0) {
       // Include data in request body
       options.body = JSON.stringify(data);
     }

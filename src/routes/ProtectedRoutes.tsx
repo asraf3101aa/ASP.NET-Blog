@@ -5,7 +5,6 @@ import { useRepository } from "@/contexts/RepositoryContext";
 import { useEffect } from "react";
 import { AccountModels } from "@/@types/account";
 import { AccountModelsType } from "@/@enums/account.enum";
-import { BlogsDurationFilters, BlogsSortingFilters } from "@/@enums/blog.enum";
 import { getRoleFromJwtToken } from "@/@utils/getRoleFromJwtToken";
 import { UserRoles } from "@/@enums/storage.enum";
 import { AdminDashboardData } from "@/@types/admin";
@@ -21,6 +20,7 @@ const ProtectedRoutes = () => {
     blogRepository,
     adminRepository,
     accountRepository,
+    dashboardDataFilters,
     setUser,
     setBlogs,
     setIsLoading,
@@ -50,17 +50,6 @@ const ProtectedRoutes = () => {
                 setUser(profileDataResponse);
 
                 blogRepository
-                  .getHomepageBlogs(BlogsSortingFilters.RECENCY, 1)
-                  .then((blogs) => {
-                    if ("errors" in blogs) {
-                      console.error(blogs);
-                    } else {
-                      setHomepageBlogsData(blogs);
-                    }
-                  })
-                  .catch((error) => console.error(error));
-
-                blogRepository
                   .getCategories()
                   .then((categories) => {
                     if ("errors" in categories) {
@@ -81,7 +70,10 @@ const ProtectedRoutes = () => {
                     .catch((error) => console.error(error));
                 } else {
                   adminRepository
-                    .getDashboardData(BlogsDurationFilters.MONTHLY, 3)
+                    .getDashboardData(
+                      dashboardDataFilters.duration,
+                      dashboardDataFilters.month
+                    )
                     .then((data: ApiResponse<AdminDashboardData>) => {
                       if ("errors" in data) {
                         console.error(data);
@@ -104,6 +96,7 @@ const ProtectedRoutes = () => {
     adminRepository,
     blogRepository,
     localStorageClient,
+    dashboardDataFilters,
     setBlogs,
     setCategories,
     setDashboardData,

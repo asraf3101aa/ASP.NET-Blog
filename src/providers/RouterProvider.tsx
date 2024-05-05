@@ -12,14 +12,14 @@ const RouterProvider = ({ children }: ProviderProps) => {
   // Access `navigate` instance from React's useNavigate hook
   const navigate = useNavigate();
 
-  // Handle return navigation, -1 means go back 1 step in Browser history
-  const handleReturn = () => navigate(-1);
+  // Handle return navigation, 0 means go to current page in Browser history
+  const handleReload = () => navigate(0);
   // Redirect from the current page to a provided route
   const handleRedirect = (route: string) => navigate(route);
 
   // Create a shared context value
   const shared: RouterProps = {
-    handleReturn,
+    handleReload,
     handleRedirect,
   };
 

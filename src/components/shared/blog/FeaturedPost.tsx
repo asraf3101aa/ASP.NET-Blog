@@ -58,7 +58,9 @@ const FeaturedPost = (props: { blog: BlogModels[BlogModelsType.BLOG] }) => {
 
   return (
     <Grid item xs={10} key={id}>
-      <CardActionArea onClick={() => handleRedirect(RoutePath.DETAILS)}>
+      <CardActionArea
+        onClick={() => handleRedirect(`${RoutePath.DETAILS}/${id}`)}
+      >
         <Card sx={{ display: "flex" }}>
           <CardContent sx={{ flex: 1 }}>
             <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
@@ -71,7 +73,7 @@ const FeaturedPost = (props: { blog: BlogModels[BlogModelsType.BLOG] }) => {
               </Box>
             </Box>
             <Typography variant="subtitle1" color="text.secondary">
-              {moment(createdAt).format("DD MMM YYYY")}
+              {moment(createdAt).format("hh:MM A, DD MMM YYYY")}
             </Typography>
             <Box sx={{ display: "flex", textWrap: "pretty" }}>
               {/* Adjust maxWidth as needed */}

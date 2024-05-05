@@ -1,7 +1,12 @@
 import { AccountModels } from "./account";
 import { AccountModelsType } from "@/@enums/account.enum";
 import { BlogModels } from "./blog";
-import { BlogModelsType } from "@/@enums/blog.enum";
+import { BlogModelsType, BlogsDurationFilters } from "@/@enums/blog.enum";
+
+export type DashboardDataFilters = {
+  duration: BlogsDurationFilters;
+  month?: number;
+};
 
 // Type representing data for admin dashboard
 export type AdminDashboardData = {

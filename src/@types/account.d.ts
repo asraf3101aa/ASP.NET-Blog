@@ -9,7 +9,7 @@ type IdentityUser = {
 // User type inheriting from IdentityUser
 type User = IdentityUser & {
   firstName: string; // Required field
-  emailVerified: boolean;
+  emailConfirmed: boolean;
   lastName?: string; // Optional field
   avatar?: string; // Optional field, represents an image URL or similar
 };
@@ -17,8 +17,8 @@ type User = IdentityUser & {
 // PopularBlogger type inheriting from User
 type PopularBlogger = User & {
   totalBlogs: number; // Number of blogs
-  totalUpvotes: number; // Total upvotes received
-  totalDownvotes: number; // Total downvotes received
+  totalUpvote: number; // Total upvotes received
+  totalDownvote: number; // Total downvotes received
   totalComments: number; // Number of comments
   totalPopularityScore: number; // Popularity score
 };
@@ -45,7 +45,6 @@ type UserRegister = AccountRegister & {
 type UserLogin = {
   email: string; // Required field, should be a valid email
   password: string; // Required field
-  rememberMe?: boolean; // Optional, defaults to false
 };
 
 // Structure for changing password

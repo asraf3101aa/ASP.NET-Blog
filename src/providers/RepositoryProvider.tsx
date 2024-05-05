@@ -9,8 +9,8 @@ import { ProviderProps, RepositoryProps } from "@/@types/providers";
 import { AccountModels } from "@/@types/account";
 import { AccountModelsType } from "@/@enums/account.enum";
 import { BlogModels } from "@/@types/blog";
-import { BlogModelsType } from "@/@enums/blog.enum";
-import { AdminDashboardData } from "@/@types/admin";
+import { BlogModelsType, BlogsDurationFilters } from "@/@enums/blog.enum";
+import { AdminDashboardData, DashboardDataFilters } from "@/@types/admin";
 
 /**
  * RepositoryProvider: A component to provide Repository context to its children.
@@ -37,6 +37,12 @@ const RepositoryProvider = ({ children }: ProviderProps) => {
     BlogModels[BlogModelsType.CATEGORY][]
   >([]);
 
+  const [dashboardDataFilters, setDashboardDataFilters] =
+    useState<DashboardDataFilters>({
+      duration: BlogsDurationFilters.ALL,
+      month: undefined,
+    });
+
   // Create a shared context value
   const shared: RepositoryProps = {
     isLoading,
@@ -53,6 +59,8 @@ const RepositoryProvider = ({ children }: ProviderProps) => {
     setDashboardData,
     categories,
     setCategories,
+    dashboardDataFilters,
+    setDashboardDataFilters,
     blogRepository,
     adminRepository,
     accountRepository,

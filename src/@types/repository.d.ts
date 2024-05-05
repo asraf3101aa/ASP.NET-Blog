@@ -2,7 +2,11 @@ import { AccountModels } from "./account";
 import { BlogModels } from "@/@types/blog";
 import { AdminDashboardData } from "./admin";
 import { AccountModelsType } from "@/@enums/account.enum";
-import { BlogModelsType, ReactionType } from "@/@enums/blog.enum";
+import {
+  BlogModelsType,
+  BlogsDurationFilters,
+  ReactionType,
+} from "@/@enums/blog.enum";
 
 /**
  * Interface for managing user account-related operations.
@@ -33,6 +37,12 @@ export interface IAccountRepository {
    * @returns A promise that resolves with an API response containing a success message.
    */
   confirmEmail: (token: string, email: string) => Promise<ApiResponse<string>>;
+
+  /**
+   * Resend confirmation of a user's email address.
+   * @returns A promise that resolves with an API response containing a success message.
+   */
+  confirmEmailResend: () => Promise<ApiResponse<string>>;
 
   /**
    * Sends a forgot password request.
@@ -114,8 +124,8 @@ export interface IAdminRepository {
    * @returns A promise that resolves with an API response containing the admin dashboard data.
    */
   getDashboardData: (
-    duration: string,
-    month: number
+    duration: BlogsDurationFilters,
+    month?: number
   ) => Promise<ApiResponse<AdminDashboardData>>;
 }
 
@@ -193,6 +203,19 @@ export interface IBlogRepository {
    */
   reactOnBlog(
     id: string,
+    reactionType: ReactionType
+  ): Promise<ApiResponse<string>>;
+
+  /**
+   * Adds a reaction to a specific blog.
+   * @param blogId - The ID of the blog to react on.
+   * @param commentId - The ID of the comment to react on.
+   * @param reactionType - The type of reaction.
+   * @returns A promise resolving to a confirmation message wrapped in an ApiResponse.
+   */
+  reactOnBlogComment(
+    blogId: string,
+    commentId: string,
     reactionType: ReactionType
   ): Promise<ApiResponse<string>>;
 

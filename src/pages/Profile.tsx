@@ -101,7 +101,7 @@ const Profile = () => {
         <List component="nav">
           <Fragment>
             <ListItemButton
-              sx={{ display: userRole !== UserRoles.ADMIN ? "none" : "block" }}
+              sx={{ display: userRole !== UserRoles.ADMIN ? "none" : "flex" }}
               onClick={() => handleRedirect(RoutePath.DASHBOARD)}
             >
               <Tooltip title={RouteTitle.DASHBOARD} arrow placement="top-start">
@@ -163,7 +163,6 @@ const Profile = () => {
           sx={{
             display: "flex",
             flexDirection: "column",
-            justifyContent: "center",
             alignItems: "center",
             minHeight: "80vh",
             px: 4,
@@ -171,7 +170,16 @@ const Profile = () => {
           }}
         >
           {isLoading ? (
-            <img src="/assets/icons/Loading.svg" alt="LoadingIcon" />
+            <Container
+              sx={{
+                height: "50vh",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <img src="/assets/icons/Loading.svg" alt="LoadingIcon" />
+            </Container>
           ) : user ? (
             <>
               <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
@@ -179,11 +187,20 @@ const Profile = () => {
                   <UserDetails user={user} />
                 </Grid>
               </Container>
-              <Container>
+              <Container
+                sx={{ display: userRole === UserRoles.ADMIN ? "none" : "flex" }}
+              >
                 <CreateBlogModal />
               </Container>
-              <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-                <Grid item xs={12}>
+              <Container
+                maxWidth="lg"
+                sx={{
+                  display: userRole === UserRoles.ADMIN ? "none" : "flex",
+                  mt: 4,
+                  mb: 4,
+                }}
+              >
+                <Grid sx={{ width: "100%" }}>
                   <Paper
                     sx={{ p: 2, display: "flex", flexDirection: "column" }}
                   >

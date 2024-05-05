@@ -7,13 +7,17 @@ import _ from "lodash";
 import { AccountModelsType } from "@/@enums/account.enum";
 import { AccountModels } from "@/@types/account";
 import { Fragment } from "react";
+import { Typography } from "@mui/material";
 
-const PopularBloggers = (popularBloggers: {
+const PopularBloggers = (props: {
   popularBloggers: AccountModels[AccountModelsType.POPULAR_BLOGGER][];
 }) => {
+  const popularBloggers = props.popularBloggers;
   return (
     <Fragment>
-      <div>Recent PopularBloggers</div>
+      <Typography variant="h6" pb={1}>
+        Recent Popular Bloggers
+      </Typography>
       <Table size="small">
         <TableHead>
           <TableRow>
@@ -28,7 +32,9 @@ const PopularBloggers = (popularBloggers: {
         </TableHead>
         <TableBody>
           {_.isEmpty(popularBloggers) ? (
-            <div>No blogs posted yet.</div>
+            <Typography variant="body1" sx={{ mt: 1 }}>
+              No blogs posted yet.
+            </Typography>
           ) : (
             _.map(
               popularBloggers,
@@ -37,8 +43,8 @@ const PopularBloggers = (popularBloggers: {
                   <TableCell>{`${blogger.firstName} ${blogger.lastName}`}</TableCell>
                   <TableCell>{blogger.email}</TableCell>
                   <TableCell>{blogger.totalBlogs}</TableCell>
-                  <TableCell>{blogger.totalUpvotes}</TableCell>
-                  <TableCell>{blogger.totalDownvotes}</TableCell>
+                  <TableCell>{blogger.totalUpvote}</TableCell>
+                  <TableCell>{blogger.totalDownvote}</TableCell>
                   <TableCell>{blogger.totalComments}</TableCell>
                   <TableCell>{blogger.totalPopularityScore}</TableCell>
                 </TableRow>

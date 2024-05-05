@@ -9,6 +9,7 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
+  Tooltip,
 } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import { BlogModels } from "@/@types/blog";
@@ -17,6 +18,7 @@ import { useRepository } from "@/contexts/RepositoryContext";
 import _ from "lodash";
 import { useRouter } from "@/contexts/RouterContext";
 import { RoutePath } from "@/@enums/router.enum";
+import { Info } from "@mui/icons-material";
 
 const CreateBlogModal = () => {
   const [open, setOpen] = useState(false);
@@ -33,7 +35,7 @@ const CreateBlogModal = () => {
     setOpen(false);
   };
 
-  const { isLoading, categories, setIsLoading, blogRepository } =
+  const { isLoading, categories, user, setIsLoading, blogRepository } =
     useRepository()!;
 
   const { handleRedirect } = useRouter()!;
@@ -59,9 +61,20 @@ const CreateBlogModal = () => {
 
   return (
     <>
-      <Button variant="contained" onClick={handleOpen}>
-        Create New Blog
-      </Button>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        <Button
+          variant="contained"
+          disabled={!user?.emailConfirmed}
+          onClick={handleOpen}
+        >
+          Create New Blog
+        </Button>
+        {!user?.emailConfirmed && (
+          <Tooltip title="Please verify email first" placement="right">
+            <Info sx={{ color: "#1976d2" }} />
+          </Tooltip>
+        )}
+      </Box>
 
       <Modal
         open={open}
@@ -75,15 +88,17 @@ const CreateBlogModal = () => {
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: 400,
+            width: 600,
             bgcolor: "background.paper",
             boxShadow: 24,
             p: 4,
             borderRadius: 2,
+            maxHeight: "100vh",
+            overflow: "auto",
           }}
         >
           <Typography variant="h6" id="blog-form-modal-title">
-            Create/Edit Blog
+            Create Blog
           </Typography>
 
           <form onSubmit={handleSubmit(onSubmit)}>
@@ -128,7 +143,7 @@ const CreateBlogModal = () => {
               control={control}
               render={({ field }) => (
                 <FormControl fullWidth margin="normal">
-                  <InputLabel>Category ID</InputLabel>
+                  <InputLabel>Category</InputLabel>
                   <Select {...field} label="Category ID" defaultValue="">
                     {_.map(categories, (category) => (
                       <MenuItem value={category.id.toString()}>

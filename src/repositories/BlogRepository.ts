@@ -77,6 +77,16 @@ export class BlogRepository implements IBlogRepository {
     );
   }
 
+  async reactOnBlogComment(
+    blogId: string,
+    commentId: string,
+    reaction: ReactionType
+  ) {
+    return await this._fetchAPI.post<string, ReactionType>(
+      `${this._blogEndpointPath}/${blogId}/${BlogEndpointPaths.COMMENT}/${commentId}/${BlogEndpointPaths.REACTION}`,
+      reaction
+    );
+  }
   async updateBlogComment(blogId: string, commentId: string, text: string) {
     return await this._fetchAPI.update<string, { text: string }>(
       `${this._blogEndpointPath}/${blogId}/${BlogEndpointPaths.COMMENT}/${commentId}`,

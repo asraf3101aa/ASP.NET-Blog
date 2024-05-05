@@ -31,6 +31,7 @@ import DashboardTile from "@/components/shared/dashboard/DashboardTile";
 import { Home, Logout } from "@mui/icons-material";
 import { handleLogout } from "@/@utils/handleLogout";
 import { Tooltip } from "@mui/material";
+import DashboardDataFilters from "@/components/shared/dashboard/DashboardDataFilters";
 
 const Dashboard = () => {
   const [open, setOpen] = useState(true);
@@ -157,9 +158,9 @@ const Dashboard = () => {
             flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
-            height: "90%",
           }}
         >
+          <DashboardDataFilters />
           {isLoading ? (
             <img src="/assets/icons/Loading.svg" />
           ) : dashboardData ? (

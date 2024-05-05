@@ -7,7 +7,7 @@ import {
 } from "./repository";
 import { BlogModels } from "./blog";
 import { BlogModelsType } from "@/@enums/blog.enum";
-import { AdminDashboardData } from "./admin";
+import { AdminDashboardData, DashboardDataFilters } from "./admin";
 
 /**
  * ProviderProps: Represents props for a provider component.
@@ -23,11 +23,11 @@ declare type ProviderProps = {
  * RouterProps: Represents the props of the router context.
  *
  * Properties:
- * - handleReturn: A function to handle navigation back.
+ * - handleReload: A function to handle navigation back.
  * - handleRedirect: A function to handle navigation redirection.
  */
 declare type RouterProps = {
-  handleReturn: () => void;
+  handleReload: () => void;
   handleRedirect: (route: string) => void;
 };
 
@@ -52,6 +52,8 @@ declare type RepositoryProps = {
   setBlogDetails: (blog: BlogModels[BlogModelsType.BLOG]) => void;
   categories: BlogModels[BlogModelsType.CATEGORY][];
   setCategories: (categories: BlogModels[BlogModelsType.CATEGORY][]) => void;
+  dashboardDataFilters: DashboardDataFilters;
+  setDashboardDataFilters: (dashboardDataFilters: DashboardDataFilters) => void;
 
   accountRepository: IAccountRepository;
   adminRepository: IAdminRepository;
