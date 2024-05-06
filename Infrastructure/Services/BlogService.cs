@@ -121,9 +121,7 @@ namespace Bislerium.Infrastructure.Services
                     {
                         existingReaction.Type = reactionType;
                         _context.Reactions.Update(existingReaction);
-                    }
-                        
-                        
+                    }                        
                 }
                 else
                 {
