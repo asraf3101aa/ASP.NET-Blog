@@ -19,7 +19,7 @@ namespace Bislerium.Domain.Entities
         public Blog Blog { get; set; }
 
         private string? _path;
-        public string? Path
+        public string Path
         {
             get
             {

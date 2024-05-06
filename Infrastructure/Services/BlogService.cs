@@ -34,9 +34,9 @@ namespace Bislerium.Infrastructure.Services
                 .Include(b => b.Images)
                 .Include(b => b.Reactions)
                     .ThenInclude(r => r.User)
-                .Include(b => b.Comments.OrderBy(c => c.CreatedAt))
+                .Include(b => b.Comments.OrderByDescending(c => c.CreatedAt))
                     .ThenInclude(c => c.User)
-               .Include(b => b.Comments.OrderBy(c => c.CreatedAt))
+                .Include(b => b.Comments.OrderByDescending(c => c.CreatedAt))
                     .ThenInclude(c => c.Reactions)
                         .ThenInclude(r => r.User);
 

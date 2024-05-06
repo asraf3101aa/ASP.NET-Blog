@@ -9,6 +9,6 @@ namespace Bislerium.Application.DTOs.BlogDTOs
         [Required]
         public string Body { get; set; }
         public int CategoryId { get; set; }
-        public ICollection<BlogImagesDTO>? Images { get; set; }
+        public ICollection<BlogImagesDTO> ? Images { get; set; }
     }
 }

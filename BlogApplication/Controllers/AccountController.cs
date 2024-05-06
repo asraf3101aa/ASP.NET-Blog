@@ -144,7 +144,7 @@ namespace Bislerium.Presentation.Controllers
                 user.Avatar = filePath;
             }
             var result = await _accountService.UpdateAsync(user, userUpdate);
-            return result.Succeeded ? Ok(_responseService.SuccessResponse("User details updated successfully.")) : BadRequest(_responseService.IdentityResultErrorResponse(result));
+            return result.Succeeded ? Accepted(_responseService.SuccessResponse("User details updated successfully.")) : BadRequest(_responseService.IdentityResultErrorResponse(result));
         }
 
         [HttpDelete]

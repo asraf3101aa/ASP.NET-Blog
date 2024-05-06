@@ -174,7 +174,7 @@ namespace Bislerium.Presentation.Controllers
                 }
             }
             var updatedBlog = await _blogService.UpdateAsync(blogUpdate, blog, blogImages);
-            return Accepted();
+            return Accepted(_responseService.SuccessResponse("Blog updated Successfully."));
         }
 
 
@@ -208,6 +208,7 @@ namespace Bislerium.Presentation.Controllers
         }
 
         [HttpPost]
+        [RequireConfirmedEmail]
         [Route("{blogId}/Comment")]
         public async Task<IActionResult> AddComment(int blogId, [FromBody] CommentDTO commentDto)
         {
@@ -223,16 +224,17 @@ namespace Bislerium.Presentation.Controllers
         }
 
         [HttpPut]
+        [RequireConfirmedEmail]
         [Route("{blogId}/Comment/{commentId}")]
         public async Task<IActionResult> UpdateComment(int blogId, int commentId, [FromBody] CommentDTO commentDto)
         {
             var blog = await _blogService.FindByIdAsync(blogId);
             if (blog == null)
-                return NotFound(_responseService.CustomErrorResponse("Blog", "Blog not found"));
+                return NotFound(_responseService.CustomErrorResponse("Not found", "Blog not found"));
 
             var comment = blog.Comments.FirstOrDefault(c => c.Id == commentId);
             if (comment == null)
-                return NotFound(_responseService.CustomErrorResponse("Comment", "Comment not found"));
+                return NotFound(_responseService.CustomErrorResponse("Not found", "Comment not found"));
 
             await _blogService.UpdateCommentAsync(comment, commentDto);
 
@@ -240,6 +242,7 @@ namespace Bislerium.Presentation.Controllers
         }
 
         [HttpDelete]
+        [RequireConfirmedEmail]
         [Route("{blogId}/Comment/{commentId}")]
         public async Task<IActionResult> DeleteComment(int blogId, int commentId)
         {
@@ -250,12 +253,13 @@ namespace Bislerium.Presentation.Controllers
             var comment = blog.Comments.FirstOrDefault(c => c.Id == commentId);
             //var comment = await _blogService.GetCommentByIdAsync(commentId);
             if (comment == null)
-                return NotFound(_responseService.CustomErrorResponse("Comment", "Comment not found"));
+                return NotFound(_responseService.CustomErrorResponse("Not found", "Comment not found"));
             await _blogService.DeleteCommentAsync(comment);
             return Ok(_responseService.SuccessResponse("Comment deleted successfully"));
         }
 
         [HttpPost]
+        [RequireConfirmedEmail]
         [Route("{blogId}/Comment/{commentId}/Reaction")]
         public async Task<IActionResult> AddReaction(int blogId, int commentId, [FromBody] ReactionType reactionType)
         {
