@@ -195,7 +195,7 @@ namespace Bislerium.Presentation.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             var user = await _accountService.GetUserByClaimsAsync(User);
-            var existingUser = _accountService.FindByEmailAsync(emailModel.Email);
+            var existingUser = await _accountService.FindByEmailAsync(emailModel.Email);
             if (emailModel.Email == user.Email || existingUser!= null)
                 return BadRequest(_responseService.CustomErrorResponse("Email", "Please provide a different email"));
 

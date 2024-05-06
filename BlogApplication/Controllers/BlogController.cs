@@ -88,7 +88,7 @@ namespace Bislerium.Presentation.Controllers
             // Creating a response object that includes pagination metadata
             var response = new
             {
-                Blogs = pagedBlogs, // The paged list of blogs
+                // The paged list of blogs
                 PaginationMetaData = new
                 {
                     TotalItems = pagedBlogs.TotalItemCount,
@@ -97,7 +97,8 @@ namespace Bislerium.Presentation.Controllers
                     TotalPages = pagedBlogs.PageCount,
                     HasPreviousPage = pagedBlogs.HasPreviousPage,
                     HasNextPage = pagedBlogs.HasNextPage
-                }
+                },
+                Blogs = pagedBlogs,
             };
             return Ok(_responseService.SuccessResponse(response));
         }
@@ -177,7 +178,6 @@ namespace Bislerium.Presentation.Controllers
             return Accepted(_responseService.SuccessResponse("Blog updated Successfully."));
         }
 
-
         [HttpDelete]
         [Route("{id}")]
         [RequireConfirmedEmail]
@@ -192,14 +192,14 @@ namespace Bislerium.Presentation.Controllers
 
         [HttpPost]
         [Route("{id}/Reaction")]
-        public async Task<IActionResult> AddReaction(int id, [FromBody] ReactionType reactionType)
+        public async Task<IActionResult> AddReaction(int id, [FromBody] ReactionTypeDTO reactionTypeDTO)
         {
             var blog = await _blogService.FindByIdAsync(id);
             if (blog == null)
                 return NotFound(_responseService.CustomErrorResponse("Blog", "Blog not found"));
             var user = await _accountService.GetUserByClaimsAsync(User);
-            await _blogService.ReactAsync(blog, null,user.Id, reactionType);
-            if (reactionType == ReactionType.Upvote)
+            await _blogService.ReactAsync(blog, null,user.Id, reactionTypeDTO.ReactionType);
+            if (reactionTypeDTO.ReactionType == ReactionType.Upvote)
             {
                 string notificationMessage = $"{user.FirstName} {user.LastName} upvoted your blog\n{blog.Title}";
                 await _hubContext.Clients.User(blog.AuthorId).SendAsync("ReceiveNotification", notificationMessage);
@@ -261,7 +261,7 @@ namespace Bislerium.Presentation.Controllers
         [HttpPost]
         [RequireConfirmedEmail]
         [Route("{blogId}/Comment/{commentId}/Reaction")]
-        public async Task<IActionResult> AddReaction(int blogId, int commentId, [FromBody] ReactionType reactionType)
+        public async Task<IActionResult> AddReaction(int blogId, int commentId, [FromBody] ReactionTypeDTO reactionTypeDTO)
         {
             var blog = await _blogService.FindByIdAsync(blogId);
             if (blog == null)
@@ -273,8 +273,8 @@ namespace Bislerium.Presentation.Controllers
                 return NotFound(_responseService.CustomErrorResponse("Not found", "Comment not found"));
 
             var user = await _accountService.GetUserByClaimsAsync(User);
-            await _blogService.ReactAsync(null, comment, user.Id, reactionType);
-            if (reactionType == ReactionType.Upvote)
+            await _blogService.ReactAsync(null, comment, user.Id, reactionTypeDTO.ReactionType);
+            if (reactionTypeDTO.ReactionType == ReactionType.Upvote)
             {
                 string notificationMessage = $"{user.FirstName} {user.LastName} upvoted your blog\n{blog.Title}";
                 await _hubContext.Clients.User(blog.AuthorId).SendAsync("ReceiveNotification", notificationMessage);
