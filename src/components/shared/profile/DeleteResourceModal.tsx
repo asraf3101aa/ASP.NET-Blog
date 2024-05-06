@@ -7,10 +7,13 @@ import DialogActions from "@mui/material/DialogActions";
 import Typography from "@mui/material/Typography";
 import { IconButton, Tooltip } from "@mui/material";
 import { Delete } from "@mui/icons-material";
+import { DeleteModalType } from "@/@enums/components.enum";
 
-const DeleteAccountModal = ({
+const DeleteResourceModal = ({
+  resourceType,
   onDelete,
 }: {
+  resourceType: DeleteModalType;
   onDelete: () => Promise<void>;
 }) => {
   const [open, setIsOpen] = useState(false);
@@ -23,17 +26,17 @@ const DeleteAccountModal = ({
     <div>
       {/* Icon to trigger the modal */}
       <IconButton onClick={() => setIsOpen(true)}>
-        <Tooltip title="Delete Account" arrow placement="right">
+        <Tooltip title={`Delete ${resourceType}`} arrow placement="right">
           <Delete sx={{ color: "red", cursor: "pointer" }} />
         </Tooltip>
       </IconButton>
 
       {/* Modal definition */}
       <Dialog open={open} onClose={() => setIsOpen(false)}>
-        <DialogTitle>Confirm Account Deletion</DialogTitle>
+        <DialogTitle>Confirm {resourceType} Deletion</DialogTitle>
         <DialogContent>
           <Typography>
-            Are you sure you want to delete your account? This action is
+            Are you sure you want to delete your {resourceType}? This action is
             irreversible.
           </Typography>
         </DialogContent>
@@ -52,4 +55,4 @@ const DeleteAccountModal = ({
   );
 };
 
-export default DeleteAccountModal;
+export default DeleteResourceModal;

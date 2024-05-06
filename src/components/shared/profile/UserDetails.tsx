@@ -11,10 +11,11 @@ import { useRepository } from "@/contexts/RepositoryContext";
 import { PersonRounded } from "@mui/icons-material";
 import { useRouter } from "@/contexts/RouterContext";
 import { RoutePath } from "@/@enums/router.enum";
-import DeleteAccountModal from "./DeleteAccountModal";
+import DeleteResourceModal from "./DeleteResourceModal";
 import EditAccountModal from "./EditAccountModal";
 import RetrieveEmailModal from "./RetrieveEmailModal";
 import ChangePasswordModal from "./ChangePasswordModal";
+import { DeleteModalType } from "@/@enums/components.enum";
 
 // A function to display a single detail
 const UserDetail = ({ title, value }: { title: string; value: string }) => (
@@ -91,7 +92,10 @@ const UserDetails = ({
           ) : (
             <>
               <EditAccountModal />
-              <DeleteAccountModal onDelete={handleDeleteAccount} />
+              <DeleteResourceModal
+                resourceType={DeleteModalType.ACCOUNT}
+                onDelete={handleDeleteAccount}
+              />
               {user.emailConfirmed ? (
                 <>
                   <RetrieveEmailModal

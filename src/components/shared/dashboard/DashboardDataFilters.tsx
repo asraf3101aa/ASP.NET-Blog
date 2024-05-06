@@ -9,7 +9,7 @@ import { BlogsDurationFilters } from "@/@enums/blog.enum";
 import { useRepository } from "@/contexts/RepositoryContext";
 import moment from "moment";
 import _ from "lodash";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 // Array of full month names
 const monthNames = [
@@ -28,11 +28,20 @@ const monthNames = [
 ];
 
 const DashboardDataFilters = () => {
-  const { setDashboardDataFilters } = useRepository()!;
-  const [month] = useState<string | undefined>(undefined);
+  const { dashboardData, setDashboardDataFilters } = useRepository()!;
+  const [month, setMonth] = useState<string | undefined>(undefined);
   const [duration, setDuration] = useState<BlogsDurationFilters>(
     BlogsDurationFilters.ALL
   );
+
+  useEffect(() => {
+    if (dashboardData?.month && dashboardData.duration) {
+      setDuration(dashboardData.duration);
+      setMonth(monthNames[dashboardData?.month - 1]);
+    } else {
+      setDuration(BlogsDurationFilters.ALL);
+    }
+  }, [dashboardData?.month, dashboardData?.duration]);
 
   const handleMonthChange = (event: SelectChangeEvent<string>) => {
     const monthIndex = _.findIndex(
