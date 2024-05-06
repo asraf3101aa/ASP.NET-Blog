@@ -65,7 +65,7 @@ namespace Bislerium.Presentation.Controllers
             var resetLink = $"{clientOrigin}/reset-password?token={token}&email={user.Email}";
 
             // Send the password reset link to the admin user's email
-            var message = new Message(new string[] { user.Email }, "Password Reset Link", resetLink, null);
+            var message = new Message(new string[] { user.Email }, "Admin Invitation", resetLink, null);
             await _emailService.SendEmailAsync(message);
             return Ok(_responseService.SuccessResponse("Admin added successfully."));
         }
