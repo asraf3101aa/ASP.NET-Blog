@@ -18,11 +18,10 @@ namespace Bislerium.Presentation.Controllers
         private readonly IBlogService _blogService;
         private readonly IEmailService _emailService;
         private readonly IResponseService _responseService;
-        public AdminController(IResponseService responseService, IFileService fileService, IAccountService accountService, IEmailService emailService, IBlogService blogService)
+        public AdminController(IResponseService responseService, IAccountService accountService, IEmailService emailService, IBlogService blogService)
         {
             _accountService = accountService;
             _emailService = emailService;
-            _fileService = fileService;
             _responseService = responseService;
             _blogService = blogService;
         }
