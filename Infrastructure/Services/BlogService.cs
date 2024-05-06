@@ -102,7 +102,7 @@ namespace Bislerium.Infrastructure.Services
             existingBlog.CategoryId = updateBlog.CategoryId;
             existingBlog.Images = blogImages;
 
-            _context.Entry(existingBlog).State = EntityState.Modified; // Mark the entity as modified
+            _context.Blogs.Update(existingBlog);
             await _context.SaveChangesAsync();
             return existingBlog;
         }
@@ -175,7 +175,7 @@ namespace Bislerium.Infrastructure.Services
         public async Task UpdateCommentAsync(Comment comment, CommentDTO updateComment)
         {
             comment.Text = updateComment.Text;
-            _context.Entry(comment).State = EntityState.Modified; // Mark the entity as modified
+            _context.Comments.Update(comment);
             await _context.SaveChangesAsync();
         }
 
