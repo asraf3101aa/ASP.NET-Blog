@@ -57,9 +57,9 @@ namespace Bislerium.Infrastructure.Services
         }
         public IQueryable<Blog> GetQueryableRandomBlogAsync()
         {
-            return GetQueryableBlogs()
-                .OrderBy(b => Guid.NewGuid())
-                .AsQueryable();
+            var blogs = GetQueryableBlogs().ToList();
+            var random = new Random();
+            return blogs.OrderBy(b => random.Next()).AsQueryable();
         }
         public async Task<Blog> FindByIdAsync(int id)
         {
