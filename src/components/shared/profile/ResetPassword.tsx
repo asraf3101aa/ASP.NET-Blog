@@ -70,7 +70,7 @@ const ResetPassword = () => {
           setIsPasswordReset(false);
         }
       } catch (error) {
-        console.error("Error resetting password:", error);
+        console.error(error);
         setIsPasswordReset(false);
       } finally {
         setIsLoading(false);

@@ -9,6 +9,7 @@ import { useRepository } from "@/contexts/RepositoryContext";
 import { useEffect, useState } from "react";
 import _ from "lodash";
 import { Button, Typography } from "@mui/material";
+import { ErrorToast } from "@/components/shared/toasts/ErrorToast";
 
 const mainFeaturedPost = {
   title: "Embrace the joy of learning",
@@ -41,7 +42,10 @@ export default function Blog() {
           document.documentElement.scrollTo({ top: 0, left: 0 });
         }
       })
-      .catch((error) => console.error(error))
+      .catch((error) => {
+        console.error(error);
+        ErrorToast({ Message: "Something went wrong!" });
+      })
       .finally(() => setIsLoading(false));
   }, [blogRepository, currentPageNumber, setHomepageBlogsData, setIsLoading]);
 

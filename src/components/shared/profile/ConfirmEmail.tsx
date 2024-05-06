@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { ErrorToast } from "../toasts/ErrorToast";
 
 const ConfirmEmail = () => {
   const params = useSearchParams();
@@ -58,7 +59,10 @@ const ConfirmEmail = () => {
             }
           }
         })
-        .catch((error) => console.error(error))
+        .catch((error) => {
+          console.error(error);
+          ErrorToast({ Message: "Something went wrong!" });
+        })
         .finally(() => {
           setIsLoading(false);
         });

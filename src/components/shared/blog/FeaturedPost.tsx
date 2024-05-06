@@ -39,8 +39,17 @@ const FeaturedPost = (props: { blog: BlogModels[BlogModelsType.BLOG] }) => {
     userId = getUserIdFromJwtToken(accessToken);
   }
 
-  const { id, body, images, comments, category, createdAt, reactions, title } =
-    props.blog;
+  const {
+    id,
+    body,
+    images,
+    author,
+    comments,
+    category,
+    createdAt,
+    reactions,
+    title,
+  } = props.blog;
 
   const upvotes = _.filter(
     reactions,
@@ -86,9 +95,14 @@ const FeaturedPost = (props: { blog: BlogModels[BlogModelsType.BLOG] }) => {
                   <Typography variant="body1">{category.name}</Typography>
                 </Box>
               </Box>
-              <Typography variant="subtitle1" color="text.secondary">
-                {moment(createdAt).format("hh:MM A, DD MMM YYYY")}
-              </Typography>
+              <Box sx={{ display: "flex", gap:2 }}>
+                <Typography variant="subtitle1" color="text.secondary">
+                  {`${author.firstName} ${author.lastName}`}
+                </Typography>
+                <Typography variant="subtitle1" color="text.secondary">
+                  {moment(createdAt).format("hh:MM A, DD MMM YYYY")}
+                </Typography>
+              </Box>
               <Box sx={{ display: "flex", textWrap: "pretty" }}>
                 {/* Adjust maxWidth as needed */}
                 <Typography

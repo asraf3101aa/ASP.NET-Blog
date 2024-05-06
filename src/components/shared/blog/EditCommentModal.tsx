@@ -12,6 +12,8 @@ import { useForm, Controller } from "react-hook-form";
 import { useRepository } from "@/contexts/RepositoryContext";
 import { Edit } from "@mui/icons-material";
 import { useRouter } from "@/contexts/RouterContext";
+import { SuccessToast } from "../toasts/SuccessToast";
+import { ErrorToast } from "../toasts/ErrorToast";
 
 const EditCommentModal = ({
   blogId,
@@ -42,10 +44,13 @@ const EditCommentModal = ({
       commentId,
       data.text
     );
-    if (response) {
-      if (typeof response === "string") {
+    if (typeof response === "string") {
+      SuccessToast({ Message: response });
+      setTimeout(() => {
         handleReload();
-      }
+      }, 1000);
+    } else {
+      ErrorToast({ Message: "Something went wrong!" });
     }
     setOpen(false);
   };

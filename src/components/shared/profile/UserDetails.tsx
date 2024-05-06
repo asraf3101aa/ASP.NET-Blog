@@ -16,6 +16,8 @@ import EditAccountModal from "./EditAccountModal";
 import RetrieveEmailModal from "./RetrieveEmailModal";
 import ChangePasswordModal from "./ChangePasswordModal";
 import { DeleteModalType } from "@/@enums/components.enum";
+import { ErrorToast } from "../toasts/ErrorToast";
+import { SuccessToast } from "../toasts/SuccessToast";
 
 // A function to display a single detail
 const UserDetail = ({ title, value }: { title: string; value: string }) => (
@@ -46,10 +48,13 @@ const UserDetails = ({
       .confirmEmailResend()
       .then((confirmResponse) => {
         if (typeof confirmResponse === "string") {
-          console.log(confirmResponse);
+          SuccessToast({ Message: confirmResponse });
         }
       })
-      .catch((error) => console.error(error))
+      .catch((error) => {
+        console.error(error);
+        ErrorToast({ Message: "Something went wrong!" });
+      })
       .finally(() => setIsLoading(false));
   };
 
@@ -63,7 +68,10 @@ const UserDetails = ({
           handleRedirect(RoutePath.LOGIN);
         }
       })
-      .catch((error) => console.error(error))
+      .catch((error) => {
+        console.error(error);
+        ErrorToast({ Message: "Something went wrong!" });
+      })
       .finally(() => setIsLoading(false));
   };
   return (
@@ -96,14 +104,11 @@ const UserDetails = ({
                 resourceType={DeleteModalType.ACCOUNT}
                 onDelete={handleDeleteAccount}
               />
-              {user.emailConfirmed ? (
-                <>
-                  <RetrieveEmailModal
-                    retrieveEmailFor={RetrieveEmailForAction.CHANGE_EMAIL}
-                  />
-                  <ChangePasswordModal />
-                </>
-              ) : (
+              <RetrieveEmailModal
+                retrieveEmailFor={RetrieveEmailForAction.CHANGE_EMAIL}
+              />
+              <ChangePasswordModal />
+              {!user.emailConfirmed && (
                 <Button variant="outlined" onClick={handleResendMail}>
                   Resend Verification Mail
                 </Button>

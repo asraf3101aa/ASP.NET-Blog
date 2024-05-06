@@ -11,6 +11,7 @@ import { AdminDashboardData } from "@/@types/admin";
 import _ from "lodash";
 import { Container } from "@mui/material";
 import { useRouter } from "@/contexts/RouterContext";
+import { ErrorToast } from "@/components/shared/toasts/ErrorToast";
 
 const ProtectedRoutes = () => {
   const localStorageClient = useStorage()!;
@@ -49,25 +50,19 @@ const ProtectedRoutes = () => {
               } else {
                 setUser(profileDataResponse);
 
-                blogRepository
-                  .getCategories()
-                  .then((categories) => {
-                    if ("errors" in categories) {
-                      console.error(categories);
-                    } else setCategories(categories);
-                  })
-                  .catch((error) => console.error(error));
+                blogRepository.getCategories().then((categories) => {
+                  if ("errors" in categories) {
+                    console.error(categories);
+                  } else setCategories(categories);
+                });
 
                 const userRole = getRoleFromJwtToken(accessToken);
                 if (_.isEqual(userRole, UserRoles.BLOGGER)) {
-                  blogRepository
-                    .getBlogs(1)
-                    .then((blogs) => {
-                      if ("errors" in blogs) {
-                        console.error(blogs);
-                      } else setBlogs(blogs.blogs);
-                    })
-                    .catch((error) => console.error(error));
+                  blogRepository.getBlogs(1).then((blogs) => {
+                    if ("errors" in blogs) {
+                      console.error(blogs);
+                    } else setBlogs(blogs.blogs);
+                  });
                 } else {
                   adminRepository
                     .getDashboardData(
@@ -78,13 +73,15 @@ const ProtectedRoutes = () => {
                       if ("errors" in data) {
                         console.error(data);
                       } else setDashboardData(data);
-                    })
-                    .catch((error) => console.error(error));
+                    });
                 }
               }
             }
           )
-          .catch((error) => console.error(error))
+          .catch((error) => {
+            console.error(error);
+            ErrorToast({ Message: "Something went wrong!" });
+          })
           .finally(() => setIsLoading(false));
       }
     } catch (error) {

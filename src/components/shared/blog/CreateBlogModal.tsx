@@ -17,8 +17,9 @@ import { BlogModelsType } from "@/@enums/blog.enum";
 import { useRepository } from "@/contexts/RepositoryContext";
 import _ from "lodash";
 import { useRouter } from "@/contexts/RouterContext";
-import { RoutePath } from "@/@enums/router.enum";
 import { Info } from "@mui/icons-material";
+import { ErrorToast } from "../toasts/ErrorToast";
+import { SuccessToast } from "../toasts/SuccessToast";
 
 const CreateBlogModal = () => {
   const [open, setOpen] = useState(false);
@@ -38,7 +39,7 @@ const CreateBlogModal = () => {
   const { isLoading, categories, user, setIsLoading, blogRepository } =
     useRepository()!;
 
-  const { handleRedirect } = useRouter()!;
+  const { handleReload } = useRouter()!;
 
   const onSubmit = (data: BlogModels[BlogModelsType.BLOG_PARTIAL_DATA]) => {
     setIsLoading(true);
@@ -51,11 +52,18 @@ const CreateBlogModal = () => {
     blogRepository
       .createBlog(data)
       .then((blogResponse: ApiResponse<BlogModels[BlogModelsType.BLOG]>) => {
-        console.log(blogResponse);
+        if ("id" in blogResponse)
+          SuccessToast({ Message: "Blog created successfully!" });
+        setTimeout(() => {
+          handleReload();
+        }, 1000);
       })
-      .catch((error) => console.error(error))
+      .catch((error) => {
+        console.error(error);
+        ErrorToast({ Message: "Something went wrong!" });
+      })
       .finally(() => {
-        handleRedirect(RoutePath.PROFILE);
+        setIsLoading(false);
       });
   };
 

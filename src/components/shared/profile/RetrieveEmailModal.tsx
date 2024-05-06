@@ -18,6 +18,8 @@ import {
   RetrieveEmailForAction,
 } from "@/@enums/account.enum";
 import { useRepository } from "@/contexts/RepositoryContext";
+import { ErrorToast } from "../toasts/ErrorToast";
+import { SuccessToast } from "../toasts/SuccessToast";
 
 const RetrieveEmailModal = (props: {
   retrieveEmailFor: RetrieveEmailForAction;
@@ -41,13 +43,25 @@ const RetrieveEmailModal = (props: {
     try {
       setIsLoading(true);
       // Simulate forgot password request
+      let successMessage = "";
       if (isEmailForChangeEmail) {
-        await accountRepository.updateEmail(data.email);
+        const updateResponse = await accountRepository.updateEmail(data.email);
+        if (typeof updateResponse === "string") {
+          successMessage = updateResponse;
+        }
       } else {
-        await accountRepository.sendForgotPasswordRequest(data.email);
+        const requestResponse =
+          await accountRepository.sendForgotPasswordRequest(data.email);
+        if (typeof requestResponse === "string") {
+          successMessage = requestResponse;
+        }
+      }
+      if (successMessage) {
+        SuccessToast({ Message: successMessage });
       }
     } catch (error) {
       console.error(error);
+      ErrorToast({ Message: "Something went wrong!" });
     } finally {
       setIsLoading(false);
       setIsOpen(false);

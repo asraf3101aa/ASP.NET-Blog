@@ -32,6 +32,7 @@ import { handleLogout } from "@/@utils/handleLogout";
 import { Tooltip } from "@mui/material";
 import { getRoleFromJwtToken } from "@/@utils/getRoleFromJwtToken";
 import { UserRoles } from "@/@enums/storage.enum";
+import InviteAdminModal from "@/components/shared/profile/InviteAdminModal";
 
 const Profile = () => {
   const [open, setOpen] = useState(true);
@@ -187,10 +188,12 @@ const Profile = () => {
                   <UserDetails user={user} />
                 </Grid>
               </Container>
-              <Container
-                sx={{ display: userRole === UserRoles.ADMIN ? "none" : "flex" }}
-              >
-                <CreateBlogModal />
+              <Container>
+                {userRole === UserRoles.ADMIN ? (
+                  <InviteAdminModal />
+                ) : (
+                  <CreateBlogModal />
+                )}
               </Container>
               <Container
                 maxWidth="lg"

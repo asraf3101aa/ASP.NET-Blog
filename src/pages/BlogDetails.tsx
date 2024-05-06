@@ -36,6 +36,8 @@ import { DeleteModalType } from "@/@enums/components.enum";
 import { RoutePath } from "@/@enums/router.enum";
 import EditBlogModal from "@/components/shared/blog/EditBlogModal";
 import EditCommentModal from "@/components/shared/blog/EditCommentModal";
+import { ErrorToast } from "@/components/shared/toasts/ErrorToast";
+import { SuccessToast } from "@/components/shared/toasts/SuccessToast";
 
 const BlogDetails = () => {
   const { id } = useParams();
@@ -66,7 +68,10 @@ const BlogDetails = () => {
             setBlog(blogDetailsResponse);
           }
         })
-        .catch((error) => console.error(error))
+        .catch((error) => {
+          console.error(error);
+          ErrorToast({ Message: "Something went wrong!" });
+        })
         .finally(() => setIsLoading(false));
     } catch (error) {
       console.error(error);
@@ -124,8 +129,18 @@ const BlogDetails = () => {
   const handleAddComment = async () => {
     try {
       if (newComment.trim() !== "") {
-        await blogRepository.commentOnBlog(id!, newComment.trim());
-        handleReload();
+        const commentResponse = await blogRepository.commentOnBlog(
+          id!,
+          newComment.trim()
+        );
+        if (typeof commentResponse === "string") {
+          SuccessToast({ Message: commentResponse });
+        } else {
+          ErrorToast({ Message: "Something went wrong!" });
+        }
+        setTimeout(() => {
+          handleReload();
+        }, 1000);
       }
     } catch (error) {
       console.error(error);
@@ -137,8 +152,19 @@ const BlogDetails = () => {
     handleRedirect(RoutePath.HOME);
   };
   const handleDeleteComment = async (commentId: string) => {
-    await blogRepository.deleteBlogComment(id!, commentId);
-    handleReload();
+    const deleteCommentRepsonse = await blogRepository.deleteBlogComment(
+      id!,
+      commentId
+    );
+
+    if (typeof deleteCommentRepsonse === "string") {
+      SuccessToast({ Message: deleteCommentRepsonse });
+    } else {
+      ErrorToast({ Message: "Something went wrong!" });
+    }
+    setTimeout(() => {
+      handleReload();
+    }, 1000);
   };
   return (
     <Container

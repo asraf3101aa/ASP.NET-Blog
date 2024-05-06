@@ -19,6 +19,8 @@ import { useRepository } from "@/contexts/RepositoryContext";
 import _ from "lodash";
 import { Edit } from "@mui/icons-material";
 import { useRouter } from "@/contexts/RouterContext";
+import { ErrorToast } from "../toasts/ErrorToast";
+import { SuccessToast } from "../toasts/SuccessToast";
 
 const EditBlogModal = ({ blog }: { blog: BlogModels[BlogModelsType.BLOG] }) => {
   const [open, setOpen] = useState(false);
@@ -50,7 +52,10 @@ const EditBlogModal = ({ blog }: { blog: BlogModels[BlogModelsType.BLOG] }) => {
             setCategories(categoriesResponse);
           }
         })
-        .catch((error) => console.error(error));
+        .catch((error) => {
+          console.error(error);
+          ErrorToast({ Message: "Something went wrong!" });
+        });
     }
   }, [open, blogRepository, setCategories]);
 
@@ -66,10 +71,17 @@ const EditBlogModal = ({ blog }: { blog: BlogModels[BlogModelsType.BLOG] }) => {
     blogRepository
       .updateBlog(blog.id.toString(), data)
       .then((blogResponse) => {
-        console.log(blogResponse);
-        handleReload();
+        if (typeof blogResponse === "string") {
+          SuccessToast({ Message: blogResponse });
+          setTimeout(() => {
+            handleReload();
+          }, 1000);
+        }
       })
-      .catch((error) => console.error(error))
+      .catch((error) => {
+        console.error(error);
+        ErrorToast({ Message: "Something went wrong!" });
+      })
       .finally(() => {
         setIsLoading(false);
         setOpen(false);
