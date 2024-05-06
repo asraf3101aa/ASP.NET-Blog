@@ -42,16 +42,6 @@ builder.Services.AddSwaggerGen(opt =>
     });
 });
 
-// Configure CORS to allow any origin
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("MyCors", policy =>
-    {
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
-    });
-});
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers()
@@ -69,12 +59,17 @@ AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(); 
 }
 
 app.UseHttpsRedirection();
 
-app.UseCors("MyCors"); // Use the CORS policy that allows any origin
+// Use the CORS policy that allows any origin
+app.UseCors(x => x
+        .AllowAnyMethod()
+        .AllowAnyHeader()
+        .SetIsOriginAllowed(origin => true) // allow any origin
+        .AllowCredentials()); // allow
 
 app.UseStaticFiles();
 
