@@ -10,7 +10,7 @@ namespace Bislerium.Application.DTOs.BlogDTOs
         [Required]
         public string Body { get; set; }
         public int CategoryId { get; set; }
-        public IFormFile Banner { get; set; }
-        public IFormFile Other {  get; set; }
+        public IFormFile ? Banner { get; set; }
+        public IFormFile ? Other {  get; set; }
     }
 }
