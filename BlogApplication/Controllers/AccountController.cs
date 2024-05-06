@@ -140,7 +140,7 @@ namespace Bislerium.Presentation.Controllers
             {
                 var (filePath, error) = _fileService.UploadFile(userUpdate.Avatar);
                 if (error != string.Empty)
-                    return BadRequest(_responseService.CustomErrorResponse(nameof(userUpdate.Avatar), error));  
+                    return BadRequest(_responseService.CustomErrorResponse("avatar", error));  
                 user.Avatar = filePath;
             }
             var result = await _accountService.UpdateAsync(user, userUpdate);
