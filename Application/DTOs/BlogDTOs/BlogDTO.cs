@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations;
 
 namespace Bislerium.Application.DTOs.BlogDTOs
 {
@@ -9,6 +10,7 @@ namespace Bislerium.Application.DTOs.BlogDTOs
         [Required]
         public string Body { get; set; }
         public int CategoryId { get; set; }
-        public ICollection<BlogImagesDTO> ? Images { get; set; }
+        public IFormFile Banner { get; set; }
+        public IFormFile Other {  get; set; }
     }
 }

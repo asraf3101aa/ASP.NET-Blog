@@ -124,24 +124,34 @@ namespace Bislerium.Presentation.Controllers
         [HttpPost]
         [Authorize(Roles = "Blogger")]
         [RequireConfirmedEmail]
-        public async Task<IActionResult> Create([FromBody] BlogDTO ? newblog)
+        public async Task<IActionResult> Create([FromForm] BlogDTO newblog)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             var blogImages = new List<BlogImage>();
-            if (newblog.Images.Any())
+            if (newblog.Banner != null)
             {
-                foreach (var image in newblog.Images)
+                
+                var (imagePath, error) = _fileService.UploadFile(newblog.Banner);
+                if (error != string.Empty)
+                    return BadRequest(_responseService.CustomErrorResponse("Banner", error));
+                blogImages.Add(new BlogImage
                 {
-                    var (imagePath, error) = _fileService.UploadFile(image.File);
-                    if (error != string.Empty)
-                        return BadRequest(_responseService.CustomErrorResponse(image.ImageType.ToString(), error));
-                    blogImages.Add(new BlogImage
-                    {
-                        Path = imagePath,
-                        ImageType = image.ImageType
-                    });
-                }
+                    Path = imagePath,
+                    ImageType = BlogImageType.Banner
+                });
+            }
+            if (newblog.Other != null)
+            {
+
+                var (imagePath, error) = _fileService.UploadFile(newblog.Other);
+                if (error != string.Empty)
+                    return BadRequest(_responseService.CustomErrorResponse("Other", error));
+                blogImages.Add(new BlogImage
+                {
+                    Path = imagePath,
+                    ImageType = BlogImageType.Body
+                });
             }
             var user = await _accountService.GetUserByClaimsAsync(User);
             var blog = await _blogService.CreateAsync(newblog, user, blogImages);
@@ -152,7 +162,7 @@ namespace Bislerium.Presentation.Controllers
         [Route("{id}")]
         [Authorize(Roles = "Blogger")]
         [RequireConfirmedEmail]
-        public async Task<IActionResult> Update([FromRoute] int id, BlogDTO blogUpdate)
+        public async Task<IActionResult> Update([FromRoute] int id, [FromForm] BlogDTO blogUpdate)
         {
             var blog = await _blogService.FindByIdAsync(id);
             if (blog == null || blog.AuthorId != User.FindFirstValue(ClaimTypes.NameIdentifier))
@@ -160,19 +170,29 @@ namespace Bislerium.Presentation.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             var blogImages = new List<BlogImage>();
-            if (blogUpdate.Images.Any())
+            if (blogUpdate.Banner != null)
             {
-                foreach (var image in blogUpdate.Images)
+
+                var (imagePath, error) = _fileService.UploadFile(blogUpdate.Banner);
+                if (error != string.Empty)
+                    return BadRequest(_responseService.CustomErrorResponse("Banner", error));
+                blogImages.Add(new BlogImage
                 {
-                    var (imagePath, error) = _fileService.UploadFile(image.File);
-                    if (error != string.Empty)
-                        return BadRequest(_responseService.CustomErrorResponse(image.ImageType.ToString(), error));
-                    blogImages.Add(new BlogImage
-                    {
-                        Path = imagePath,
-                        ImageType = image.ImageType
-                    });
-                }
+                    Path = imagePath,
+                    ImageType = BlogImageType.Banner
+                });
+            }
+            if (blogUpdate.Other != null)
+            {
+
+                var (imagePath, error) = _fileService.UploadFile(blogUpdate.Other);
+                if (error != string.Empty)
+                    return BadRequest(_responseService.CustomErrorResponse("Other", error));
+                blogImages.Add(new BlogImage
+                {
+                    Path = imagePath,
+                    ImageType = BlogImageType.Body
+                });
             }
             var updatedBlog = await _blogService.UpdateAsync(blogUpdate, blog, blogImages);
             return Accepted(_responseService.SuccessResponse("Blog updated Successfully."));

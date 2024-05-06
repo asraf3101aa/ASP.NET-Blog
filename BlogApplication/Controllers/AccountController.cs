@@ -131,7 +131,7 @@ namespace Bislerium.Presentation.Controllers
         [HttpPut]
         [Authorize]
         [RequireConfirmedEmail]
-        public async Task<IActionResult> Update(UserUpdate userUpdate)
+        public async Task<IActionResult> Update([FromForm] UserUpdate userUpdate)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
