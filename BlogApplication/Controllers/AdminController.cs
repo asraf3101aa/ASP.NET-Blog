@@ -58,8 +58,15 @@ namespace Bislerium.Presentation.Controllers
             var confirmEmailResult = await _accountService.ConfirmEmailAsync(user, await _accountService.GenerateEmailConfirmationTokenAsync(user));
             var token = HttpUtility.UrlEncode(await _accountService.GeneratePasswordResetTokenAsync(user));
 
+            // Get the client's origin URL
+            var clientOrigin = Request.Headers["Origin"].ToString();
+
+            // If the client origin is not present, fallback to the current request URL
+            if (string.IsNullOrEmpty(clientOrigin))
+                clientOrigin = $"{Request.Scheme}://{Request.Host}";
+
             // Construct the password reset link
-            var resetLink = Url.Action(nameof(ResetPassword), "Account", new { token, email = user.Email }, Request.Scheme);
+            var resetLink = $"{clientOrigin}/reset-password?token={token}&email={user.Email}";
 
             // Send the password reset link to the admin user's email
             var message = new Message(new string[] { user.Email }, "Password Reset Link", resetLink, null);

@@ -208,13 +208,12 @@ namespace Bislerium.Presentation.Controllers
         }
 
         [HttpPost]
-        [RequireConfirmedEmail]
         [Route("{blogId}/Comment")]
         public async Task<IActionResult> AddComment(int blogId, [FromBody] CommentDTO commentDto)
         {
             var blog = await _blogService.FindByIdAsync(blogId);
             if (blog == null)
-                return NotFound(_responseService.CustomErrorResponse("Blog", "Blog not found"));
+                return NotFound(_responseService.CustomErrorResponse("Not found", "Blog not found"));
 
             var user = await _accountService.GetUserByClaimsAsync(User);
             await _blogService.AddCommentAsync(commentDto, blog.Id, user.Id);
