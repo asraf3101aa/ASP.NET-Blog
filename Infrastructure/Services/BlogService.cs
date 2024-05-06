@@ -118,7 +118,12 @@ namespace Bislerium.Infrastructure.Services
                     if (existingReaction.Type == reactionType)
                         _context.Reactions.Remove(existingReaction);
                     else
+                    {
                         existingReaction.Type = reactionType;
+                        _context.Reactions.Update(existingReaction);
+                    }
+                        
+                        
                 }
                 else
                 {
@@ -142,7 +147,10 @@ namespace Bislerium.Infrastructure.Services
                     if (existingReaction.Type == reactionType)
                         _context.Reactions.Remove(existingReaction);
                     else
+                    {
                         existingReaction.Type = reactionType;
+                        _context.Reactions.Update(existingReaction);
+                    }
                 }
                 else
                 {
