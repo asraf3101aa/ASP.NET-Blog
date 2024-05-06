@@ -181,6 +181,7 @@ namespace Bislerium.Infrastructure.Services
         public async Task UpdateCommentAsync(Comment comment, CommentDTO updateComment)
         {
             comment.Text = updateComment.Text;
+            comment.CreatedAt = comment.CreatedAt;
             _context.Comments.Update(comment);
             await _context.SaveChangesAsync();
         }
