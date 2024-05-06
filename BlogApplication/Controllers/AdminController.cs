@@ -1,13 +1,11 @@
 ﻿using Bislerium.Application.Common.Interfaces;
 using Bislerium.Application.DTOs.AccountDTOs;
 using Bislerium.Application.DTOs.AdminDTOs;
-using Bislerium.Application.DTOs.BlogDTOs;
 using Bislerium.Application.DTOs.Extensions;
 using Bislerium.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PasswordGenerator;
-using System.Globalization;
 using System.Web;
 
 namespace Bislerium.Presentation.Controllers
@@ -19,7 +17,6 @@ namespace Bislerium.Presentation.Controllers
         private readonly IAccountService _accountService;
         private readonly IBlogService _blogService;
         private readonly IEmailService _emailService;
-        private readonly IFileService _fileService;
         private readonly IResponseService _responseService;
         public AdminController(IResponseService responseService, IFileService fileService, IAccountService accountService, IEmailService emailService, IBlogService blogService)
         {
@@ -71,7 +68,7 @@ namespace Bislerium.Presentation.Controllers
             // Send the password reset link to the admin user's email
             var message = new Message(new string[] { user.Email }, "Password Reset Link", resetLink, null);
             await _emailService.SendEmailAsync(message);
-            return Ok();
+            return Ok(_responseService.SuccessResponse("Admin added successfully."));
         }
         
         [Authorize(Roles = "Admin")]
