@@ -101,7 +101,7 @@ namespace Bislerium.Infrastructure.Services
             existingBlog.Body = updateBlog.Body;
             existingBlog.CategoryId = updateBlog.CategoryId;
             existingBlog.Images = blogImages;
-
+            existingBlog.CreatedAt = existingBlog.CreatedAt;
             _context.Blogs.Update(existingBlog);
             await _context.SaveChangesAsync();
             return existingBlog;
