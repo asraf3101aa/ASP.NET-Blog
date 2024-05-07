@@ -44,6 +44,7 @@ const Profile = () => {
   const { handleRedirect } = useRouter()!;
   const localStorageClient = useStorage()!;
   const { isAppDataLoading, user, blogs, setBlogs } = useRepository()!;
+
   const accessToken = localStorageClient.getAccessToken();
   let userRole = "";
   if (accessToken) {

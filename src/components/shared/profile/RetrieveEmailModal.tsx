@@ -41,13 +41,14 @@ const RetrieveEmailModal = (props: {
     setRepositoryDataLoadingFlags,
     accountRepository,
   } = useRepository()!;
+  const [dataLoadingFlags] = useState({ ...repositoryDataLoadingFlags });
 
   const onSubmit: SubmitHandler<
     AccountModels[AccountModelsType.EMAIL_MODEL]
   > = async (data) => {
     try {
       setRepositoryDataLoadingFlags({
-        ...repositoryDataLoadingFlags,
+        ...dataLoadingFlags,
         isAccountRepositoryDataLoading: true,
       });
       // Simulate forgot password request
@@ -72,7 +73,7 @@ const RetrieveEmailModal = (props: {
       ErrorToast({ Message: "Something went wrong!" });
     } finally {
       setRepositoryDataLoadingFlags({
-        ...repositoryDataLoadingFlags,
+        ...dataLoadingFlags,
         isAccountRepositoryDataLoading: true,
       });
       setIsOpen(false);

@@ -28,6 +28,7 @@ const ConfirmEmail = () => {
     setRepositoryDataLoadingFlags,
     accountRepository,
   } = useRepository()!;
+  const [dataLoadingFlags] = useState({ ...repositoryDataLoadingFlags });
   const [isConfirmed, setIsConfirmed] = useState<boolean | undefined>(
     undefined
   );
@@ -44,7 +45,7 @@ const ConfirmEmail = () => {
     }
     if (email && token) {
       setRepositoryDataLoadingFlags({
-        ...repositoryDataLoadingFlags,
+        ...dataLoadingFlags,
         isAccountRepositoryDataLoading: true,
       });
       accountRepository
@@ -73,7 +74,7 @@ const ConfirmEmail = () => {
         })
         .finally(() => {
           setRepositoryDataLoadingFlags({
-            ...repositoryDataLoadingFlags,
+            ...dataLoadingFlags,
             isAccountRepositoryDataLoading: false,
           });
         });
@@ -86,7 +87,7 @@ const ConfirmEmail = () => {
     token,
     accessToken,
     handleRedirect,
-    repositoryDataLoadingFlags,
+    dataLoadingFlags,
   ]);
 
   const onClose = () => handleRedirect(RoutePath.HOME);

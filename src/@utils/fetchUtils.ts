@@ -17,6 +17,9 @@ export const getApiResponse = async <T>(
   } else {
     const status: number = response.status;
 
+    if (status === ApiResponseStatus.UNAUTHORIZED) {
+      return undefined as T;
+    }
     const errorsResponse: ApiErrorsResponse = await response.json();
     const errors: ApiErrorLog[] = errorsResponse.errors;
 

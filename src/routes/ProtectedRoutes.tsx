@@ -2,7 +2,7 @@ import { RoutePath } from "@/@enums/router.enum";
 import { Navigate, Outlet } from "react-router-dom";
 import { useStorage } from "@/contexts/StorageContext";
 import { useRepository } from "@/contexts/RepositoryContext";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { AccountModels } from "@/@types/account";
 import { AccountModelsType } from "@/@enums/account.enum";
 import { getRoleFromJwtToken } from "@/@utils/getRoleFromJwtToken";
@@ -17,20 +17,22 @@ const ProtectedRoutes = () => {
   const localStorageClient = useStorage()!;
   const accessToken = localStorageClient.getAccessToken();
   const {
-    isAppDataLoading,
     blogs,
     blogRepository,
     adminRepository,
+    isAppDataLoading,
     accountRepository,
     dashboardDataFilters,
+    repositoryDataLoadingFlags,
     setUser,
     setBlogs,
-    repositoryDataLoadingFlags,
-    setRepositoryDataLoadingFlags,
     setCategories,
-    setHomepageBlogsData,
     setDashboardData,
+    setHomepageBlogsData,
+    setRepositoryDataLoadingFlags,
   } = useRepository()!;
+
+  const [dataLoadingFlags] = useState({ ...repositoryDataLoadingFlags });
 
   const { handleRedirect } = useRouter()!;
 
@@ -39,7 +41,7 @@ const ProtectedRoutes = () => {
       const accessToken = localStorageClient.getAccessToken();
       if (accessToken) {
         setRepositoryDataLoadingFlags({
-          ...repositoryDataLoadingFlags,
+          ...dataLoadingFlags,
           isAccountRepositoryDataLoading: false,
         });
 
@@ -92,7 +94,7 @@ const ProtectedRoutes = () => {
           })
           .finally(() =>
             setRepositoryDataLoadingFlags({
-              ...repositoryDataLoadingFlags,
+              ...dataLoadingFlags,
               isAccountRepositoryDataLoading: false,
             })
           );
@@ -115,7 +117,7 @@ const ProtectedRoutes = () => {
     setRepositoryDataLoadingFlags,
     setUser,
     handleRedirect,
-    repositoryDataLoadingFlags,
+    dataLoadingFlags,
   ]);
   return (
     <>

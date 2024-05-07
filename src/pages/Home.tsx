@@ -18,6 +18,7 @@ import {
 } from "@mui/material";
 import { ErrorToast } from "@/components/shared/toasts/ErrorToast";
 import { BlogsSortingFilters } from "@/@enums/blog.enum";
+import { useStorage } from "@/contexts/StorageContext";
 
 const mainFeaturedPost = {
   title: "Embrace the joy of learning",
@@ -33,7 +34,10 @@ export default function Blog() {
     homepageBlogsData,
     setHomepageBlogsData,
     blogRepository,
+    setUser,
+    accountRepository,
   } = useRepository()!;
+  const [dataLoadingFlags] = useState({ ...repositoryDataLoadingFlags });
 
   const [currentPageNumber, setCurrentPageNumber] = useState<number>(
     homepageBlogsData?.paginationMetaData?.pageNumber ?? 1
@@ -43,9 +47,22 @@ export default function Blog() {
     BlogsSortingFilters.RECENCY
   );
 
+  const localStorageClient = useStorage()!;
+  const accessToken = localStorageClient.getAccessToken();
+
+  useEffect(() => {
+    if (accessToken) {
+      accountRepository.getProfile().then((userProfile) => {
+        if (userProfile && "id" in userProfile) {
+          setUser(userProfile);
+        }
+      });
+    }
+  }, [accessToken, accountRepository, localStorageClient, setUser]);
+
   useEffect(() => {
     setRepositoryDataLoadingFlags({
-      ...repositoryDataLoadingFlags,
+      ...dataLoadingFlags,
       isBlogRepositoryDataLoading: true,
     });
     blogRepository
@@ -64,14 +81,14 @@ export default function Blog() {
       })
       .finally(() =>
         setRepositoryDataLoadingFlags({
-          ...repositoryDataLoadingFlags,
+          ...dataLoadingFlags,
           isBlogRepositoryDataLoading: false,
         })
       );
   }, [
     blogRepository,
     currentPageNumber,
-    repositoryDataLoadingFlags,
+    dataLoadingFlags,
     selectedFilter,
     setHomepageBlogsData,
     setRepositoryDataLoadingFlags,

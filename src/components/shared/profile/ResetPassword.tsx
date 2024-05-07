@@ -30,6 +30,8 @@ const ResetPassword = () => {
     setRepositoryDataLoadingFlags,
     accountRepository,
   } = useRepository()!;
+  const [dataLoadingFlags] = useState({ ...repositoryDataLoadingFlags });
+
   const { handleRedirect } = useRouter()!;
 
   const {
@@ -60,7 +62,7 @@ const ResetPassword = () => {
 
     if (email && token) {
       setRepositoryDataLoadingFlags({
-        ...repositoryDataLoadingFlags,
+        ...dataLoadingFlags,
         isAccountRepositoryDataLoading: true,
       });
       try {
@@ -81,7 +83,7 @@ const ResetPassword = () => {
         setIsPasswordReset(false);
       } finally {
         setRepositoryDataLoadingFlags({
-          ...repositoryDataLoadingFlags,
+          ...dataLoadingFlags,
           isAccountRepositoryDataLoading: false,
         });
       }

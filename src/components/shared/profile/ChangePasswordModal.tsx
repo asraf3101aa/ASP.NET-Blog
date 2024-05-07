@@ -21,6 +21,8 @@ const ChangePasswordModal = () => {
     repositoryDataLoadingFlags,
     setRepositoryDataLoadingFlags,
   } = useRepository()!;
+  const [dataLoadingFlags] = useState({ ...repositoryDataLoadingFlags });
+
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isPasswordChanged, setIsPasswordChanged] = useState<
     boolean | undefined
@@ -52,7 +54,7 @@ const ChangePasswordModal = () => {
     }
 
     setRepositoryDataLoadingFlags({
-      ...repositoryDataLoadingFlags,
+      ...dataLoadingFlags,
       isAccountRepositoryDataLoading: true,
     });
     try {
@@ -71,7 +73,7 @@ const ChangePasswordModal = () => {
       setIsPasswordChanged(false);
     } finally {
       setRepositoryDataLoadingFlags({
-        ...repositoryDataLoadingFlags,
+        ...dataLoadingFlags,
         isAccountRepositoryDataLoading: false,
       });
       setIsOpen(false);

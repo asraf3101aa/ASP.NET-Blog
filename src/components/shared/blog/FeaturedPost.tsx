@@ -12,7 +12,6 @@ import {
   Label,
 } from "@mui/icons-material";
 import { RoutePath } from "@/@enums/router.enum";
-import { useRouter } from "@/contexts/RouterContext";
 import { BlogModels } from "@/@types/blog";
 import {
   BlogEndpointPaths,
@@ -23,21 +22,13 @@ import moment from "moment";
 import _ from "lodash";
 import { AccountModels } from "@/@types/account";
 import { AccountModelsType } from "@/@enums/account.enum";
-import { useStorage } from "@/contexts/StorageContext";
-import { getUserIdFromJwtToken } from "@/@utils/getRoleFromJwtToken";
 import { useRepository } from "@/contexts/RepositoryContext";
+import { useRouter } from "@/contexts/RouterContext";
 
 const FeaturedPost = (props: { blog: BlogModels[BlogModelsType.BLOG] }) => {
-  const { handleRedirect } = useRouter()!;
-  const localstorageClient = useStorage()!;
-  const { blogRepository } = useRepository()!;
-  const { handleReload } = useRouter()!;
-  const accessToken = localstorageClient.getAccessToken();
-
-  let userId: string | undefined = "";
-  if (accessToken) {
-    userId = getUserIdFromJwtToken(accessToken);
-  }
+  const { handleRedirect, handleReload } = useRouter()!;
+  const { user, blogRepository } = useRepository()!;
+  const userId = user?.id;
 
   const {
     id,
@@ -148,6 +139,12 @@ const FeaturedPost = (props: { blog: BlogModels[BlogModelsType.BLOG] }) => {
                             ? "lightgray"
                             : "white",
                         borderRadius: "100%",
+                        ":hover": {
+                          backgroundColor:
+                            userReactionOnBlog && userUpvoted
+                              ? "white"
+                              : "lightgray",
+                        },
                       }}
                     />
                   </Box>
@@ -159,10 +156,7 @@ const FeaturedPost = (props: { blog: BlogModels[BlogModelsType.BLOG] }) => {
                   >
                     <ArrowUpward
                       sx={{
-                        bgcolor:
-                          userReactionOnBlog && userUpvoted
-                            ? "lightgray"
-                            : "white",
+                        bgcolor: "white",
                         borderRadius: "100%",
                       }}
                     />
@@ -181,6 +175,12 @@ const FeaturedPost = (props: { blog: BlogModels[BlogModelsType.BLOG] }) => {
                             ? "lightgray"
                             : "white",
                         borderRadius: "100%",
+                        ":hover": {
+                          backgroundColor:
+                            userReactionOnBlog && !userUpvoted
+                              ? "white"
+                              : "lightgray",
+                        },
                       }}
                     />
                   </Box>
@@ -192,10 +192,7 @@ const FeaturedPost = (props: { blog: BlogModels[BlogModelsType.BLOG] }) => {
                   >
                     <ArrowDownward
                       sx={{
-                        bgcolor:
-                          userReactionOnBlog && !userUpvoted
-                            ? "lightgray"
-                            : "white",
+                        bgcolor: "white",
                         borderRadius: "100%",
                       }}
                     />
@@ -219,6 +216,7 @@ const FeaturedPost = (props: { blog: BlogModels[BlogModelsType.BLOG] }) => {
           </CardContent>
           {images.length > 0 && (
             <CardMedia
+              onClick={() => handleRedirect(`${RoutePath.DETAILS}/${id}`)}
               component="img"
               sx={{
                 width: "20%",

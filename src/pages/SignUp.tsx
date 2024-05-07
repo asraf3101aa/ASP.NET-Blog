@@ -20,7 +20,7 @@ import { AccountModelsType } from "@/@enums/account.enum";
 import { useRepository } from "@/contexts/RepositoryContext";
 import MiniFooter from "@/components/shared/navigation/MiniFooter";
 import { useStorage } from "@/contexts/StorageContext";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { ErrorToast } from "@/components/shared/toasts/ErrorToast";
 import { SuccessToast } from "@/components/shared/toasts/SuccessToast";
 
@@ -33,6 +33,8 @@ const SignUp = () => {
     setRepositoryDataLoadingFlags,
     accountRepository,
   } = useRepository()!;
+  const [dataLoadingFlags] = useState({ ...repositoryDataLoadingFlags });
+
   const {
     register,
     handleSubmit,
@@ -51,7 +53,7 @@ const SignUp = () => {
     AccountModels[AccountModelsType.USER_REGISTER]
   > = async (data) => {
     setRepositoryDataLoadingFlags({
-      ...repositoryDataLoadingFlags,
+      ...dataLoadingFlags,
       isAccountRepositoryDataLoading: true,
     });
     accountRepository
@@ -59,7 +61,7 @@ const SignUp = () => {
       .then((userSignUpResponse: ApiResponse<string>) => {
         if (typeof userSignUpResponse === "string") {
           setRepositoryDataLoadingFlags({
-            ...repositoryDataLoadingFlags,
+            ...dataLoadingFlags,
             isAccountRepositoryDataLoading: false,
           });
           SuccessToast({ Message: userSignUpResponse });
@@ -80,7 +82,7 @@ const SignUp = () => {
       })
       .finally(() =>
         setRepositoryDataLoadingFlags({
-          ...repositoryDataLoadingFlags,
+          ...dataLoadingFlags,
           isAccountRepositoryDataLoading: false,
         })
       );

@@ -33,7 +33,6 @@ import {
 import _ from "lodash";
 import { AccountModels } from "@/@types/account";
 import { AccountModelsType } from "@/@enums/account.enum";
-import { getUserIdFromJwtToken } from "@/@utils/getRoleFromJwtToken";
 import { useStorage } from "@/contexts/StorageContext";
 import { useRouter } from "@/contexts/RouterContext";
 import DeleteResourceModal from "@/components/shared/profile/DeleteResourceModal";
@@ -43,6 +42,7 @@ import EditBlogModal from "@/components/shared/blog/EditBlogModal";
 import EditCommentModal from "@/components/shared/blog/EditCommentModal";
 import { ErrorToast } from "@/components/shared/toasts/ErrorToast";
 import { SuccessToast } from "@/components/shared/toasts/SuccessToast";
+import { handleLogout } from "@/@utils/handleLogout";
 
 const BlogDetails = () => {
   const { id } = useParams();
@@ -50,11 +50,14 @@ const BlogDetails = () => {
     null
   );
   const {
+    user,
     isAppDataLoading,
+    accountRepository,
     repositoryDataLoadingFlags,
     setRepositoryDataLoadingFlags,
     blogRepository,
   } = useRepository()!;
+  const [dataLoadingFlags] = useState({ ...repositoryDataLoadingFlags });
 
   const location = useLocation();
   useEffect(() => {
@@ -66,10 +69,27 @@ const BlogDetails = () => {
     }
   }, [blog, location]);
 
+  const { handleReload, handleRedirect } = useRouter()!;
+  const localStorageClient = useStorage()!;
+  const accessToken = localStorageClient.getAccessToken();
+  const [userId, setUserId] = useState<string | undefined>(user?.id);
+
+  useEffect(() => {
+    if (accessToken) {
+      accountRepository.getProfile().then((userProfile) => {
+        if (!userProfile) {
+          handleLogout(localStorageClient, handleRedirect);
+        } else if ("id" in userProfile) {
+          setUserId(userProfile.id);
+        }
+      });
+    }
+  }, [accessToken, accountRepository, handleRedirect, localStorageClient]);
+
   useEffect(() => {
     try {
       setRepositoryDataLoadingFlags({
-        ...repositoryDataLoadingFlags,
+        ...dataLoadingFlags,
         isBlogRepositoryDataLoading: true,
       });
       blogRepository
@@ -87,28 +107,14 @@ const BlogDetails = () => {
         })
         .finally(() =>
           setRepositoryDataLoadingFlags({
-            ...repositoryDataLoadingFlags,
+            ...dataLoadingFlags,
             isBlogRepositoryDataLoading: false,
           })
         );
     } catch (error) {
       console.error(error);
     }
-  }, [
-    blogRepository,
-    id,
-    repositoryDataLoadingFlags,
-    setRepositoryDataLoadingFlags,
-  ]);
-
-  const { handleReload, handleRedirect } = useRouter()!;
-  const localstorageClient = useStorage()!;
-  const accessToken = localstorageClient.getAccessToken();
-
-  let userId: string | undefined = "";
-  if (accessToken) {
-    userId = getUserIdFromJwtToken(accessToken);
-  }
+  }, [blogRepository, dataLoadingFlags, id, setRepositoryDataLoadingFlags]);
 
   const upvotes = _.filter(
     blog?.reactions,
@@ -274,102 +280,100 @@ const BlogDetails = () => {
                   ))}
                 </Box>
               </Paper>
-              {userId && id && (
-                <Box sx={{ display: "flex", gap: 2 }}>
-                  <Box sx={{ display: "flex", alignItems: "center" }}>
-                    {userId ? (
-                      <IconButton
-                        onClick={() =>
-                          handleReaction(
-                            ReactionOn.BLOG,
-                            ReactionType.Upvote,
-                            id
-                          )
-                        }
-                      >
-                        <ArrowUpward
-                          sx={{
-                            bgcolor:
-                              userReactionOnBlog && userUpvoted
-                                ? "lightgray"
-                                : "white",
-                            borderRadius: "100%",
-                          }}
-                        />
-                      </IconButton>
-                    ) : (
-                      <Tooltip
-                        title="Please login to react"
-                        placement="bottom"
-                        arrow
-                      >
-                        <ArrowUpward
-                          sx={{
-                            bgcolor:
-                              userReactionOnBlog && userUpvoted
-                                ? "lightgray"
-                                : "white",
-                            borderRadius: "100%",
-                          }}
-                        />
-                      </Tooltip>
-                    )}
-                    {upvotes.length}
-                  </Box>
-                  <Box sx={{ display: "flex", alignItems: "center" }}>
-                    {userId ? (
-                      <IconButton
-                        onClick={() =>
-                          handleReaction(
-                            ReactionOn.BLOG,
-                            ReactionType.Downvote,
-                            id
-                          )
-                        }
-                      >
-                        <ArrowDownward
-                          sx={{
-                            bgcolor:
-                              userReactionOnBlog && !userUpvoted
-                                ? "lightgray"
-                                : "white",
-                            borderRadius: "100%",
-                          }}
-                        />
-                      </IconButton>
-                    ) : (
-                      <Tooltip
-                        title="Please login to react"
-                        placement="bottom"
-                        arrow
-                      >
-                        <ArrowDownward
-                          sx={{
-                            bgcolor:
-                              userReactionOnBlog && !userUpvoted
-                                ? "lightgray"
-                                : "white",
-                            borderRadius: "100%",
-                          }}
-                        />
-                      </Tooltip>
-                    )}
-                    {downvotes.length}
-                  </Box>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <Comment />
-                    {blog.comments.length}
-                  </Box>
-
-                  {userId === blog?.authorId && <EditBlogModal blog={blog} />}
-                  {userId === blog?.authorId && (
-                    <DeleteResourceModal
-                      resourceType={DeleteModalType.BLOG}
-                      onDelete={handleDeleteBlog}
-                    />
+              <Box sx={{ display: "flex", gap: 2, my: 2 }}>
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                  {userId ? (
+                    <IconButton
+                      onClick={() =>
+                        handleReaction(
+                          ReactionOn.BLOG,
+                          ReactionType.Upvote,
+                          id!
+                        )
+                      }
+                    >
+                      <ArrowUpward
+                        sx={{
+                          bgcolor:
+                            userReactionOnBlog && userUpvoted
+                              ? "lightgray"
+                              : "white",
+                          borderRadius: "100%",
+                        }}
+                      />
+                    </IconButton>
+                  ) : (
+                    <Tooltip
+                      title="Please login to react"
+                      placement="bottom"
+                      arrow
+                    >
+                      <ArrowUpward
+                        sx={{
+                          bgcolor:
+                            userReactionOnBlog && userUpvoted
+                              ? "lightgray"
+                              : "white",
+                          borderRadius: "100%",
+                        }}
+                      />
+                    </Tooltip>
                   )}
+                  {upvotes.length}
                 </Box>
-              )}
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                  {userId ? (
+                    <IconButton
+                      onClick={() =>
+                        handleReaction(
+                          ReactionOn.BLOG,
+                          ReactionType.Downvote,
+                          id!
+                        )
+                      }
+                    >
+                      <ArrowDownward
+                        sx={{
+                          bgcolor:
+                            userReactionOnBlog && !userUpvoted
+                              ? "lightgray"
+                              : "white",
+                          borderRadius: "100%",
+                        }}
+                      />
+                    </IconButton>
+                  ) : (
+                    <Tooltip
+                      title="Please login to react"
+                      placement="bottom"
+                      arrow
+                    >
+                      <ArrowDownward
+                        sx={{
+                          bgcolor:
+                            userReactionOnBlog && !userUpvoted
+                              ? "lightgray"
+                              : "white",
+                          borderRadius: "100%",
+                        }}
+                      />
+                    </Tooltip>
+                  )}
+                  {downvotes.length}
+                </Box>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <Comment />
+                  {blog.comments.length}
+                </Box>
+
+                {userId === blog?.authorId && <EditBlogModal blog={blog} />}
+                {userId === blog?.authorId && (
+                  <DeleteResourceModal
+                    resourceType={DeleteModalType.BLOG}
+                    onDelete={handleDeleteBlog}
+                  />
+                )}
+              </Box>
               {/* New Comment */}
               <Stack spacing={2} direction="column">
                 <TextField
@@ -394,7 +398,7 @@ const BlogDetails = () => {
                     variant="contained"
                     color="primary"
                     onClick={handleAddComment}
-                    disabled={newComment.trim() === ""}
+                    disabled={newComment.trim() === "" || !userId}
                   >
                     Comment
                   </Button>

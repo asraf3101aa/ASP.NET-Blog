@@ -20,6 +20,7 @@ const PopularBlogs = (props: {
 }) => {
   const popularBlogs = props.popularBlogs;
   const { isAppDataLoading } = useRepository()!;
+
   const localStorageClient = useStorage()!;
   const role = getRoleFromJwtToken(localStorageClient.getAccessToken()!);
   const isBloggerAtProfilePage =

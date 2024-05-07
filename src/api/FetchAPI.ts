@@ -43,14 +43,13 @@ export class FetchAPI implements IFetchAPI {
       method,
       headers,
     };
-    if (data || data === 0) {
+    if (data) {
       if (data instanceof FormData) {
         options.body = data;
       } else {
         headers.set("Content-Type", "application/json");
         options.body = JSON.stringify(data);
       }
-      // Include data in request body
     }
 
     try {

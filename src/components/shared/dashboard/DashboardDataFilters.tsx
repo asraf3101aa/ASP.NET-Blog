@@ -29,6 +29,7 @@ const monthNames = [
 
 const DashboardDataFilters = () => {
   const { dashboardData, setDashboardDataFilters } = useRepository()!;
+
   const [month, setMonth] = useState<string | undefined>(undefined);
   const [duration, setDuration] = useState<BlogsDurationFilters>(
     BlogsDurationFilters.ALL

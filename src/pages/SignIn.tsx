@@ -25,7 +25,7 @@ import {
 import { useRepository } from "@/contexts/RepositoryContext";
 import { LocalStorageItemsKeys } from "@/@enums/storage.enum";
 import MiniFooter from "@/components/shared/navigation/MiniFooter";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import RetrieveEmailModal from "@/components/shared/profile/RetrieveEmailModal";
 import { ErrorToast } from "@/components/shared/toasts/ErrorToast";
 
@@ -45,6 +45,7 @@ const SignIn = () => {
     setRepositoryDataLoadingFlags,
     accountRepository,
   } = useRepository()!;
+  const [dataLoadingFlags] = useState({ ...repositoryDataLoadingFlags });
 
   useEffect(() => {
     const accessToken = localStorageClient.getAccessToken();
@@ -57,7 +58,7 @@ const SignIn = () => {
     AccountModels[AccountModelsType.USER_LOGIN]
   > = async (data) => {
     setRepositoryDataLoadingFlags({
-      ...repositoryDataLoadingFlags,
+      ...dataLoadingFlags,
       isAccountRepositoryDataLoading: true,
     });
     accountRepository
@@ -71,7 +72,7 @@ const SignIn = () => {
           if (LocalStorageItemsKeys.ACCESS_TOKEN in userSignInResponse) {
             localStorageClient.setAccessToken(userSignInResponse);
             setRepositoryDataLoadingFlags({
-              ...repositoryDataLoadingFlags,
+              ...dataLoadingFlags,
               isAccountRepositoryDataLoading: false,
             });
             handleRedirect(RoutePath.PROFILE);
@@ -88,7 +89,7 @@ const SignIn = () => {
       })
       .finally(() =>
         setRepositoryDataLoadingFlags({
-          ...repositoryDataLoadingFlags,
+          ...dataLoadingFlags,
           isAccountRepositoryDataLoading: false,
         })
       );

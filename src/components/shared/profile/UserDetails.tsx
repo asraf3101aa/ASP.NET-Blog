@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Box, Button, Typography } from "@mui/material";
 import { AccountModels } from "@/@types/account";
 import {
@@ -45,11 +45,13 @@ const UserDetails = ({
     setRepositoryDataLoadingFlags,
     accountRepository,
   } = useRepository()!;
+  const [dataLoadingFlags] = useState({ ...repositoryDataLoadingFlags });
+
   const { handleRedirect } = useRouter()!;
 
   const handleResendMail = async () => {
     setRepositoryDataLoadingFlags({
-      ...repositoryDataLoadingFlags,
+      ...dataLoadingFlags,
       isAccountRepositoryDataLoading: true,
     });
     accountRepository
@@ -65,7 +67,7 @@ const UserDetails = ({
       })
       .finally(() =>
         setRepositoryDataLoadingFlags({
-          ...repositoryDataLoadingFlags,
+          ...dataLoadingFlags,
           isAccountRepositoryDataLoading: false,
         })
       );
@@ -73,7 +75,7 @@ const UserDetails = ({
 
   const handleDeleteAccount = async () => {
     setRepositoryDataLoadingFlags({
-      ...repositoryDataLoadingFlags,
+      ...dataLoadingFlags,
       isAccountRepositoryDataLoading: true,
     });
     accountRepository
@@ -90,7 +92,7 @@ const UserDetails = ({
       })
       .finally(() =>
         setRepositoryDataLoadingFlags({
-          ...repositoryDataLoadingFlags,
+          ...dataLoadingFlags,
           isAccountRepositoryDataLoading: false,
         })
       );

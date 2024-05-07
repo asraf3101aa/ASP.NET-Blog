@@ -12,7 +12,7 @@ import {
   Tooltip,
   IconButton,
 } from "@mui/material";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { BlogModels } from "@/@types/blog";
 import { BlogModelsType } from "@/@enums/blog.enum";
 import { useRepository } from "@/contexts/RepositoryContext";
@@ -22,118 +22,112 @@ import { ErrorToast } from "../toasts/ErrorToast";
 import { SuccessToast } from "../toasts/SuccessToast";
 import { useRouter } from "@/contexts/RouterContext";
 
-const EditBlogModal = ({ blog }: { blog: BlogModels[BlogModelsType.BLOG] }) => {
+interface EditBlogModalProps {
+  blog: BlogModels[BlogModelsType.BLOG];
+}
+
+const EditBlogModal: React.FC<EditBlogModalProps> = ({ blog }) => {
   const [open, setOpen] = useState(false);
+
   const {
     blogRepository,
     repositoryDataLoadingFlags,
     setRepositoryDataLoadingFlags,
     categories,
     setCategories,
-    isAppDataLoading,
   } = useRepository()!;
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-    reset,
-    setValue,
-  } = useForm<BlogModels[BlogModelsType.BLOG_PARTIAL_DATA]>({
+  const [dataLoadingFlags] = useState({ ...repositoryDataLoadingFlags });
+
+  const { handleSubmit, register, setValue, reset } = useForm<
+    BlogModels[BlogModelsType.BLOG_PARTIAL_DATA]
+  >({
     defaultValues: {
       title: blog.title,
       body: blog.body,
-      categoryId: categories.length > 0 ? blog.category.name : "",
+      categoryId: blog.category.name,
     },
   });
 
   useEffect(() => {
-    if (open) {
-      blogRepository
-        .getCategories()
-        .then((response) => {
-          if ("errors" in response) {
-            console.error("Failed to load categories.");
-          } else {
-            setCategories(response);
-          }
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    }
-  }, [open, blogRepository, setCategories]);
+    blogRepository.getCategories().then((categories) => {
+      if ("errors" in categories) {
+        console.error(categories);
+      } else setCategories(categories);
+    });
+  }, [blogRepository, setCategories]);
+
+  const { handleReload } = useRouter()!;
 
   const handleOpen = () => setOpen(true);
+
   const handleClose = () => {
     reset();
     setOpen(false);
   };
 
-  const { handleReload } = useRouter()!;
-
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const file = e.target.files[0];
-      const field = e.target.name as
-        | "title"
-        | "body"
-        | "categoryId"
-        | "banner"
-        | "other";
+    const file = e.target.files?.[0];
+    const field = e.target
+      .name as keyof BlogModels[BlogModelsType.BLOG_PARTIAL_DATA];
 
-      if (file) {
-        setValue(field, file);
-      }
+    if (file) {
+      setValue(field, file);
     }
   };
 
   const onSubmit = (data: BlogModels[BlogModelsType.BLOG_PARTIAL_DATA]) => {
     setRepositoryDataLoadingFlags({
-      ...repositoryDataLoadingFlags,
+      ...dataLoadingFlags,
       isBlogRepositoryDataLoading: true,
     });
 
-    const categoryIndex = _.findIndex(
-      categories,
-      (category) => category.name === data.categoryId
-    );
+    const category = _.find(categories, (c) => c.name === data.categoryId);
+
     const blogData = new FormData();
     blogData.append("title", data.title);
     blogData.append("body", data.body);
-    blogData.append("categoryId", categories[categoryIndex].id.toString());
+
+    if (category) {
+      blogData.append("categoryId", category.id.toString());
+    }
+
     if (data.banner) {
       blogData.append("banner", data.banner);
     }
+
     if (data.other) {
       blogData.append("other", data.other);
     }
 
     blogRepository
       .updateBlog(blog.id.toString(), blogData)
-      .then((blogResponse: ApiResponse<string>) => {
-        if (typeof blogResponse === "string") {
-          SuccessToast({ Message: blogResponse });
+      .then((response) => {
+        if (typeof response === "string") {
+          SuccessToast({ Message: response });
           setTimeout(() => {
             handleReload();
           }, 1000);
+        } else {
+          ErrorToast({ Message: "Update failed." });
         }
       })
       .catch((error) => {
         console.error(error);
-        ErrorToast({ Message: "Something went wrong!" });
+        ErrorToast({ Message: "An error occurred during update." });
       })
       .finally(() => {
         setRepositoryDataLoadingFlags({
-          ...repositoryDataLoadingFlags,
+          ...dataLoadingFlags,
           isBlogRepositoryDataLoading: false,
         });
+        setOpen(false);
       });
   };
 
   return (
     <>
       <IconButton onClick={handleOpen}>
-        <Tooltip title="Edit Blog" placement="top">
+        <Tooltip title="Edit Blog" arrow>
           <Edit sx={{ color: "#1976d2" }} />
         </Tooltip>
       </IconButton>
@@ -161,61 +155,40 @@ const EditBlogModal = ({ blog }: { blog: BlogModels[BlogModelsType.BLOG] }) => {
           <Typography variant="h6">Edit Blog</Typography>
 
           <form onSubmit={handleSubmit(onSubmit)}>
-            <Controller
-              name="title"
-              control={control}
-              rules={{ required: "Title is required" }}
-              render={({ field }) => (
-                <TextField
-                  fullWidth
-                  label="Title"
-                  variant="outlined"
-                  margin="normal"
-                  error={!!errors.title}
-                  helperText={errors.title?.message}
-                  {...field}
-                />
-              )}
+            <TextField
+              fullWidth
+              label="Title"
+              required
+              {...register("title")}
+              margin="normal"
             />
 
-            <Controller
-              name="body"
-              control={control}
-              rules={{ required: "Body is required" }}
-              render={({ field }) => (
-                <TextField
-                  fullWidth
-                  multiline
-                  rows={4}
-                  label="Body"
-                  variant="outlined"
-                  error={!!errors.body}
-                  helperText={errors.body?.message}
-                  {...field}
-                  margin="normal"
-                />
-              )}
+            <TextField
+              fullWidth
+              multiline
+              rows={4}
+              label="Body"
+              required
+              {...register("body")}
+              margin="normal"
             />
 
-            <Controller
-              name="categoryId"
-              control={control}
-              render={({ field }) => (
-                <FormControl fullWidth margin="normal">
-                  <InputLabel>Category</InputLabel>
-                  <Select {...field} label="Category ID">
-                    {_.map(categories, (category) => (
-                      <MenuItem key={category.id} value={category.name}>
-                        {category.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              )}
-            />
+            <FormControl fullWidth margin="normal">
+              <InputLabel>Category</InputLabel>
+              <Select
+                {...register("categoryId")}
+                defaultValue={blog.category.name}
+              >
+                {_.map(categories, (category) => (
+                  <MenuItem key={category.id} value={category.name}>
+                    {category.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
 
             <Box>
-              <InputLabel sx={{ mt: 2 }}>Upload Banner</InputLabel>
+              <InputLabel>Upload Banner</InputLabel>
               <Box
                 sx={{
                   my: 1,
@@ -226,17 +199,16 @@ const EditBlogModal = ({ blog }: { blog: BlogModels[BlogModelsType.BLOG] }) => {
                 }}
               >
                 <input
-                  name="banner"
                   type="file"
-                  value={control._formValues["banner"]}
-                  onChange={handleFileChange}
+                  name="banner"
                   accept="image/*"
+                  onChange={handleFileChange}
                 />
               </Box>
             </Box>
 
             <Box>
-              <InputLabel sx={{ mt: 2 }}>Body Image</InputLabel>
+              <InputLabel>Body Image</InputLabel>
               <Box
                 sx={{
                   my: 1,
@@ -247,11 +219,10 @@ const EditBlogModal = ({ blog }: { blog: BlogModels[BlogModelsType.BLOG] }) => {
                 }}
               >
                 <input
-                  name="other"
                   type="file"
-                  value={control._formValues["other"]}
-                  onChange={handleFileChange}
+                  name="other"
                   accept="image/*"
+                  onChange={handleFileChange}
                 />
               </Box>
             </Box>
@@ -267,7 +238,7 @@ const EditBlogModal = ({ blog }: { blog: BlogModels[BlogModelsType.BLOG] }) => {
               <Button variant="outlined" onClick={handleClose}>
                 Cancel
               </Button>
-              {isAppDataLoading ? (
+              {repositoryDataLoadingFlags.isBlogRepositoryDataLoading ? (
                 <img src="/assets/icons/Loading.svg" alt="Loading" />
               ) : (
                 <Button variant="contained" color="primary" type="submit">
