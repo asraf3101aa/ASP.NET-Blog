@@ -2,7 +2,11 @@ import { AccountModels } from "./account";
 import { BlogModels } from "@/@types/blog";
 import { AdminDashboardData } from "./admin";
 import { AccountModelsType } from "@/@enums/account.enum";
-import { BlogModelsType, ReactionType } from "@/@enums/blog.enum";
+import {
+  BlogModelsType,
+  BlogsDurationFilters,
+  ReactionType,
+} from "@/@enums/blog.enum";
 
 /**
  * Interface for managing user account-related operations.
@@ -35,6 +39,12 @@ export interface IAccountRepository {
   confirmEmail: (token: string, email: string) => Promise<ApiResponse<string>>;
 
   /**
+   * Resend confirmation of a user's email address.
+   * @returns A promise that resolves with an API response containing a success message.
+   */
+  confirmEmailResend: () => Promise<ApiResponse<string>>;
+
+  /**
    * Sends a forgot password request.
    * @param email - The email address to send the password confirm link to.
    * @returns A promise that resolves with an API response containing a success message.
@@ -55,9 +65,7 @@ export interface IAccountRepository {
    * @param updatedData - The new data to update the user's account with.
    * @returns A promise that resolves with an API response containing a success message.
    */
-  userUpdate: (
-    updatedData: AccountModels[AccountModelsType.USER_UPDATE]
-  ) => Promise<ApiResponse<string>>;
+  userUpdate: (updatedData: FormData) => Promise<ApiResponse<string>>;
 
   /**
    * Deletes the user's account.
@@ -114,8 +122,8 @@ export interface IAdminRepository {
    * @returns A promise that resolves with an API response containing the admin dashboard data.
    */
   getDashboardData: (
-    duration: string,
-    month: number
+    duration: BlogsDurationFilters,
+    month?: number
   ) => Promise<ApiResponse<AdminDashboardData>>;
 }
 
@@ -148,9 +156,7 @@ export interface IBlogRepository {
    * @param blogData - The partial data for creating a new blog.
    * @returns A promise resolving to the created blog wrapped in an ApiResponse.
    */
-  createBlog(
-    blogData: BlogModels[BlogModelsType.BLOG_PARTIAL_DATA]
-  ): Promise<ApiResponse<BlogModels[BlogModelsType.BLOG]>>;
+  createBlog(blogData: FormData): Promise<ApiResponse<string>>;
 
   /**
    * Gets the details of a specific blog by ID.
@@ -173,10 +179,7 @@ export interface IBlogRepository {
    * @param updatedData - The updated blog data.
    * @returns A promise resolving to a confirmation message or updated blog wrapped in an ApiResponse.
    */
-  updateBlog(
-    id: string,
-    updatedData: BlogModels[BlogModelsType.BLOG_PARTIAL_DATA]
-  ): Promise<ApiResponse<string>>;
+  updateBlog(id: string, updatedData: FormData): Promise<ApiResponse<string>>;
 
   /**
    * Deletes a blog by ID.
@@ -193,7 +196,20 @@ export interface IBlogRepository {
    */
   reactOnBlog(
     id: string,
-    reactionType: ReactionType
+    reactionType: { reactionType: ReactionType }
+  ): Promise<ApiResponse<string>>;
+
+  /**
+   * Adds a reaction to a specific blog.
+   * @param blogId - The ID of the blog to react on.
+   * @param commentId - The ID of the comment to react on.
+   * @param reactionType - The type of reaction.
+   * @returns A promise resolving to a confirmation message wrapped in an ApiResponse.
+   */
+  reactOnBlogComment(
+    blogId: string,
+    commentId: string,
+    reactionType: { reactionType: ReactionType }
   ): Promise<ApiResponse<string>>;
 
   /**

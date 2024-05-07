@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { ErrorToast } from "../toasts/ErrorToast";
 
 const ConfirmEmail = () => {
   const params = useSearchParams();
@@ -22,33 +23,52 @@ const ConfirmEmail = () => {
   const email = params[0].get("email");
 
   const { isLoading, setIsLoading, accountRepository } = useRepository()!;
-  const [isConfirmed, setIsConfirmed] = useState<boolean>(false);
+  const [isConfirmed, setIsConfirmed] = useState<boolean | undefined>(
+    undefined
+  );
   const localStorageClient = useStorage()!;
   const accessToken = localStorageClient.getAccessToken();
   const { handleRedirect } = useRouter()!;
 
   useEffect(() => {
-    // if (!accessToken) {
-    //   handleRedirect(RoutePath.LOGIN);
-    // }
+    if (isConfirmed) {
+      return;
+    }
+    if (!accessToken) {
+      handleRedirect(RoutePath.LOGIN);
+    }
     if (email && token) {
       setIsLoading(true);
       accountRepository
-        .confirmEmail(token, email)
-        .then((confirmationResponse) => {
-          if (typeof confirmationResponse === "string") {
-            setIsConfirmed(true);
-          } else {
-            setIsConfirmed(false);
-            console.error(confirmationResponse);
+        .getProfile()
+        .then((profileResponse) => {
+          if ("emailConfirmed" in profileResponse) {
+            if (profileResponse.emailConfirmed === false) {
+              accountRepository
+                .confirmEmail(token, email)
+                .then((confirmationResponse) => {
+                  if (typeof confirmationResponse === "string") {
+                    setIsConfirmed(true);
+                  } else {
+                    setIsConfirmed(false);
+                    console.error(confirmationResponse);
+                  }
+                });
+            } else {
+              setIsConfirmed(true);
+            }
           }
         })
-        .catch((error) => console.error(error))
-        .finally(() => setIsLoading(false));
-    } else {
-      setTimeout(() => handleRedirect(RoutePath.PROFILE), 2000);
+        .catch((error) => {
+          console.error(error);
+          ErrorToast({ Message: "Something went wrong!" });
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
     }
   }, [
+    isConfirmed,
     accountRepository,
     email,
     setIsLoading,
@@ -59,7 +79,7 @@ const ConfirmEmail = () => {
 
   const onClose = () => handleRedirect(RoutePath.HOME);
 
-  return isLoading ? (
+  return isLoading || isConfirmed === undefined ? (
     <Container
       sx={{
         height: "50vh",
@@ -71,7 +91,7 @@ const ConfirmEmail = () => {
       <img src="/assets/icons/Loading.svg" alt="LoadingIcon" />
     </Container>
   ) : (
-    <Dialog open={!isLoading} onClose={onClose}>
+    <Dialog open={!isLoading && isConfirmed !== undefined} onClose={onClose}>
       <DialogTitle sx={{ px: 8 }}>
         Email Confirmation
         <IconButton

@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import {
   Button,
   Modal,
@@ -10,26 +10,52 @@ import {
   FormControl,
   InputLabel,
   Tooltip,
+  IconButton,
 } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import { BlogModels } from "@/@types/blog";
 import { BlogModelsType } from "@/@enums/blog.enum";
 import { useRepository } from "@/contexts/RepositoryContext";
 import _ from "lodash";
-import { useRouter } from "@/contexts/RouterContext";
-import { Info } from "@mui/icons-material";
+import { Edit } from "@mui/icons-material";
 import { ErrorToast } from "../toasts/ErrorToast";
 import { SuccessToast } from "../toasts/SuccessToast";
+import { useRouter } from "@/contexts/RouterContext";
 
-const CreateBlogModal = () => {
+const EditBlogModal = ({ blog }: { blog: BlogModels[BlogModelsType.BLOG] }) => {
   const [open, setOpen] = useState(false);
+  const { blogRepository, setIsLoading, categories, setCategories, isLoading } =
+    useRepository()!;
   const {
     control,
     handleSubmit,
-    setValue,
-    reset,
     formState: { errors },
-  } = useForm<BlogModels[BlogModelsType.BLOG_PARTIAL_DATA]>({});
+    reset,
+    setValue,
+  } = useForm<BlogModels[BlogModelsType.BLOG_PARTIAL_DATA]>({
+    defaultValues: {
+      title: blog.title,
+      body: blog.body,
+      categoryId: categories.length > 0 ? blog.category.name : "",
+    },
+  });
+
+  useEffect(() => {
+    if (open) {
+      blogRepository
+        .getCategories()
+        .then((response) => {
+          if ("errors" in response) {
+            console.error("Failed to load categories.");
+          } else {
+            setCategories(response);
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
+  }, [open, blogRepository, setCategories]);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
@@ -37,10 +63,8 @@ const CreateBlogModal = () => {
     setOpen(false);
   };
 
-  const { isLoading, categories, user, setIsLoading, blogRepository } =
-    useRepository()!;
-
   const { handleReload } = useRouter()!;
+
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const file = e.target.files[0];
@@ -56,13 +80,18 @@ const CreateBlogModal = () => {
       }
     }
   };
+
   const onSubmit = (data: BlogModels[BlogModelsType.BLOG_PARTIAL_DATA]) => {
     setIsLoading(true);
 
+    const categoryIndex = _.findIndex(
+      categories,
+      (category) => category.name === data.categoryId
+    );
     const blogData = new FormData();
     blogData.append("title", data.title);
     blogData.append("body", data.body);
-    blogData.append("categoryId", data.categoryId!);
+    blogData.append("categoryId", categories[categoryIndex].id.toString());
     if (data.banner) {
       blogData.append("banner", data.banner);
     }
@@ -71,7 +100,7 @@ const CreateBlogModal = () => {
     }
 
     blogRepository
-      .createBlog(blogData)
+      .updateBlog(blog.id.toString(), blogData)
       .then((blogResponse: ApiResponse<string>) => {
         if (typeof blogResponse === "string") {
           SuccessToast({ Message: blogResponse });
@@ -91,26 +120,17 @@ const CreateBlogModal = () => {
 
   return (
     <>
-      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-        <Button
-          variant="contained"
-          disabled={!user?.emailConfirmed}
-          onClick={handleOpen}
-        >
-          Create New Blog
-        </Button>
-        {!user?.emailConfirmed && (
-          <Tooltip title="Please verify email first" placement="right">
-            <Info sx={{ color: "#1976d2" }} />
-          </Tooltip>
-        )}
-      </Box>
+      <IconButton onClick={handleOpen}>
+        <Tooltip title="Edit Blog" placement="top">
+          <Edit sx={{ color: "#1976d2" }} />
+        </Tooltip>
+      </IconButton>
 
       <Modal
         open={open}
         onClose={handleClose}
-        aria-labelledby="blog-form-modal-title"
-        aria-describedby="blog-form-modal-description"
+        aria-labelledby="edit-blog-modal-title"
+        aria-describedby="edit-blog-modal-description"
       >
         <Box
           sx={{
@@ -118,20 +138,17 @@ const CreateBlogModal = () => {
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: 600,
             bgcolor: "background.paper",
             boxShadow: 24,
-            p: 4,
             borderRadius: 2,
+            p: 4,
             maxHeight: "100vh",
             overflow: "auto",
           }}
         >
-          <Typography variant="h6" id="blog-form-modal-title">
-            Create Blog
-          </Typography>
+          <Typography variant="h6">Edit Blog</Typography>
 
-          <form encType="multipart/form-data" onSubmit={handleSubmit(onSubmit)}>
+          <form onSubmit={handleSubmit(onSubmit)}>
             <Controller
               name="title"
               control={control}
@@ -141,9 +158,10 @@ const CreateBlogModal = () => {
                   fullWidth
                   label="Title"
                   variant="outlined"
-                  error={!!errors.title}
-                  {...field}
                   margin="normal"
+                  error={!!errors.title}
+                  helperText={errors.title?.message}
+                  {...field}
                 />
               )}
             />
@@ -160,6 +178,7 @@ const CreateBlogModal = () => {
                   label="Body"
                   variant="outlined"
                   error={!!errors.body}
+                  helperText={errors.body?.message}
                   {...field}
                   margin="normal"
                 />
@@ -172,12 +191,9 @@ const CreateBlogModal = () => {
               render={({ field }) => (
                 <FormControl fullWidth margin="normal">
                   <InputLabel>Category</InputLabel>
-                  <Select {...field} label="Category ID" defaultValue="">
+                  <Select {...field} label="Category ID">
                     {_.map(categories, (category) => (
-                      <MenuItem
-                        value={category.id.toString()}
-                        key={category.id}
-                      >
+                      <MenuItem key={category.id} value={category.name}>
                         {category.name}
                       </MenuItem>
                     ))}
@@ -240,10 +256,10 @@ const CreateBlogModal = () => {
                 Cancel
               </Button>
               {isLoading ? (
-                <img src="/assets/icons/Loading.svg" />
+                <img src="/assets/icons/Loading.svg" alt="Loading" />
               ) : (
                 <Button variant="contained" color="primary" type="submit">
-                  Save
+                  Save Changes
                 </Button>
               )}
             </Box>
@@ -254,4 +270,4 @@ const CreateBlogModal = () => {
   );
 };
 
-export default CreateBlogModal;
+export default EditBlogModal;

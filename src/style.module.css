@@ -1,0 +1,10 @@
+.toastSuccess {
+  --toastify-color-success: #3ebd88;
+  --toastify-toast-min-height: 56px;
+  font-size: 14px;
+}
+.toastError {
+  --toastify-color-error: #ff6961;
+  --toastify-toast-min-height: 56px;
+  font-size: 14px;
+}

@@ -29,8 +29,22 @@ export class AccountRepository implements IAccountRepository {
   }
 
   async confirmEmail(token: string, email: string) {
+    const request = {
+      token,
+      email,
+    };
+    return await this._fetchAPI.update<
+      string,
+      { token: string; email: string }
+    >(
+      `${this._accountEndpointPath}/${AccountEndpointPaths.ACCOUNT_CONFIRM}`,
+      request
+    );
+  }
+
+  async confirmEmailResend() {
     return await this._fetchAPI.get<string>(
-      `${this._accountEndpointPath}/${AccountEndpointPaths.ACCOUNT_CONFIRM}?token=${token}&email=${email}`
+      `${this._accountEndpointPath}/${AccountEndpointPaths.ACCOUNT_CONFIRM_RESEND}`
     );
   }
 
@@ -46,7 +60,7 @@ export class AccountRepository implements IAccountRepository {
   async confirmPassword(
     confirmPasswordData: AccountModels[AccountModelsType.CONFIRM_PASSWORD]
   ) {
-    return await this._fetchAPI.post<
+    return await this._fetchAPI.update<
       string,
       AccountModels[AccountModelsType.CONFIRM_PASSWORD]
     >(
@@ -55,11 +69,11 @@ export class AccountRepository implements IAccountRepository {
     );
   }
 
-  async userUpdate(updatedData: AccountModels[AccountModelsType.USER_UPDATE]) {
-    return await this._fetchAPI.update<
-      string,
-      AccountModels[AccountModelsType.USER_UPDATE]
-    >(this._accountEndpointPath, updatedData);
+  async userUpdate(updatedData: FormData) {
+    return await this._fetchAPI.update<string, FormData>(
+      this._accountEndpointPath,
+      updatedData
+    );
   }
 
   async deleteAccount() {
@@ -80,7 +94,7 @@ export class AccountRepository implements IAccountRepository {
   }
 
   async updateEmail(email: string) {
-    return await this._fetchAPI.update<
+    return await this._fetchAPI.post<
       string,
       AccountModels[AccountModelsType.EMAIL_MODEL]
     >(`${this._accountEndpointPath}/${AccountEndpointPaths.EMAIL_UPDATE}`, {

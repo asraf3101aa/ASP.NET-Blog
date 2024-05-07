@@ -8,18 +8,20 @@ import Dashboard from "@/pages/Dashboard";
 import Profile from "@/pages/Profile";
 import BlogDetails from "@/pages/BlogDetails";
 import ConfirmEmail from "@/components/shared/profile/ConfirmEmail";
+import ResetPassword from "@/components/shared/profile/ResetPassword";
 
 const Router = () => {
   return (
     <Routes>
       <Route path={RoutePath.LOGIN} element={<SignIn />} />
+      <Route path={RoutePath.RESET_PASSWORD} element={<ResetPassword />} />
       <Route path={RoutePath.SIGN_UP} element={<SignUp />} />
       <Route path={RoutePath.HOME} element={<Home />} />
+      <Route path={`${RoutePath.DETAILS}/:id`} element={<BlogDetails />} />
       <Route path={RoutePath.CONFIRM_EMAIL} element={<ConfirmEmail />} />
       <Route element={<ProtectedRoutes />}>
-        <Route path={RoutePath.DASHBOARD} element={<Dashboard />} />
         <Route path={RoutePath.PROFILE} element={<Profile />} />
-        <Route path={RoutePath.DETAILS} element={<BlogDetails />} />
+        <Route path={RoutePath.DASHBOARD} element={<Dashboard />} />
       </Route>
     </Routes>
   );

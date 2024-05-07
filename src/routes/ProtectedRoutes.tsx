@@ -5,22 +5,24 @@ import { useRepository } from "@/contexts/RepositoryContext";
 import { useEffect } from "react";
 import { AccountModels } from "@/@types/account";
 import { AccountModelsType } from "@/@enums/account.enum";
-import { BlogsDurationFilters, BlogsSortingFilters } from "@/@enums/blog.enum";
 import { getRoleFromJwtToken } from "@/@utils/getRoleFromJwtToken";
 import { UserRoles } from "@/@enums/storage.enum";
 import { AdminDashboardData } from "@/@types/admin";
 import _ from "lodash";
 import { Container } from "@mui/material";
 import { useRouter } from "@/contexts/RouterContext";
+import { ErrorToast } from "@/components/shared/toasts/ErrorToast";
 
 const ProtectedRoutes = () => {
   const localStorageClient = useStorage()!;
   const accessToken = localStorageClient.getAccessToken();
   const {
     isLoading,
+    blogs,
     blogRepository,
     adminRepository,
     accountRepository,
+    dashboardDataFilters,
     setUser,
     setBlogs,
     setIsLoading,
@@ -49,50 +51,40 @@ const ProtectedRoutes = () => {
               } else {
                 setUser(profileDataResponse);
 
-                blogRepository
-                  .getHomepageBlogs(BlogsSortingFilters.RECENCY, 1)
-                  .then((blogs) => {
-                    if ("errors" in blogs) {
-                      console.error(blogs);
-                    } else {
-                      setHomepageBlogsData(blogs);
-                    }
-                  })
-                  .catch((error) => console.error(error));
-
-                blogRepository
-                  .getCategories()
-                  .then((categories) => {
-                    if ("errors" in categories) {
-                      console.error(categories);
-                    } else setCategories(categories);
-                  })
-                  .catch((error) => console.error(error));
+                blogRepository.getCategories().then((categories) => {
+                  if ("errors" in categories) {
+                    console.error(categories);
+                  } else setCategories(categories);
+                });
 
                 const userRole = getRoleFromJwtToken(accessToken);
                 if (_.isEqual(userRole, UserRoles.BLOGGER)) {
                   blogRepository
-                    .getBlogs(1)
+                    .getBlogs(blogs?.paginationMetaData.pageNumber ?? 1)
                     .then((blogs) => {
                       if ("errors" in blogs) {
                         console.error(blogs);
-                      } else setBlogs(blogs.blogs);
-                    })
-                    .catch((error) => console.error(error));
+                      } else setBlogs(blogs);
+                    });
                 } else {
                   adminRepository
-                    .getDashboardData(BlogsDurationFilters.MONTHLY, 3)
+                    .getDashboardData(
+                      dashboardDataFilters.duration,
+                      dashboardDataFilters.month
+                    )
                     .then((data: ApiResponse<AdminDashboardData>) => {
                       if ("errors" in data) {
                         console.error(data);
                       } else setDashboardData(data);
-                    })
-                    .catch((error) => console.error(error));
+                    });
                 }
               }
             }
           )
-          .catch((error) => console.error(error))
+          .catch((error) => {
+            console.error(error);
+            ErrorToast({ Message: "Something went wrong!" });
+          })
           .finally(() => setIsLoading(false));
       }
     } catch (error) {
@@ -100,10 +92,12 @@ const ProtectedRoutes = () => {
       handleRedirect(RoutePath.LOGIN);
     }
   }, [
+    blogs?.paginationMetaData.pageNumber,
     accountRepository,
     adminRepository,
     blogRepository,
     localStorageClient,
+    dashboardDataFilters,
     setBlogs,
     setCategories,
     setDashboardData,

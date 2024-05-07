@@ -4,6 +4,7 @@ import { AdminDashboardData } from "@/@types/admin";
 import { ApiEndpointPaths } from "@/@enums/api.enum";
 import { IAdminRepository } from "@/@types/repository";
 import { AccountModelsType } from "@/@enums/account.enum";
+import { BlogsDurationFilters } from "@/@enums/blog.enum";
 
 export class AdminRepository implements IAdminRepository {
   private _fetchAPI: IFetchAPI;
@@ -20,9 +21,12 @@ export class AdminRepository implements IAdminRepository {
     >(this._adminEndpointPath, adminData);
   }
 
-  async getDashboardData(duration: string, month: number) {
-    return await this._fetchAPI.get<AdminDashboardData>(
-      `${this._adminEndpointPath}?duration=${duration}&month=${month}`
-    );
+  async getDashboardData(duration: BlogsDurationFilters, month?: number) {
+    const isDurationMonthly = duration === BlogsDurationFilters.MONTHLY;
+    let apiEndpoint = `${this._adminEndpointPath}/dashboard`;
+    if (isDurationMonthly) {
+      apiEndpoint = `${apiEndpoint}?duration=${duration}&month=${month}`;
+    }
+    return await this._fetchAPI.get<AdminDashboardData>(apiEndpoint);
   }
 }

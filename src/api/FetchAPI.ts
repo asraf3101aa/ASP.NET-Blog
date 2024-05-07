@@ -35,7 +35,6 @@ export class FetchAPI implements IFetchAPI {
     const apiEndpoint = `${this._baseURL}/${path}`;
 
     const headers = new Headers();
-    headers.set("Content-Type", "application/json");
     if (requiresAuth) {
       const accessToken = this._localStorageClient.getAccessToken();
       headers.set("Authorization", `Bearer ${accessToken}`);
@@ -44,10 +43,16 @@ export class FetchAPI implements IFetchAPI {
       method,
       headers,
     };
-    if (data) {
+    if (data || data === 0) {
+      if (data instanceof FormData) {
+        options.body = data;
+      } else {
+        headers.set("Content-Type", "application/json");
+        options.body = JSON.stringify(data);
+      }
       // Include data in request body
-      options.body = JSON.stringify(data);
     }
+
     try {
       const response = await fetch(apiEndpoint, options);
       return getApiResponse<T>(response);

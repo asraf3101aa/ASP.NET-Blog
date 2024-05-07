@@ -22,6 +22,11 @@ export enum ReactionType {
   Downvote = 1,
 }
 
+export enum ReactionOn {
+  BLOG = "Blog",
+  COMMENT = "Comment",
+}
+
 // Enum representing different endpoints of blog controller
 export enum BlogEndpointPaths {
   HOMEPAGE_BLOGS = "list",
@@ -31,10 +36,10 @@ export enum BlogEndpointPaths {
 }
 
 export enum BlogStatsData {
-  BLOG_COUNT = "Blog Count",
-  COMMENT_COUNT = "Comment Count",
-  DOWN_VOTE_COUNT = "Downvote Count",
-  UP_VOTE_COUNT = "Upvote Count",
+  BLOG_COUNT = "Blogs",
+  UP_VOTE_COUNT = "Upvotes",
+  COMMENT_COUNT = "Comments",
+  DOWN_VOTE_COUNT = "Downvotes",
 }
 
 export enum BlogsDurationFilters {
@@ -43,6 +48,7 @@ export enum BlogsDurationFilters {
 }
 
 export enum BlogsSortingFilters {
-  ALL = "all",
   RECENCY = "recency",
+  POPULARITY = "popularity",
+  RANDOM = "random",
 }

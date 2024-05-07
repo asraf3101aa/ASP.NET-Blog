@@ -16,10 +16,16 @@ export enum AccountModelsType {
 // Enum representing different account module's api endpoints
 export enum AccountEndpointPaths {
   ACCOUNT_CONFIRM = "confirm",
+  ACCOUNT_CONFIRM_RESEND = "confirm/resend",
   USER_LOGIN = "login",
   PASSWORD_FORGOT = "password/forgot",
   PASSWORD_CONFIRM = "password/confirm",
   EMAIL_UPDATE = "email",
   EMAIL_CONFIRM = "email/confirm",
   CHANGE_PASSWORD = "password",
+}
+
+export enum RetrieveEmailForAction {
+  RESET_PASSWORD = "Forgot Password?",
+  CHANGE_EMAIL = "Change Email",
 }

@@ -9,8 +9,8 @@ import { ProviderProps, RepositoryProps } from "@/@types/providers";
 import { AccountModels } from "@/@types/account";
 import { AccountModelsType } from "@/@enums/account.enum";
 import { BlogModels } from "@/@types/blog";
-import { BlogModelsType } from "@/@enums/blog.enum";
-import { AdminDashboardData } from "@/@types/admin";
+import { BlogModelsType, BlogsDurationFilters } from "@/@enums/blog.enum";
+import { AdminDashboardData, DashboardDataFilters } from "@/@types/admin";
 
 /**
  * RepositoryProvider: A component to provide Repository context to its children.
@@ -20,7 +20,9 @@ import { AdminDashboardData } from "@/@types/admin";
  */
 const RepositoryProvider = ({ children }: ProviderProps) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [blogs, setBlogs] = useState<BlogModels[BlogModelsType.BLOG][]>([]);
+  const [blogs, setBlogs] = useState<
+    BlogModels[BlogModelsType.BLOGS_LIST] | null
+  >(null);
   const [user, setUser] = useState<
     AccountModels[AccountModelsType.USER] | null
   >(null);
@@ -36,6 +38,12 @@ const RepositoryProvider = ({ children }: ProviderProps) => {
   const [categories, setCategories] = useState<
     BlogModels[BlogModelsType.CATEGORY][]
   >([]);
+
+  const [dashboardDataFilters, setDashboardDataFilters] =
+    useState<DashboardDataFilters>({
+      duration: BlogsDurationFilters.ALL,
+      month: undefined,
+    });
 
   // Create a shared context value
   const shared: RepositoryProps = {
@@ -53,6 +61,8 @@ const RepositoryProvider = ({ children }: ProviderProps) => {
     setDashboardData,
     categories,
     setCategories,
+    dashboardDataFilters,
+    setDashboardDataFilters,
     blogRepository,
     adminRepository,
     accountRepository,

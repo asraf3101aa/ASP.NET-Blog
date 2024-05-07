@@ -72,7 +72,8 @@ type BlogPartialData = {
   title: string; // Corresponds to C# "Title", required field
   body: string; // Corresponds to C# "Body", required field
   categoryId?: string; // "CategoryId", optional field (default if not required)
-  images?: BlogImage[]; // Corresponds to C# "Images", optional field, can be an array of BlogImagesDTO
+  banner?: File | string;
+  other?: File | string; // Corresponds to C# "Images", optional field, can be an array of BlogImagesDTO
 };
 
 // Type for Blog models, gathering all other types

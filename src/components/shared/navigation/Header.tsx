@@ -11,6 +11,7 @@ import { Box, Tooltip } from "@mui/material";
 import { getRoleFromJwtToken } from "@/@utils/getRoleFromJwtToken";
 import _ from "lodash";
 import { UserRoles } from "@/@enums/storage.enum";
+import Notifications from "../blog/Notifications";
 
 const Header = () => {
   const headerTitle = import.meta.env.VITE_BLOG_APP_HEADER_TITLE;
@@ -31,12 +32,14 @@ const Header = () => {
           variant="h5"
           color="inherit"
           noWrap
-          sx={{ flex: 1, letterSpacing: 1 }}
+          sx={{ flex: 1, letterSpacing: 1, cursor: "pointer" }}
+          onClick={() => handleRedirect(RoutePath.HOME)}
         >
           {headerTitle?.toUpperCase()}
         </Typography>
         {accessToken ? (
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <Notifications />
             <Button
               variant="outlined"
               size="small"

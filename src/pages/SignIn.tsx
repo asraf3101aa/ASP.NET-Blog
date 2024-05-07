@@ -5,8 +5,6 @@ import {
   Button,
   CssBaseline,
   TextField,
-  FormControlLabel,
-  Checkbox,
   Link,
   Paper,
   Box,
@@ -20,11 +18,16 @@ import { AccountModels } from "@/@types/account";
 import { useRouter } from "@/contexts/RouterContext";
 import { useStorage } from "@/contexts/StorageContext";
 import BlogLoginBg from "/assets/images/BlogLoginBg.jpg";
-import { AccountModelsType } from "@/@enums/account.enum";
+import {
+  AccountModelsType,
+  RetrieveEmailForAction,
+} from "@/@enums/account.enum";
 import { useRepository } from "@/contexts/RepositoryContext";
 import { LocalStorageItemsKeys } from "@/@enums/storage.enum";
 import MiniFooter from "@/components/shared/navigation/MiniFooter";
 import { useEffect } from "react";
+import RetrieveEmailModal from "@/components/shared/profile/RetrieveEmailModal";
+import { ErrorToast } from "@/components/shared/toasts/ErrorToast";
 
 const SignIn = () => {
   const {
@@ -62,13 +65,16 @@ const SignIn = () => {
             setIsLoading(false);
             handleRedirect(RoutePath.PROFILE);
           } else {
-            setError("rememberMe", {
+            setError("password", {
               message: userSignInResponse.errors[0].message,
             });
           }
         }
       )
-      .catch((error) => console.error(error))
+      .catch((error) => {
+        console.error(error);
+        ErrorToast({ Message: "Something went wrong!" });
+      })
       .finally(() => setIsLoading(false));
   };
 
@@ -162,17 +168,6 @@ const SignIn = () => {
                   <p style={{ color: "red" }}>{errors.password.message}</p>
                 )}
               </Grid>
-              <Grid item xs={12}>
-                <FormControlLabel
-                  control={
-                    <Checkbox color="primary" {...register("rememberMe")} />
-                  }
-                  label="Remember me"
-                />
-                {errors.rememberMe && (
-                  <p style={{ color: "red" }}>{errors.rememberMe.message}</p>
-                )}
-              </Grid>
             </Grid>
             {isLoading ? (
               <Grid
@@ -193,11 +188,11 @@ const SignIn = () => {
               </Button>
             )}
 
-            <Grid container>
+            <Grid container sx={{ alignItems: "center" }}>
               <Grid item xs>
-                <Link href="/forgot-password" variant="body2">
-                  Forgot password?
-                </Link>
+                <RetrieveEmailModal
+                  retrieveEmailFor={RetrieveEmailForAction.RESET_PASSWORD}
+                />
               </Grid>
               <Grid item>
                 <Link href="/sign-up" variant="body2">
