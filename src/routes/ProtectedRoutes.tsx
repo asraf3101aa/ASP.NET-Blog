@@ -18,6 +18,7 @@ const ProtectedRoutes = () => {
   const accessToken = localStorageClient.getAccessToken();
   const {
     isLoading,
+    blogs,
     blogRepository,
     adminRepository,
     accountRepository,
@@ -58,11 +59,13 @@ const ProtectedRoutes = () => {
 
                 const userRole = getRoleFromJwtToken(accessToken);
                 if (_.isEqual(userRole, UserRoles.BLOGGER)) {
-                  blogRepository.getBlogs(1).then((blogs) => {
-                    if ("errors" in blogs) {
-                      console.error(blogs);
-                    } else setBlogs(blogs.blogs);
-                  });
+                  blogRepository
+                    .getBlogs(blogs?.paginationMetaData.pageNumber ?? 1)
+                    .then((blogs) => {
+                      if ("errors" in blogs) {
+                        console.error(blogs);
+                      } else setBlogs(blogs);
+                    });
                 } else {
                   adminRepository
                     .getDashboardData(
@@ -89,6 +92,7 @@ const ProtectedRoutes = () => {
       handleRedirect(RoutePath.LOGIN);
     }
   }, [
+    blogs?.paginationMetaData.pageNumber,
     accountRepository,
     adminRepository,
     blogRepository,

@@ -28,11 +28,11 @@ export class BlogRepository implements IBlogRepository {
     );
   }
 
-  async createBlog(blogData: BlogModels[BlogModelsType.BLOG_PARTIAL_DATA]) {
-    return await this._fetchAPI.post<
-      BlogModels[BlogModelsType.BLOG],
-      BlogModels[BlogModelsType.BLOG_PARTIAL_DATA]
-    >(this._blogEndpointPath, blogData);
+  async createBlog(blogData: FormData) {
+    return await this._fetchAPI.post<string, FormData>(
+      this._blogEndpointPath,
+      blogData
+    );
   }
 
   async getBlogDetails(id: string) {
@@ -47,14 +47,11 @@ export class BlogRepository implements IBlogRepository {
     );
   }
 
-  async updateBlog(
-    id: string,
-    updatedData: BlogModels[BlogModelsType.BLOG_PARTIAL_DATA]
-  ) {
-    return await this._fetchAPI.update<
-      string,
-      BlogModels[BlogModelsType.BLOG_PARTIAL_DATA]
-    >(`${this._blogEndpointPath}/${id}`, updatedData);
+  async updateBlog(id: string, updatedData: FormData) {
+    return await this._fetchAPI.update<string, FormData>(
+      `${this._blogEndpointPath}/${id}`,
+      updatedData
+    );
   }
 
   async deleteBlog(id: string) {
@@ -63,8 +60,8 @@ export class BlogRepository implements IBlogRepository {
     );
   }
 
-  async reactOnBlog(id: string, reactionType: ReactionType) {
-    return await this._fetchAPI.post<string, ReactionType>(
+  async reactOnBlog(id: string, reactionType: { reactionType: ReactionType }) {
+    return await this._fetchAPI.post<string, { reactionType: ReactionType }>(
       `${this._blogEndpointPath}/${id}/${BlogEndpointPaths.REACTION}`,
       reactionType
     );
@@ -80,11 +77,11 @@ export class BlogRepository implements IBlogRepository {
   async reactOnBlogComment(
     blogId: string,
     commentId: string,
-    reaction: ReactionType
+    reactionType: { reactionType: ReactionType }
   ) {
-    return await this._fetchAPI.post<string, ReactionType>(
+    return await this._fetchAPI.post<string, { reactionType: ReactionType }>(
       `${this._blogEndpointPath}/${blogId}/${BlogEndpointPaths.COMMENT}/${commentId}/${BlogEndpointPaths.REACTION}`,
-      reaction
+      reactionType
     );
   }
   async updateBlogComment(blogId: string, commentId: string, text: string) {

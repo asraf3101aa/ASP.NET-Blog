@@ -42,8 +42,8 @@ declare type RepositoryProps = {
   setIsLoading: (loading: boolean) => void;
   user: AccountModels[AccountModelsType.USER] | null;
   setUser: (user: AccountModels[AccountModelsType.USER]) => void;
-  blogs: BlogModels[BlogModelsType.BLOG][];
-  setBlogs: (blogs: BlogModels[BlogModelsType.BLOG[]]) => void;
+  blogs: BlogModels[BlogModelsType.BLOGS_LIST] |null;
+  setBlogs: (blogs: BlogModels[BlogModelsType.BLOGS_LIST]) => void;
   dashboardData: AdminDashboardData | null;
   setDashboardData: (data: AdminDashboardData) => void;
   homepageBlogsData: BlogModels[BlogModelsType.BLOGS_LIST] | null;

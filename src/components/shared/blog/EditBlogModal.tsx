@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import {
   Button,
   Modal,
@@ -18,59 +18,90 @@ import { BlogModelsType } from "@/@enums/blog.enum";
 import { useRepository } from "@/contexts/RepositoryContext";
 import _ from "lodash";
 import { Edit } from "@mui/icons-material";
-import { useRouter } from "@/contexts/RouterContext";
 import { ErrorToast } from "../toasts/ErrorToast";
 import { SuccessToast } from "../toasts/SuccessToast";
+import { useRouter } from "@/contexts/RouterContext";
 
 const EditBlogModal = ({ blog }: { blog: BlogModels[BlogModelsType.BLOG] }) => {
   const [open, setOpen] = useState(false);
-
+  const { blogRepository, setIsLoading, categories, setCategories, isLoading } =
+    useRepository()!;
   const {
     control,
     handleSubmit,
     formState: { errors },
+    reset,
+    setValue,
   } = useForm<BlogModels[BlogModelsType.BLOG_PARTIAL_DATA]>({
     defaultValues: {
       title: blog.title,
       body: blog.body,
-      categoryId: blog.categoryId.toString(),
-      images: blog.images,
+      categoryId: categories.length > 0 ? blog.category.name : "",
     },
   });
-
-  const { isLoading, setIsLoading, blogRepository, categories, setCategories } =
-    useRepository()!;
 
   useEffect(() => {
     if (open) {
       blogRepository
         .getCategories()
-        .then((categoriesResponse) => {
-          if ("errors" in categoriesResponse) {
-            console.error(categoriesResponse);
+        .then((response) => {
+          if ("errors" in response) {
+            console.error("Failed to load categories.");
           } else {
-            setCategories(categoriesResponse);
+            setCategories(response);
           }
         })
         .catch((error) => {
           console.error(error);
-          ErrorToast({ Message: "Something went wrong!" });
         });
     }
   }, [open, blogRepository, setCategories]);
 
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => {
+    reset();
+    setOpen(false);
+  };
+
   const { handleReload } = useRouter()!;
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const file = e.target.files[0];
+      const field = e.target.name as
+        | "title"
+        | "body"
+        | "categoryId"
+        | "banner"
+        | "other";
+
+      if (file) {
+        setValue(field, file);
+      }
+    }
+  };
+
   const onSubmit = (data: BlogModels[BlogModelsType.BLOG_PARTIAL_DATA]) => {
     setIsLoading(true);
-    data.images = data.images
-      ? typeof data.images === "object"
-        ? data.images
-        : [data.images]
-      : [];
+
+    const categoryIndex = _.findIndex(
+      categories,
+      (category) => category.name === data.categoryId
+    );
+    const blogData = new FormData();
+    blogData.append("title", data.title);
+    blogData.append("body", data.body);
+    blogData.append("categoryId", categories[categoryIndex].id.toString());
+    if (data.banner) {
+      blogData.append("banner", data.banner);
+    }
+    if (data.other) {
+      blogData.append("other", data.other);
+    }
 
     blogRepository
-      .updateBlog(blog.id.toString(), data)
-      .then((blogResponse) => {
+      .updateBlog(blog.id.toString(), blogData)
+      .then((blogResponse: ApiResponse<string>) => {
         if (typeof blogResponse === "string") {
           SuccessToast({ Message: blogResponse });
           setTimeout(() => {
@@ -84,22 +115,22 @@ const EditBlogModal = ({ blog }: { blog: BlogModels[BlogModelsType.BLOG] }) => {
       })
       .finally(() => {
         setIsLoading(false);
-        setOpen(false);
       });
   };
 
   return (
     <>
-      <IconButton onClick={() => setOpen(true)}>
-        <Tooltip title="Edit Blog" arrow placement="right">
+      <IconButton onClick={handleOpen}>
+        <Tooltip title="Edit Blog" placement="top">
           <Edit sx={{ color: "#1976d2" }} />
         </Tooltip>
       </IconButton>
+
       <Modal
         open={open}
-        onClose={() => setOpen(false)}
-        aria-labelledby="blog-edit-modal-title"
-        aria-describedby="blog-edit-modal-description"
+        onClose={handleClose}
+        aria-labelledby="edit-blog-modal-title"
+        aria-describedby="edit-blog-modal-description"
       >
         <Box
           sx={{
@@ -107,18 +138,15 @@ const EditBlogModal = ({ blog }: { blog: BlogModels[BlogModelsType.BLOG] }) => {
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: 600,
             bgcolor: "background.paper",
             boxShadow: 24,
-            p: 4,
             borderRadius: 2,
+            p: 4,
             maxHeight: "100vh",
             overflow: "auto",
           }}
         >
-          <Typography variant="h6" id="blog-edit-modal-title">
-            Edit Blog
-          </Typography>
+          <Typography variant="h6">Edit Blog</Typography>
 
           <form onSubmit={handleSubmit(onSubmit)}>
             <Controller
@@ -130,10 +158,10 @@ const EditBlogModal = ({ blog }: { blog: BlogModels[BlogModelsType.BLOG] }) => {
                   fullWidth
                   label="Title"
                   variant="outlined"
+                  margin="normal"
                   error={!!errors.title}
                   helperText={errors.title?.message}
                   {...field}
-                  margin="normal"
                 />
               )}
             />
@@ -165,10 +193,7 @@ const EditBlogModal = ({ blog }: { blog: BlogModels[BlogModelsType.BLOG] }) => {
                   <InputLabel>Category</InputLabel>
                   <Select {...field} label="Category ID">
                     {_.map(categories, (category) => (
-                      <MenuItem
-                        key={category.id}
-                        value={category.id.toString()}
-                      >
+                      <MenuItem key={category.id} value={category.name}>
                         {category.name}
                       </MenuItem>
                     ))}
@@ -177,20 +202,47 @@ const EditBlogModal = ({ blog }: { blog: BlogModels[BlogModelsType.BLOG] }) => {
               )}
             />
 
-            <InputLabel sx={{ mt: 2 }}>Upload Images</InputLabel>
-            <Controller
-              name="images"
-              control={control}
-              render={({ field }) => (
-                <FormControl fullWidth margin="normal">
-                  <TextField
-                    type="file"
-                    inputProps={{ multiple: true }}
-                    {...field}
-                  />
-                </FormControl>
-              )}
-            />
+            <Box>
+              <InputLabel sx={{ mt: 2 }}>Upload Banner</InputLabel>
+              <Box
+                sx={{
+                  my: 1,
+                  p: 1,
+                  border: 1,
+                  borderColor: "lightgray",
+                  borderRadius: 1,
+                }}
+              >
+                <input
+                  name="banner"
+                  type="file"
+                  value={control._formValues["banner"]}
+                  onChange={handleFileChange}
+                  accept="image/*"
+                />
+              </Box>
+            </Box>
+
+            <Box>
+              <InputLabel sx={{ mt: 2 }}>Body Image</InputLabel>
+              <Box
+                sx={{
+                  my: 1,
+                  p: 1,
+                  border: 1,
+                  borderColor: "lightgray",
+                  borderRadius: 1,
+                }}
+              >
+                <input
+                  name="other"
+                  type="file"
+                  value={control._formValues["other"]}
+                  onChange={handleFileChange}
+                  accept="image/*"
+                />
+              </Box>
+            </Box>
 
             <Box
               sx={{
@@ -200,7 +252,7 @@ const EditBlogModal = ({ blog }: { blog: BlogModels[BlogModelsType.BLOG] }) => {
                 mt: 3,
               }}
             >
-              <Button variant="outlined" onClick={() => setOpen(false)}>
+              <Button variant="outlined" onClick={handleClose}>
                 Cancel
               </Button>
               {isLoading ? (

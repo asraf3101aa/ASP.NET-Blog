@@ -81,14 +81,24 @@ const UserDetails = ({
       border={1}
       borderRadius={2}
       borderColor="lightgray"
-      sx={{ display: "flex", gap: 1, minWidth: "75%", alignItems: "start" }}
+      sx={{ display: "flex", gap: 2, minWidth: "75%", alignItems: "start" }}
     >
       <Box
         sx={{
-          width: "120px",
+          display: "flex",
+          width: "100px",
+          height: "100px",
         }}
       >
-        <PersonRounded sx={{ width: "100%", height: "100%" }} />
+        {user.avatar ? (
+          <img
+            src={user.avatar as string}
+            alt="UserProfilePic"
+            style={{ width: "100%", height: "100%", borderRadius: "50%" }}
+          />
+        ) : (
+          <PersonRounded sx={{ width: "100%", height: "100%" }} />
+        )}
       </Box>
       <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
         <UserDetail title="Name" value={`${user.firstName} ${user.lastName}`} />

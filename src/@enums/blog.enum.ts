@@ -48,6 +48,7 @@ export enum BlogsDurationFilters {
 }
 
 export enum BlogsSortingFilters {
-  ALL = "all",
   RECENCY = "recency",
+  POPULARITY = "popularity",
+  RANDOM = "random",
 }

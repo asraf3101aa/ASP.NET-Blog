@@ -69,11 +69,11 @@ export class AccountRepository implements IAccountRepository {
     );
   }
 
-  async userUpdate(updatedData: AccountModels[AccountModelsType.USER_UPDATE]) {
-    return await this._fetchAPI.update<
-      string,
-      AccountModels[AccountModelsType.USER_UPDATE]
-    >(this._accountEndpointPath, updatedData);
+  async userUpdate(updatedData: FormData) {
+    return await this._fetchAPI.update<string, FormData>(
+      this._accountEndpointPath,
+      updatedData
+    );
   }
 
   async deleteAccount() {

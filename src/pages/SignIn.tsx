@@ -188,7 +188,7 @@ const SignIn = () => {
               </Button>
             )}
 
-            <Grid container>
+            <Grid container sx={{ alignItems: "center" }}>
               <Grid item xs>
                 <RetrieveEmailModal
                   retrieveEmailFor={RetrieveEmailForAction.RESET_PASSWORD}

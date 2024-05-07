@@ -10,6 +10,7 @@ import {
   IconButton,
   Container,
   Tooltip,
+  InputLabel,
 } from "@mui/material";
 import { Edit } from "@mui/icons-material";
 import { useRepository } from "@/contexts/RepositoryContext";
@@ -17,28 +18,37 @@ import { AccountModels } from "@/@types/account";
 import { AccountModelsType } from "@/@enums/account.enum";
 import { ErrorToast } from "../toasts/ErrorToast";
 import { SuccessToast } from "../toasts/SuccessToast";
+import { useRouter } from "@/contexts/RouterContext";
 
 const EditAccountModal = () => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const { user, setUser, isLoading, setIsLoading, accountRepository } =
-    useRepository()!;
+  const { user, isLoading, setIsLoading, accountRepository } = useRepository()!;
   const [userToBeUpdated, setUserToBeUpdated] = useState<
     AccountModels[AccountModelsType.USER]
   >(user!);
 
+  const { handleReload } = useRouter()!;
+
   const handleUpdate = () => {
     setIsLoading(true);
+    const updatedFormData = new FormData();
+    updatedFormData.append("firstName", userToBeUpdated.firstName);
+    if (userToBeUpdated.lastName) {
+      updatedFormData.append("lastName", userToBeUpdated.lastName);
+    }
+    if (userToBeUpdated.avatar) {
+      updatedFormData.append("avatar", userToBeUpdated.avatar);
+    }
+
     accountRepository
-      .userUpdate(userToBeUpdated)
+      .userUpdate(updatedFormData)
       .then((updateResponse) => {
         if (typeof updateResponse === "string") {
-          setUser({
-            ...userToBeUpdated,
-            firstName: userToBeUpdated.firstName,
-            lastName: userToBeUpdated.lastName,
-          });
           SuccessToast({ Message: updateResponse });
+          setTimeout(() => {
+            handleReload();
+          }, 1000);
         } else {
           console.error(updateResponse);
         }
@@ -53,6 +63,14 @@ const EditAccountModal = () => {
       });
   };
 
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const file = e.target.files[0];
+      if (file) {
+        setUserToBeUpdated({ ...userToBeUpdated, avatar: file });
+      }
+    }
+  };
   return (
     user?.emailConfirmed && (
       <>
@@ -86,6 +104,25 @@ const EditAccountModal = () => {
                   })
                 }
               />
+              <Box>
+                <InputLabel>Profile Picture</InputLabel>
+                <Box
+                  sx={{
+                    my: 1,
+                    p: 1,
+                    border: 1,
+                    borderColor: "lightgray",
+                    borderRadius: 1,
+                  }}
+                >
+                  <input
+                    type="file"
+                    value={""}
+                    onChange={handleFileChange}
+                    accept="image/*"
+                  />
+                </Box>
+              </Box>
             </Box>
           </DialogContent>
           {isLoading ? (

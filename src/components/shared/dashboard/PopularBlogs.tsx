@@ -16,7 +16,7 @@ import { RoutePath } from "@/@enums/router.enum";
 import { UserRoles } from "@/@enums/storage.enum";
 
 const PopularBlogs = (props: {
-  popularBlogs: BlogModels[BlogModelsType.BLOG][];
+  popularBlogs?: BlogModels[BlogModelsType.BLOG][];
 }) => {
   const popularBlogs = props.popularBlogs;
   const { isLoading } = useRepository()!;

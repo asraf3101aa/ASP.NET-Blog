@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { ChangeEvent, useState } from "react";
 import {
   Button,
   Modal,
@@ -26,6 +26,7 @@ const CreateBlogModal = () => {
   const {
     control,
     handleSubmit,
+    setValue,
     reset,
     formState: { errors },
   } = useForm<BlogModels[BlogModelsType.BLOG_PARTIAL_DATA]>({});
@@ -40,23 +41,44 @@ const CreateBlogModal = () => {
     useRepository()!;
 
   const { handleReload } = useRouter()!;
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const file = e.target.files[0];
+      const field = e.target.name as
+        | "title"
+        | "body"
+        | "categoryId"
+        | "banner"
+        | "other";
 
+      if (file) {
+        setValue(field, file);
+      }
+    }
+  };
   const onSubmit = (data: BlogModels[BlogModelsType.BLOG_PARTIAL_DATA]) => {
     setIsLoading(true);
-    data.images = data.images
-      ? typeof data.images === "object"
-        ? data.images
-        : [data.images]
-      : [];
+
+    const blogData = new FormData();
+    blogData.append("title", data.title);
+    blogData.append("body", data.body);
+    blogData.append("categoryId", data.categoryId!);
+    if (data.banner) {
+      blogData.append("banner", data.banner);
+    }
+    if (data.other) {
+      blogData.append("other", data.other);
+    }
 
     blogRepository
-      .createBlog(data)
-      .then((blogResponse: ApiResponse<BlogModels[BlogModelsType.BLOG]>) => {
-        if ("id" in blogResponse)
-          SuccessToast({ Message: "Blog created successfully!" });
-        setTimeout(() => {
-          handleReload();
-        }, 1000);
+      .createBlog(blogData)
+      .then((blogResponse: ApiResponse<string>) => {
+        if (typeof blogResponse === "string") {
+          SuccessToast({ Message: blogResponse });
+          setTimeout(() => {
+            handleReload();
+          }, 1000);
+        }
       })
       .catch((error) => {
         console.error(error);
@@ -109,7 +131,7 @@ const CreateBlogModal = () => {
             Create Blog
           </Typography>
 
-          <form onSubmit={handleSubmit(onSubmit)}>
+          <form encType="multipart/form-data" onSubmit={handleSubmit(onSubmit)}>
             <Controller
               name="title"
               control={control}
@@ -120,7 +142,6 @@ const CreateBlogModal = () => {
                   label="Title"
                   variant="outlined"
                   error={!!errors.title}
-                  helperText={errors.title?.message}
                   {...field}
                   margin="normal"
                 />
@@ -139,7 +160,6 @@ const CreateBlogModal = () => {
                   label="Body"
                   variant="outlined"
                   error={!!errors.body}
-                  helperText={errors.body?.message}
                   {...field}
                   margin="normal"
                 />
@@ -154,7 +174,10 @@ const CreateBlogModal = () => {
                   <InputLabel>Category</InputLabel>
                   <Select {...field} label="Category ID" defaultValue="">
                     {_.map(categories, (category) => (
-                      <MenuItem value={category.id.toString()}>
+                      <MenuItem
+                        value={category.id.toString()}
+                        key={category.id}
+                      >
                         {category.name}
                       </MenuItem>
                     ))}
@@ -163,20 +186,47 @@ const CreateBlogModal = () => {
               )}
             />
 
-            <InputLabel sx={{ mt: 2 }}>Upload Images</InputLabel>
-            <Controller
-              name="images"
-              control={control}
-              render={({ field }) => (
-                <FormControl fullWidth margin="normal">
-                  <TextField
-                    type="file"
-                    inputProps={{ multiple: true }}
-                    {...field}
-                  />
-                </FormControl>
-              )}
-            />
+            <Box>
+              <InputLabel sx={{ mt: 2 }}>Upload Banner</InputLabel>
+              <Box
+                sx={{
+                  my: 1,
+                  p: 1,
+                  border: 1,
+                  borderColor: "lightgray",
+                  borderRadius: 1,
+                }}
+              >
+                <input
+                  name="banner"
+                  type="file"
+                  value={control._formValues["banner"]}
+                  onChange={handleFileChange}
+                  accept="image/*"
+                />
+              </Box>
+            </Box>
+
+            <Box>
+              <InputLabel sx={{ mt: 2 }}>Body Image</InputLabel>
+              <Box
+                sx={{
+                  my: 1,
+                  p: 1,
+                  border: 1,
+                  borderColor: "lightgray",
+                  borderRadius: 1,
+                }}
+              >
+                <input
+                  name="other"
+                  type="file"
+                  value={control._formValues["other"]}
+                  onChange={handleFileChange}
+                  accept="image/*"
+                />
+              </Box>
+            </Box>
 
             <Box
               sx={{

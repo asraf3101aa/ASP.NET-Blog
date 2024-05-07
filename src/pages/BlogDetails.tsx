@@ -15,7 +15,12 @@ import Header from "../components/shared/navigation/Header";
 import { useRepository } from "@/contexts/RepositoryContext";
 import { useEffect, useState } from "react";
 import { BlogModels } from "@/@types/blog";
-import { BlogModelsType, ReactionOn, ReactionType } from "@/@enums/blog.enum";
+import {
+  BlogImageType,
+  BlogModelsType,
+  ReactionOn,
+  ReactionType,
+} from "@/@enums/blog.enum";
 import { useLocation, useParams } from "react-router-dom";
 import moment from "moment";
 import {
@@ -115,9 +120,11 @@ const BlogDetails = () => {
   ) => {
     try {
       if (_.isEqual(reactionOn, ReactionOn.BLOG)) {
-        await blogRepository.reactOnBlog(id!, reactionType);
+        await blogRepository.reactOnBlog(id!, { reactionType });
       } else {
-        await blogRepository.reactOnBlogComment(id!, postId, reactionType);
+        await blogRepository.reactOnBlogComment(id!, postId, {
+          reactionType,
+        });
       }
       handleReload();
     } catch (error) {
@@ -224,8 +231,30 @@ const BlogDetails = () => {
                 </Typography>
               </Box>
 
-              <Paper sx={{ p: 2, minHeight: 100 }}>
+              <Paper
+                sx={{ p: 2, display: "flex", flexDirection: "column", gap: 1 }}
+              >
                 <Typography variant="body1">{blog.body}</Typography>
+                <Box sx={{ display: "flex", flexWrap: "wrap" }}>
+                  {_.map(blog.images, (image) => (
+                    <Box
+                      key={image.id}
+                      sx={{ maxWidth: 400, maxHeight: 400, p: 1 }}
+                    >
+                      <Tooltip
+                        title={BlogImageType[image.imageType]}
+                        arrow
+                        placement="right"
+                      >
+                        <img
+                          src={image.path}
+                          alt="BlogImage"
+                          style={{ width: "100%", height: "100%" }}
+                        />
+                      </Tooltip>
+                    </Box>
+                  ))}
+                </Box>
               </Paper>
               {userId && id && (
                 <Box sx={{ display: "flex", gap: 2 }}>

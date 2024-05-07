@@ -11,7 +11,7 @@ type User = IdentityUser & {
   firstName: string; // Required field
   emailConfirmed: boolean;
   lastName?: string; // Optional field
-  avatar?: string; // Optional field, represents an image URL or similar
+  avatar?: File | string; // Optional field, represents an image URL or similar
 };
 
 // PopularBlogger type inheriting from User
@@ -72,7 +72,7 @@ type UserUpdate = {
   firstName: string; // Required field
   lastName?: string; // Optional field
   image?: ChangeEvent<HTMLInputElement>["target"]["files"][0]; // Optional field
-  avatar?: string; // Optional field, for avatar URL or similar representation
+  avatar?: File; // Optional field, for avatar URL or similar representation
 };
 
 // AccountModels type containing all other types

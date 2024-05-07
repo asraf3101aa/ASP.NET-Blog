@@ -65,9 +65,7 @@ export interface IAccountRepository {
    * @param updatedData - The new data to update the user's account with.
    * @returns A promise that resolves with an API response containing a success message.
    */
-  userUpdate: (
-    updatedData: AccountModels[AccountModelsType.USER_UPDATE]
-  ) => Promise<ApiResponse<string>>;
+  userUpdate: (updatedData: FormData) => Promise<ApiResponse<string>>;
 
   /**
    * Deletes the user's account.
@@ -158,9 +156,7 @@ export interface IBlogRepository {
    * @param blogData - The partial data for creating a new blog.
    * @returns A promise resolving to the created blog wrapped in an ApiResponse.
    */
-  createBlog(
-    blogData: BlogModels[BlogModelsType.BLOG_PARTIAL_DATA]
-  ): Promise<ApiResponse<BlogModels[BlogModelsType.BLOG]>>;
+  createBlog(blogData: FormData): Promise<ApiResponse<string>>;
 
   /**
    * Gets the details of a specific blog by ID.
@@ -183,10 +179,7 @@ export interface IBlogRepository {
    * @param updatedData - The updated blog data.
    * @returns A promise resolving to a confirmation message or updated blog wrapped in an ApiResponse.
    */
-  updateBlog(
-    id: string,
-    updatedData: BlogModels[BlogModelsType.BLOG_PARTIAL_DATA]
-  ): Promise<ApiResponse<string>>;
+  updateBlog(id: string, updatedData: FormData): Promise<ApiResponse<string>>;
 
   /**
    * Deletes a blog by ID.
@@ -203,7 +196,7 @@ export interface IBlogRepository {
    */
   reactOnBlog(
     id: string,
-    reactionType: ReactionType
+    reactionType: { reactionType: ReactionType }
   ): Promise<ApiResponse<string>>;
 
   /**
@@ -216,7 +209,7 @@ export interface IBlogRepository {
   reactOnBlogComment(
     blogId: string,
     commentId: string,
-    reactionType: ReactionType
+    reactionType: { reactionType: ReactionType }
   ): Promise<ApiResponse<string>>;
 
   /**

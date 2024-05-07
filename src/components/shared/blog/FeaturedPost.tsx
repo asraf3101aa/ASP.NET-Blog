@@ -4,7 +4,7 @@ import Card from "@mui/material/Card";
 import CardActionArea from "@mui/material/CardActionArea";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
-import { Box, IconButton, Tooltip } from "@mui/material";
+import { Box, Tooltip } from "@mui/material";
 import {
   ArrowDownward,
   ArrowUpward,
@@ -74,7 +74,9 @@ const FeaturedPost = (props: { blog: BlogModels[BlogModelsType.BLOG] }) => {
 
   const handleReaction = async (reactionType: ReactionType) => {
     try {
-      await blogRepository.reactOnBlog(id.toString(), reactionType);
+      await blogRepository.reactOnBlog(id.toString(), {
+        reactionType,
+      });
       handleReload();
     } catch (error) {
       console.error(error);
@@ -84,7 +86,14 @@ const FeaturedPost = (props: { blog: BlogModels[BlogModelsType.BLOG] }) => {
     <Grid item xs={10} key={id}>
       <CardActionArea>
         <Card sx={{ display: "flex" }}>
-          <CardContent sx={{ flex: 1 }}>
+          <CardContent
+            sx={{
+              display: "flex",
+              width: "100%",
+              flexDirection: "column",
+              justifyContent: "space-between",
+            }}
+          >
             <Box onClick={() => handleRedirect(`${RoutePath.DETAILS}/${id}`)}>
               <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                 <Typography component="h2" variant="h5">
@@ -95,11 +104,17 @@ const FeaturedPost = (props: { blog: BlogModels[BlogModelsType.BLOG] }) => {
                   <Typography variant="body1">{category.name}</Typography>
                 </Box>
               </Box>
-              <Box sx={{ display: "flex", gap:2 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  mb: 1,
+                }}
+              >
                 <Typography variant="subtitle1" color="text.secondary">
                   {`${author.firstName} ${author.lastName}`}
                 </Typography>
-                <Typography variant="subtitle1" color="text.secondary">
+                <Typography variant="subtitle2" color="text.secondary">
                   {moment(createdAt).format("hh:MM A, DD MMM YYYY")}
                 </Typography>
               </Box>
@@ -112,8 +127,9 @@ const FeaturedPost = (props: { blog: BlogModels[BlogModelsType.BLOG] }) => {
                     display: "-webkit-box",
                     overflow: "hidden",
                     textOverflow: "ellipsis",
-                    WebkitLineClamp: 2,
+                    WebkitLineClamp: 3,
                     WebkitBoxOrient: "vertical",
+                    textWrap: "pretty",
                   }}
                 >
                   {body}
@@ -124,9 +140,7 @@ const FeaturedPost = (props: { blog: BlogModels[BlogModelsType.BLOG] }) => {
             <Box sx={{ display: "flex", gap: 2 }}>
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 {userId ? (
-                  <IconButton
-                    onClick={() => handleReaction(ReactionType.Upvote)}
-                  >
+                  <Box onClick={() => handleReaction(ReactionType.Upvote)}>
                     <ArrowUpward
                       sx={{
                         bgcolor:
@@ -136,7 +150,7 @@ const FeaturedPost = (props: { blog: BlogModels[BlogModelsType.BLOG] }) => {
                         borderRadius: "100%",
                       }}
                     />
-                  </IconButton>
+                  </Box>
                 ) : (
                   <Tooltip
                     title="Please login to react"
@@ -159,9 +173,7 @@ const FeaturedPost = (props: { blog: BlogModels[BlogModelsType.BLOG] }) => {
 
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 {userId ? (
-                  <IconButton
-                    onClick={() => handleReaction(ReactionType.Downvote)}
-                  >
+                  <Box onClick={() => handleReaction(ReactionType.Downvote)}>
                     <ArrowDownward
                       sx={{
                         bgcolor:
@@ -171,7 +183,7 @@ const FeaturedPost = (props: { blog: BlogModels[BlogModelsType.BLOG] }) => {
                         borderRadius: "100%",
                       }}
                     />
-                  </IconButton>
+                  </Box>
                 ) : (
                   <Tooltip
                     title="Please login to react"
@@ -208,7 +220,11 @@ const FeaturedPost = (props: { blog: BlogModels[BlogModelsType.BLOG] }) => {
           {images.length > 0 && (
             <CardMedia
               component="img"
-              sx={{ width: 160, display: { xs: "none", sm: "block" } }}
+              sx={{
+                width: "20%",
+                minWidth: 150,
+                display: { xs: "none", sm: "block" },
+              }}
               image={images[0].path}
               alt={`BlogImage-${images[0].id}`}
             />

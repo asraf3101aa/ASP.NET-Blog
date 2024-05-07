@@ -20,7 +20,9 @@ import { AdminDashboardData, DashboardDataFilters } from "@/@types/admin";
  */
 const RepositoryProvider = ({ children }: ProviderProps) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [blogs, setBlogs] = useState<BlogModels[BlogModelsType.BLOG][]>([]);
+  const [blogs, setBlogs] = useState<
+    BlogModels[BlogModelsType.BLOGS_LIST] | null
+  >(null);
   const [user, setUser] = useState<
     AccountModels[AccountModelsType.USER] | null
   >(null);
