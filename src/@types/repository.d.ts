@@ -8,6 +8,12 @@ import {
   ReactionType,
 } from "@/@enums/blog.enum";
 
+export type RepositoryDataLoadingFlags = {
+  isAccountRepositoryDataLoading: boolean;
+  isBlogRepositoryDataLoading: boolean;
+  isAdminRepositoryDataLoading: boolean;
+};
+
 /**
  * Interface for managing user account-related operations.
  */

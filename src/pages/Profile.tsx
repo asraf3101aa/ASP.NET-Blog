@@ -43,7 +43,7 @@ const Profile = () => {
 
   const { handleRedirect } = useRouter()!;
   const localStorageClient = useStorage()!;
-  const { isLoading, user, blogs, setBlogs } = useRepository()!;
+  const { isAppDataLoading, user, blogs, setBlogs } = useRepository()!;
   const accessToken = localStorageClient.getAccessToken();
   let userRole = "";
   if (accessToken) {
@@ -192,7 +192,7 @@ const Profile = () => {
             py: 2,
           }}
         >
-          {isLoading ? (
+          {isAppDataLoading ? (
             <Container
               sx={{
                 height: "50vh",

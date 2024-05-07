@@ -39,11 +39,19 @@ const UserDetails = ({
 }) => {
   const localStorageClient = useStorage()!;
   const role = getRoleFromJwtToken(localStorageClient.getAccessToken()!);
-  const { isLoading, setIsLoading, accountRepository } = useRepository()!;
+  const {
+    isAppDataLoading,
+    repositoryDataLoadingFlags,
+    setRepositoryDataLoadingFlags,
+    accountRepository,
+  } = useRepository()!;
   const { handleRedirect } = useRouter()!;
 
   const handleResendMail = async () => {
-    setIsLoading(true);
+    setRepositoryDataLoadingFlags({
+      ...repositoryDataLoadingFlags,
+      isAccountRepositoryDataLoading: true,
+    });
     accountRepository
       .confirmEmailResend()
       .then((confirmResponse) => {
@@ -55,11 +63,19 @@ const UserDetails = ({
         console.error(error);
         ErrorToast({ Message: "Something went wrong!" });
       })
-      .finally(() => setIsLoading(false));
+      .finally(() =>
+        setRepositoryDataLoadingFlags({
+          ...repositoryDataLoadingFlags,
+          isAccountRepositoryDataLoading: false,
+        })
+      );
   };
 
   const handleDeleteAccount = async () => {
-    setIsLoading(true);
+    setRepositoryDataLoadingFlags({
+      ...repositoryDataLoadingFlags,
+      isAccountRepositoryDataLoading: true,
+    });
     accountRepository
       .deleteAccount()
       .then((deleteResponse) => {
@@ -72,7 +88,12 @@ const UserDetails = ({
         console.error(error);
         ErrorToast({ Message: "Something went wrong!" });
       })
-      .finally(() => setIsLoading(false));
+      .finally(() =>
+        setRepositoryDataLoadingFlags({
+          ...repositoryDataLoadingFlags,
+          isAccountRepositoryDataLoading: false,
+        })
+      );
   };
   return (
     <Box
@@ -105,7 +126,7 @@ const UserDetails = ({
         <UserDetail title="Role" value={role} />
         <UserDetail title="Email" value={user.email} />
         <Box sx={{ display: "flex", gap: 1, mt: 1, alignItems: "center" }}>
-          {isLoading ? (
+          {isAppDataLoading ? (
             <img src="/assets/icons/Loading.svg" alt="LoadingIcon" />
           ) : (
             <>

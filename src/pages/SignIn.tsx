@@ -39,7 +39,12 @@ const SignIn = () => {
 
   const { handleRedirect } = useRouter()!;
   const localStorageClient = useStorage()!;
-  const { isLoading, setIsLoading, accountRepository } = useRepository()!;
+  const {
+    isAppDataLoading,
+    repositoryDataLoadingFlags,
+    setRepositoryDataLoadingFlags,
+    accountRepository,
+  } = useRepository()!;
 
   useEffect(() => {
     const accessToken = localStorageClient.getAccessToken();
@@ -51,7 +56,10 @@ const SignIn = () => {
   const onSubmit: SubmitHandler<
     AccountModels[AccountModelsType.USER_LOGIN]
   > = async (data) => {
-    setIsLoading(true);
+    setRepositoryDataLoadingFlags({
+      ...repositoryDataLoadingFlags,
+      isAccountRepositoryDataLoading: true,
+    });
     accountRepository
       .login(data)
       .then(
@@ -62,7 +70,10 @@ const SignIn = () => {
         ) => {
           if (LocalStorageItemsKeys.ACCESS_TOKEN in userSignInResponse) {
             localStorageClient.setAccessToken(userSignInResponse);
-            setIsLoading(false);
+            setRepositoryDataLoadingFlags({
+              ...repositoryDataLoadingFlags,
+              isAccountRepositoryDataLoading: false,
+            });
             handleRedirect(RoutePath.PROFILE);
           } else {
             setError("password", {
@@ -75,7 +86,12 @@ const SignIn = () => {
         console.error(error);
         ErrorToast({ Message: "Something went wrong!" });
       })
-      .finally(() => setIsLoading(false));
+      .finally(() =>
+        setRepositoryDataLoadingFlags({
+          ...repositoryDataLoadingFlags,
+          isAccountRepositoryDataLoading: false,
+        })
+      );
   };
 
   return (
@@ -169,7 +185,7 @@ const SignIn = () => {
                 )}
               </Grid>
             </Grid>
-            {isLoading ? (
+            {isAppDataLoading ? (
               <Grid
                 item
                 xs={12}

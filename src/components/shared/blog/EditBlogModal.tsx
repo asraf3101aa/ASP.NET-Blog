@@ -24,8 +24,14 @@ import { useRouter } from "@/contexts/RouterContext";
 
 const EditBlogModal = ({ blog }: { blog: BlogModels[BlogModelsType.BLOG] }) => {
   const [open, setOpen] = useState(false);
-  const { blogRepository, setIsLoading, categories, setCategories, isLoading } =
-    useRepository()!;
+  const {
+    blogRepository,
+    repositoryDataLoadingFlags,
+    setRepositoryDataLoadingFlags,
+    categories,
+    setCategories,
+    isAppDataLoading,
+  } = useRepository()!;
   const {
     control,
     handleSubmit,
@@ -82,7 +88,10 @@ const EditBlogModal = ({ blog }: { blog: BlogModels[BlogModelsType.BLOG] }) => {
   };
 
   const onSubmit = (data: BlogModels[BlogModelsType.BLOG_PARTIAL_DATA]) => {
-    setIsLoading(true);
+    setRepositoryDataLoadingFlags({
+      ...repositoryDataLoadingFlags,
+      isBlogRepositoryDataLoading: true,
+    });
 
     const categoryIndex = _.findIndex(
       categories,
@@ -114,7 +123,10 @@ const EditBlogModal = ({ blog }: { blog: BlogModels[BlogModelsType.BLOG] }) => {
         ErrorToast({ Message: "Something went wrong!" });
       })
       .finally(() => {
-        setIsLoading(false);
+        setRepositoryDataLoadingFlags({
+          ...repositoryDataLoadingFlags,
+          isBlogRepositoryDataLoading: false,
+        });
       });
   };
 
@@ -255,7 +267,7 @@ const EditBlogModal = ({ blog }: { blog: BlogModels[BlogModelsType.BLOG] }) => {
               <Button variant="outlined" onClick={handleClose}>
                 Cancel
               </Button>
-              {isLoading ? (
+              {isAppDataLoading ? (
                 <img src="/assets/icons/Loading.svg" alt="Loading" />
               ) : (
                 <Button variant="contained" color="primary" type="submit">

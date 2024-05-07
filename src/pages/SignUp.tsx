@@ -27,7 +27,12 @@ import { SuccessToast } from "@/components/shared/toasts/SuccessToast";
 const SignUp = () => {
   const { handleRedirect } = useRouter()!;
   const localStorageClient = useStorage()!;
-  const { isLoading, setIsLoading, accountRepository } = useRepository()!;
+  const {
+    isAppDataLoading,
+    repositoryDataLoadingFlags,
+    setRepositoryDataLoadingFlags,
+    accountRepository,
+  } = useRepository()!;
   const {
     register,
     handleSubmit,
@@ -45,12 +50,18 @@ const SignUp = () => {
   const onSubmit: SubmitHandler<
     AccountModels[AccountModelsType.USER_REGISTER]
   > = async (data) => {
-    setIsLoading(true);
+    setRepositoryDataLoadingFlags({
+      ...repositoryDataLoadingFlags,
+      isAccountRepositoryDataLoading: true,
+    });
     accountRepository
       .register(data)
       .then((userSignUpResponse: ApiResponse<string>) => {
         if (typeof userSignUpResponse === "string") {
-          setIsLoading(false);
+          setRepositoryDataLoadingFlags({
+            ...repositoryDataLoadingFlags,
+            isAccountRepositoryDataLoading: false,
+          });
           SuccessToast({ Message: userSignUpResponse });
           setTimeout(() => {
             handleRedirect(RoutePath.LOGIN);
@@ -67,7 +78,12 @@ const SignUp = () => {
         console.error(error);
         ErrorToast({ Message: "Something went wrong!" });
       })
-      .finally(() => setIsLoading(false));
+      .finally(() =>
+        setRepositoryDataLoadingFlags({
+          ...repositoryDataLoadingFlags,
+          isAccountRepositoryDataLoading: false,
+        })
+      );
   };
 
   return (
@@ -192,7 +208,7 @@ const SignUp = () => {
                 )}
               </Grid>
             </Grid>
-            {isLoading ? (
+            {isAppDataLoading ? (
               <Grid
                 item
                 xs={12}

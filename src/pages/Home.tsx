@@ -27,8 +27,9 @@ const mainFeaturedPost = {
 
 export default function Blog() {
   const {
-    isLoading,
-    setIsLoading,
+    isAppDataLoading,
+    repositoryDataLoadingFlags,
+    setRepositoryDataLoadingFlags,
     homepageBlogsData,
     setHomepageBlogsData,
     blogRepository,
@@ -43,7 +44,10 @@ export default function Blog() {
   );
 
   useEffect(() => {
-    setIsLoading(true);
+    setRepositoryDataLoadingFlags({
+      ...repositoryDataLoadingFlags,
+      isBlogRepositoryDataLoading: true,
+    });
     blogRepository
       .getHomepageBlogs(selectedFilter, currentPageNumber)
       .then((blogsResponse) => {
@@ -58,13 +62,19 @@ export default function Blog() {
         console.error(error);
         ErrorToast({ Message: "Something went wrong!" });
       })
-      .finally(() => setIsLoading(false));
+      .finally(() =>
+        setRepositoryDataLoadingFlags({
+          ...repositoryDataLoadingFlags,
+          isBlogRepositoryDataLoading: false,
+        })
+      );
   }, [
     blogRepository,
     currentPageNumber,
+    repositoryDataLoadingFlags,
     selectedFilter,
     setHomepageBlogsData,
-    setIsLoading,
+    setRepositoryDataLoadingFlags,
   ]);
 
   const handleNextPageChange = () => {
@@ -112,7 +122,7 @@ export default function Blog() {
               </Select>
             </FormControl>
           </Container>
-          {isLoading ? (
+          {isAppDataLoading ? (
             <Container
               sx={{
                 height: "50vh",

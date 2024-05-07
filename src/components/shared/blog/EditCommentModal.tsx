@@ -36,7 +36,7 @@ const EditCommentModal = ({
 
   const [open, setOpen] = useState(false);
   const { handleReload } = useRouter()!;
-  const { isLoading, blogRepository } = useRepository()!;
+  const { isAppDataLoading, blogRepository } = useRepository()!;
 
   const onSubmit = async (data: { text: string }) => {
     const response = await blogRepository.updateBlogComment(
@@ -118,7 +118,7 @@ const EditCommentModal = ({
               <Button variant="outlined" onClick={() => setOpen(false)}>
                 Cancel
               </Button>
-              {isLoading ? (
+              {isAppDataLoading ? (
                 <img src="/assets/icons/Loading.svg" alt="Loading" />
               ) : (
                 <Button variant="contained" color="primary" type="submit">

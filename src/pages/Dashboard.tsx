@@ -40,7 +40,7 @@ const Dashboard = () => {
 
   const { handleRedirect } = useRouter()!;
   const localStorageClient = useStorage()!;
-  const { isLoading, dashboardData } = useRepository()!;
+  const { isAppDataLoading, dashboardData } = useRepository()!;
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -156,7 +156,7 @@ const Dashboard = () => {
           }}
         >
           <DashboardDataFilters />
-          {isLoading ? (
+          {isAppDataLoading ? (
             <img src="/assets/icons/Loading.svg" />
           ) : dashboardData ? (
             <>

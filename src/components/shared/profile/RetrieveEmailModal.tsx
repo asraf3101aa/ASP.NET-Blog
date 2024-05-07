@@ -35,13 +35,21 @@ const RetrieveEmailModal = (props: {
   } = useForm<AccountModels[AccountModelsType.EMAIL_MODEL]>();
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const { isLoading, setIsLoading, accountRepository } = useRepository()!;
+  const {
+    isAppDataLoading,
+    repositoryDataLoadingFlags,
+    setRepositoryDataLoadingFlags,
+    accountRepository,
+  } = useRepository()!;
 
   const onSubmit: SubmitHandler<
     AccountModels[AccountModelsType.EMAIL_MODEL]
   > = async (data) => {
     try {
-      setIsLoading(true);
+      setRepositoryDataLoadingFlags({
+        ...repositoryDataLoadingFlags,
+        isAccountRepositoryDataLoading: true,
+      });
       // Simulate forgot password request
       let successMessage = "";
       if (isEmailForChangeEmail) {
@@ -63,7 +71,10 @@ const RetrieveEmailModal = (props: {
       console.error(error);
       ErrorToast({ Message: "Something went wrong!" });
     } finally {
-      setIsLoading(false);
+      setRepositoryDataLoadingFlags({
+        ...repositoryDataLoadingFlags,
+        isAccountRepositoryDataLoading: true,
+      });
       setIsOpen(false);
     }
   };
@@ -109,7 +120,7 @@ const RetrieveEmailModal = (props: {
             )}
           </form>
         </DialogContent>
-        {isLoading ? (
+        {isAppDataLoading ? (
           <Container sx={{ display: "flex", justifyContent: "end", py: 1 }}>
             <img src="/assets/icons/Loading.svg" alt="LoadingIcon" />
           </Container>

@@ -17,7 +17,7 @@ const ProtectedRoutes = () => {
   const localStorageClient = useStorage()!;
   const accessToken = localStorageClient.getAccessToken();
   const {
-    isLoading,
+    isAppDataLoading,
     blogs,
     blogRepository,
     adminRepository,
@@ -25,7 +25,8 @@ const ProtectedRoutes = () => {
     dashboardDataFilters,
     setUser,
     setBlogs,
-    setIsLoading,
+    repositoryDataLoadingFlags,
+    setRepositoryDataLoadingFlags,
     setCategories,
     setHomepageBlogsData,
     setDashboardData,
@@ -37,7 +38,11 @@ const ProtectedRoutes = () => {
     try {
       const accessToken = localStorageClient.getAccessToken();
       if (accessToken) {
-        setIsLoading(true);
+        setRepositoryDataLoadingFlags({
+          ...repositoryDataLoadingFlags,
+          isAccountRepositoryDataLoading: false,
+        });
+
         accountRepository
           .getProfile()
           .then(
@@ -85,7 +90,12 @@ const ProtectedRoutes = () => {
             console.error(error);
             ErrorToast({ Message: "Something went wrong!" });
           })
-          .finally(() => setIsLoading(false));
+          .finally(() =>
+            setRepositoryDataLoadingFlags({
+              ...repositoryDataLoadingFlags,
+              isAccountRepositoryDataLoading: false,
+            })
+          );
       }
     } catch (error) {
       console.error(error);
@@ -102,13 +112,14 @@ const ProtectedRoutes = () => {
     setCategories,
     setDashboardData,
     setHomepageBlogsData,
-    setIsLoading,
+    setRepositoryDataLoadingFlags,
     setUser,
     handleRedirect,
+    repositoryDataLoadingFlags,
   ]);
   return (
     <>
-      {isLoading ? (
+      {isAppDataLoading ? (
         <Container
           sx={{
             display: "flex",

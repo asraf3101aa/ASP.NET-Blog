@@ -22,7 +22,12 @@ const ConfirmEmail = () => {
   const token = params[0].get("token");
   const email = params[0].get("email");
 
-  const { isLoading, setIsLoading, accountRepository } = useRepository()!;
+  const {
+    isAppDataLoading,
+    repositoryDataLoadingFlags,
+    setRepositoryDataLoadingFlags,
+    accountRepository,
+  } = useRepository()!;
   const [isConfirmed, setIsConfirmed] = useState<boolean | undefined>(
     undefined
   );
@@ -38,7 +43,10 @@ const ConfirmEmail = () => {
       handleRedirect(RoutePath.LOGIN);
     }
     if (email && token) {
-      setIsLoading(true);
+      setRepositoryDataLoadingFlags({
+        ...repositoryDataLoadingFlags,
+        isAccountRepositoryDataLoading: true,
+      });
       accountRepository
         .getProfile()
         .then((profileResponse) => {
@@ -64,22 +72,26 @@ const ConfirmEmail = () => {
           ErrorToast({ Message: "Something went wrong!" });
         })
         .finally(() => {
-          setIsLoading(false);
+          setRepositoryDataLoadingFlags({
+            ...repositoryDataLoadingFlags,
+            isAccountRepositoryDataLoading: false,
+          });
         });
     }
   }, [
     isConfirmed,
     accountRepository,
     email,
-    setIsLoading,
+    setRepositoryDataLoadingFlags,
     token,
     accessToken,
     handleRedirect,
+    repositoryDataLoadingFlags,
   ]);
 
   const onClose = () => handleRedirect(RoutePath.HOME);
 
-  return isLoading || isConfirmed === undefined ? (
+  return isAppDataLoading || isConfirmed === undefined ? (
     <Container
       sx={{
         height: "50vh",
@@ -91,7 +103,10 @@ const ConfirmEmail = () => {
       <img src="/assets/icons/Loading.svg" alt="LoadingIcon" />
     </Container>
   ) : (
-    <Dialog open={!isLoading && isConfirmed !== undefined} onClose={onClose}>
+    <Dialog
+      open={!isAppDataLoading && isConfirmed !== undefined}
+      onClose={onClose}
+    >
       <DialogTitle sx={{ px: 8 }}>
         Email Confirmation
         <IconButton

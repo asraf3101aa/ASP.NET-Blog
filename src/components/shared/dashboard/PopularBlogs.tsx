@@ -19,7 +19,7 @@ const PopularBlogs = (props: {
   popularBlogs?: BlogModels[BlogModelsType.BLOG][];
 }) => {
   const popularBlogs = props.popularBlogs;
-  const { isLoading } = useRepository()!;
+  const { isAppDataLoading } = useRepository()!;
   const localStorageClient = useStorage()!;
   const role = getRoleFromJwtToken(localStorageClient.getAccessToken()!);
   const isBloggerAtProfilePage =
@@ -31,7 +31,7 @@ const PopularBlogs = (props: {
         Recent Popular Blogs
       </Typography>
 
-      {isLoading ? (
+      {isAppDataLoading ? (
         <img src="/assets/icons/Loading.svg" alt="LoadingIcon" />
       ) : _.isEmpty(popularBlogs) ? (
         <Typography variant="body1" sx={{ mt: 1 }}>

@@ -49,7 +49,12 @@ const BlogDetails = () => {
   const [blog, setBlog] = useState<BlogModels[BlogModelsType.BLOG] | null>(
     null
   );
-  const { isLoading, setIsLoading, blogRepository } = useRepository()!;
+  const {
+    isAppDataLoading,
+    repositoryDataLoadingFlags,
+    setRepositoryDataLoadingFlags,
+    blogRepository,
+  } = useRepository()!;
 
   const location = useLocation();
   useEffect(() => {
@@ -63,7 +68,10 @@ const BlogDetails = () => {
 
   useEffect(() => {
     try {
-      setIsLoading(true);
+      setRepositoryDataLoadingFlags({
+        ...repositoryDataLoadingFlags,
+        isBlogRepositoryDataLoading: true,
+      });
       blogRepository
         .getBlogDetails(id!)
         .then((blogDetailsResponse) => {
@@ -77,11 +85,21 @@ const BlogDetails = () => {
           console.error(error);
           ErrorToast({ Message: "Something went wrong!" });
         })
-        .finally(() => setIsLoading(false));
+        .finally(() =>
+          setRepositoryDataLoadingFlags({
+            ...repositoryDataLoadingFlags,
+            isBlogRepositoryDataLoading: false,
+          })
+        );
     } catch (error) {
       console.error(error);
     }
-  }, [blogRepository, id, setIsLoading]);
+  }, [
+    blogRepository,
+    id,
+    repositoryDataLoadingFlags,
+    setRepositoryDataLoadingFlags,
+  ]);
 
   const { handleReload, handleRedirect } = useRouter()!;
   const localstorageClient = useStorage()!;
@@ -188,7 +206,7 @@ const BlogDetails = () => {
       <Container>
         <Header />
         <main>
-          {isLoading || !blog ? (
+          {isAppDataLoading || !blog ? (
             <Container
               sx={{
                 height: "50vh",

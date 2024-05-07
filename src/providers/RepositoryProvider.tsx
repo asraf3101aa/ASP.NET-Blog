@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   blogRepository,
   adminRepository,
@@ -11,6 +11,7 @@ import { AccountModelsType } from "@/@enums/account.enum";
 import { BlogModels } from "@/@types/blog";
 import { BlogModelsType, BlogsDurationFilters } from "@/@enums/blog.enum";
 import { AdminDashboardData, DashboardDataFilters } from "@/@types/admin";
+import { RepositoryDataLoadingFlags } from "@/@types/repository";
 
 /**
  * RepositoryProvider: A component to provide Repository context to its children.
@@ -19,7 +20,6 @@ import { AdminDashboardData, DashboardDataFilters } from "@/@types/admin";
  * - children: React node representing the children components.
  */
 const RepositoryProvider = ({ children }: ProviderProps) => {
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [blogs, setBlogs] = useState<
     BlogModels[BlogModelsType.BLOGS_LIST] | null
   >(null);
@@ -45,10 +45,32 @@ const RepositoryProvider = ({ children }: ProviderProps) => {
       month: undefined,
     });
 
+  const [repositoryDataLoadingFlags, setRepositoryDataLoadingFlags] =
+    useState<RepositoryDataLoadingFlags>({
+      isAccountRepositoryDataLoading: false,
+      isAdminRepositoryDataLoading: false,
+      isBlogRepositoryDataLoading: false,
+    });
+
+  const [isAppDataLoading, setIsAppDataLoading] = useState<boolean>(false);
+  useEffect(() => {
+    setIsAppDataLoading(
+      repositoryDataLoadingFlags.isAccountRepositoryDataLoading ||
+        repositoryDataLoadingFlags.isAdminRepositoryDataLoading ||
+        repositoryDataLoadingFlags.isBlogRepositoryDataLoading
+    );
+  }, [
+    repositoryDataLoadingFlags.isAccountRepositoryDataLoading,
+    repositoryDataLoadingFlags.isAdminRepositoryDataLoading,
+    repositoryDataLoadingFlags.isBlogRepositoryDataLoading,
+  ]);
+
   // Create a shared context value
   const shared: RepositoryProps = {
-    isLoading,
-    setIsLoading,
+    isAppDataLoading,
+    setIsAppDataLoading,
+    repositoryDataLoadingFlags,
+    setRepositoryDataLoadingFlags,
     homepageBlogsData,
     setHomepageBlogsData,
     user,

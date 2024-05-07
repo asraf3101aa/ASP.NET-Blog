@@ -16,7 +16,11 @@ import { AccountModels } from "@/@types/account";
 import { AccountModelsType } from "@/@enums/account.enum";
 
 const ChangePasswordModal = () => {
-  const { accountRepository, setIsLoading } = useRepository()!;
+  const {
+    accountRepository,
+    repositoryDataLoadingFlags,
+    setRepositoryDataLoadingFlags,
+  } = useRepository()!;
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isPasswordChanged, setIsPasswordChanged] = useState<
     boolean | undefined
@@ -47,7 +51,10 @@ const ChangePasswordModal = () => {
       return;
     }
 
-    setIsLoading(true);
+    setRepositoryDataLoadingFlags({
+      ...repositoryDataLoadingFlags,
+      isAccountRepositoryDataLoading: true,
+    });
     try {
       const response = await accountRepository.changePassword({
         currentPassword,
@@ -63,7 +70,10 @@ const ChangePasswordModal = () => {
       console.error("Error changing password:", error);
       setIsPasswordChanged(false);
     } finally {
-      setIsLoading(false);
+      setRepositoryDataLoadingFlags({
+        ...repositoryDataLoadingFlags,
+        isAccountRepositoryDataLoading: false,
+      });
       setIsOpen(false);
     }
   };

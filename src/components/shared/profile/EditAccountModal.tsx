@@ -23,7 +23,13 @@ import { useRouter } from "@/contexts/RouterContext";
 const EditAccountModal = () => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const { user, isLoading, setIsLoading, accountRepository } = useRepository()!;
+  const {
+    user,
+    isAppDataLoading,
+    repositoryDataLoadingFlags,
+    setRepositoryDataLoadingFlags,
+    accountRepository,
+  } = useRepository()!;
   const [userToBeUpdated, setUserToBeUpdated] = useState<
     AccountModels[AccountModelsType.USER]
   >(user!);
@@ -31,7 +37,10 @@ const EditAccountModal = () => {
   const { handleReload } = useRouter()!;
 
   const handleUpdate = () => {
-    setIsLoading(true);
+    setRepositoryDataLoadingFlags({
+      ...repositoryDataLoadingFlags,
+      isAccountRepositoryDataLoading: true,
+    });
     const updatedFormData = new FormData();
     updatedFormData.append("firstName", userToBeUpdated.firstName);
     if (userToBeUpdated.lastName) {
@@ -58,7 +67,10 @@ const EditAccountModal = () => {
         ErrorToast({ Message: "Something went wrong!" });
       })
       .finally(() => {
-        setIsLoading(false);
+        setRepositoryDataLoadingFlags({
+          ...repositoryDataLoadingFlags,
+          isAccountRepositoryDataLoading: false,
+        });
         setIsOpen(false);
       });
   };
@@ -125,7 +137,7 @@ const EditAccountModal = () => {
               </Box>
             </Box>
           </DialogContent>
-          {isLoading ? (
+          {isAppDataLoading ? (
             <Container sx={{ display: "flex", justifyContent: "end", py: 2 }}>
               <img src="/assets/icons/Loading.svg" />
             </Container>

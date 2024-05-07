@@ -4,6 +4,7 @@ import {
   IAccountRepository,
   IAdminRepository,
   IBlogRepository,
+  RepositoryDataLoadingFlags,
 } from "./repository";
 import { BlogModels } from "./blog";
 import { BlogModelsType } from "@/@enums/blog.enum";
@@ -38,20 +39,24 @@ declare type RouterProps = {
  * - fetchAPI: An instance of IFetchAPI to handle API calls.
  */
 declare type RepositoryProps = {
-  isLoading: boolean;
-  setIsLoading: (loading: boolean) => void;
+  isAppDataLoading: boolean;
+  setIsAppDataLoading: (loading: boolean) => void;
+  repositoryDataLoadingFlags: RepositoryDataLoadingFlags;
+  setRepositoryDataLoadingFlags: (flags: RepositoryDataLoadingFlags) => void;
+
   user: AccountModels[AccountModelsType.USER] | null;
   setUser: (user: AccountModels[AccountModelsType.USER]) => void;
-  blogs: BlogModels[BlogModelsType.BLOGS_LIST] |null;
+  blogs: BlogModels[BlogModelsType.BLOGS_LIST] | null;
   setBlogs: (blogs: BlogModels[BlogModelsType.BLOGS_LIST]) => void;
-  dashboardData: AdminDashboardData | null;
-  setDashboardData: (data: AdminDashboardData) => void;
-  homepageBlogsData: BlogModels[BlogModelsType.BLOGS_LIST] | null;
-  setHomepageBlogsData: (blogs: BlogModels[BlogModelsType.BLOGS_LIST]) => void;
   blogDetails: BlogModels[BlogModelsType.BLOG] | null;
   setBlogDetails: (blog: BlogModels[BlogModelsType.BLOG]) => void;
   categories: BlogModels[BlogModelsType.CATEGORY][];
   setCategories: (categories: BlogModels[BlogModelsType.CATEGORY][]) => void;
+
+  dashboardData: AdminDashboardData | null;
+  setDashboardData: (data: AdminDashboardData) => void;
+  homepageBlogsData: BlogModels[BlogModelsType.BLOGS_LIST] | null;
+  setHomepageBlogsData: (blogs: BlogModels[BlogModelsType.BLOGS_LIST]) => void;
   dashboardDataFilters: DashboardDataFilters;
   setDashboardDataFilters: (dashboardDataFilters: DashboardDataFilters) => void;
 

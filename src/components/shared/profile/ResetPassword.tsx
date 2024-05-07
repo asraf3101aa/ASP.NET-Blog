@@ -25,7 +25,11 @@ const ResetPassword = () => {
   const token = params[0].get("token");
   const email = params[0].get("email");
 
-  const { setIsLoading, accountRepository } = useRepository()!;
+  const {
+    repositoryDataLoadingFlags,
+    setRepositoryDataLoadingFlags,
+    accountRepository,
+  } = useRepository()!;
   const { handleRedirect } = useRouter()!;
 
   const {
@@ -55,7 +59,10 @@ const ResetPassword = () => {
     }
 
     if (email && token) {
-      setIsLoading(true);
+      setRepositoryDataLoadingFlags({
+        ...repositoryDataLoadingFlags,
+        isAccountRepositoryDataLoading: true,
+      });
       try {
         const response = await accountRepository.confirmPassword({
           token,
@@ -73,7 +80,10 @@ const ResetPassword = () => {
         console.error(error);
         setIsPasswordReset(false);
       } finally {
-        setIsLoading(false);
+        setRepositoryDataLoadingFlags({
+          ...repositoryDataLoadingFlags,
+          isAccountRepositoryDataLoading: false,
+        });
       }
     }
   };

@@ -37,8 +37,14 @@ const CreateBlogModal = () => {
     setOpen(false);
   };
 
-  const { isLoading, categories, user, setIsLoading, blogRepository } =
-    useRepository()!;
+  const {
+    isAppDataLoading,
+    categories,
+    user,
+    repositoryDataLoadingFlags,
+    setRepositoryDataLoadingFlags,
+    blogRepository,
+  } = useRepository()!;
 
   const { handleReload } = useRouter()!;
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -57,7 +63,10 @@ const CreateBlogModal = () => {
     }
   };
   const onSubmit = (data: BlogModels[BlogModelsType.BLOG_PARTIAL_DATA]) => {
-    setIsLoading(true);
+    setRepositoryDataLoadingFlags({
+      ...repositoryDataLoadingFlags,
+      isBlogRepositoryDataLoading: true,
+    });
 
     const blogData = new FormData();
     blogData.append("title", data.title);
@@ -85,7 +94,10 @@ const CreateBlogModal = () => {
         ErrorToast({ Message: "Something went wrong!" });
       })
       .finally(() => {
-        setIsLoading(false);
+        setRepositoryDataLoadingFlags({
+          ...repositoryDataLoadingFlags,
+          isBlogRepositoryDataLoading: false,
+        });
       });
   };
 
@@ -239,7 +251,7 @@ const CreateBlogModal = () => {
               <Button variant="outlined" onClick={handleClose}>
                 Cancel
               </Button>
-              {isLoading ? (
+              {isAppDataLoading ? (
                 <img src="/assets/icons/Loading.svg" />
               ) : (
                 <Button variant="contained" color="primary" type="submit">
