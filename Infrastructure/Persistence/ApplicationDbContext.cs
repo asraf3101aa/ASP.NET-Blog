@@ -27,6 +27,12 @@ namespace Bislerium.Infrastructure.Persistence
                 .WithMany()
                 .HasForeignKey(c => c.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Blog>()
+            .HasMany(b => b.Comments)
+            .WithOne(c => c.Blog)
+            .HasForeignKey(c => c.BlogId)
+            .OnDelete(DeleteBehavior.Cascade);
         }
         public DbSet<Blog> Blogs { get; set; }
         public DbSet<Category> Categories { get; set; }

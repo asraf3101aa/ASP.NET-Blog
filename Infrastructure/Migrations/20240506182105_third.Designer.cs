@@ -3,6 +3,7 @@ using System;
 using Bislerium.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Bislerium.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240506182105_third")]
+    partial class third
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -302,15 +305,15 @@ namespace Bislerium.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "3ced1e96-afb1-4110-aed3-14b608d2d582",
-                            ConcurrencyStamp = "79977746-aa4f-471f-b053-2b541ea83d54",
+                            Id = "8b97b1ce-2d37-42ca-a4d0-7184457113f0",
+                            ConcurrencyStamp = "dc541c1c-aea1-48e2-b535-22c27fdc0177",
                             Name = "Blogger",
                             NormalizedName = "BLOGGER"
                         },
                         new
                         {
-                            Id = "a1f7e5b3-9381-4d50-be64-1bf23f939e8f",
-                            ConcurrencyStamp = "837f400b-1bc0-4549-8c68-5de86d1307d7",
+                            Id = "ee64e5d8-0729-4973-a86b-6ef80703c972",
+                            ConcurrencyStamp = "17b32d5e-0f59-4eca-93cf-d5093ae680a4",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });
@@ -461,7 +464,7 @@ namespace Bislerium.Infrastructure.Migrations
                     b.HasOne("Bislerium.Domain.Entities.Blog", "Blog")
                         .WithMany("Comments")
                         .HasForeignKey("BlogId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Bislerium.Domain.Entities.User", "User")

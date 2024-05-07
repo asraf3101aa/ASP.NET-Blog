@@ -6,6 +6,5 @@ namespace Bislerium.Application.DTOs.BlogDTOs
     {
         [Required]
         public string Text { get; set; }
-
     }
 }

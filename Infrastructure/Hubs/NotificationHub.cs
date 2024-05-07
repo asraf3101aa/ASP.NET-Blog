@@ -4,9 +4,9 @@ namespace Bislerium.Infrastructure.Hubs
 {
     public class NotificationHub : Hub
     {
-        public async Task SendNotification(string title, string body)
+        public async Task SendNotification(string userId, object notificationData)
         {
-            await Clients.User(Context.UserIdentifier).SendAsync("ReceiveNotification", title, body);
+            await Clients.User(userId).SendAsync("ReceiveNotification", notificationData);
         }
     }
 }

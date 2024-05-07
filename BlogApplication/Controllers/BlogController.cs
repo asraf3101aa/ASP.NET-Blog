@@ -296,7 +296,7 @@ namespace Bislerium.Presentation.Controllers
             if (reactionTypeDTO.ReactionType == ReactionType.Upvote)
             {
                 string notificationMessage = $"{user.FirstName} {user.LastName} upvoted your blog\n{blog.Title}";
-                await _hubContext.Clients.User(blog.AuthorId).SendAsync("ReceiveNotification", "Reaction", notificationMessage);
+                await _hubContext.Clients.User(blog.AuthorId).SendAsync("ReceiveNotification", new { Title = "Reaction", Body = notificationMessage });
             }
             return Ok(_responseService.SuccessResponse("Reacted successfully"));
         }
