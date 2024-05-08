@@ -54,15 +54,16 @@ const RepositoryProvider = ({ children }: ProviderProps) => {
 
   const [isAppDataLoading, setIsAppDataLoading] = useState<boolean>(false);
   useEffect(() => {
-    if (repositoryDataLoadingFlags) {
-      console.log(repositoryDataLoadingFlags);
-      setIsAppDataLoading(
-        repositoryDataLoadingFlags.isAccountRepositoryDataLoading ||
-          repositoryDataLoadingFlags.isAdminRepositoryDataLoading ||
-          repositoryDataLoadingFlags.isBlogRepositoryDataLoading
-      );
-    }
-  }, [repositoryDataLoadingFlags]);
+    setIsAppDataLoading(
+      repositoryDataLoadingFlags.isAccountRepositoryDataLoading ||
+        repositoryDataLoadingFlags.isAdminRepositoryDataLoading ||
+        repositoryDataLoadingFlags.isBlogRepositoryDataLoading
+    );
+  }, [
+    repositoryDataLoadingFlags.isAccountRepositoryDataLoading,
+    repositoryDataLoadingFlags.isAdminRepositoryDataLoading,
+    repositoryDataLoadingFlags.isBlogRepositoryDataLoading,
+  ]);
 
   // Create a shared context value
   const shared: RepositoryProps = {

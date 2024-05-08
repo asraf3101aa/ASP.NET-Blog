@@ -35,14 +35,14 @@ const ProtectedRoutes = () => {
   const [dataLoadingFlags] = useState({ ...repositoryDataLoadingFlags });
 
   const { handleRedirect } = useRouter()!;
-
   useEffect(() => {
     try {
       const accessToken = localStorageClient.getAccessToken();
       if (accessToken) {
         setRepositoryDataLoadingFlags({
-          ...dataLoadingFlags,
-          isAccountRepositoryDataLoading: false,
+          isAdminRepositoryDataLoading: true,
+          isBlogRepositoryDataLoading: true,
+          isAccountRepositoryDataLoading: true,
         });
 
         accountRepository
@@ -85,19 +85,16 @@ const ProtectedRoutes = () => {
                       } else setDashboardData(data);
                     });
                 }
+                setRepositoryDataLoadingFlags({
+                  ...dataLoadingFlags,
+                });
               }
             }
           )
           .catch((error) => {
             console.error(error);
             ErrorToast({ Message: "Something went wrong!" });
-          })
-          .finally(() =>
-            setRepositoryDataLoadingFlags({
-              ...dataLoadingFlags,
-              isAccountRepositoryDataLoading: false,
-            })
-          );
+          });
       }
     } catch (error) {
       console.error(error);

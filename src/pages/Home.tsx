@@ -26,7 +26,7 @@ const mainFeaturedPost = {
   imageText: "main image description",
 };
 
-export default function Blog() {
+const Blog = () => {
   const {
     isAppDataLoading,
     repositoryDataLoadingFlags,
@@ -183,4 +183,6 @@ export default function Blog() {
       <Footer />
     </Container>
   );
-}
+};
+
+export default Blog;

@@ -30,14 +30,15 @@ const TitleProvider = ({ children }: { children: React.ReactNode }) => {
       case RoutePath.PROFILE:
         pageTitle = RouteTitle.PROFILE;
         break;
-      case RoutePath.DETAILS:
-        pageTitle = RouteTitle.DETAILS;
-        break;
       case RoutePath.CONFIRM_EMAIL:
         pageTitle = RouteTitle.CONFIRM_EMAIL;
         break;
       default:
         pageTitle = appTitle ?? "Blog";
+    }
+
+    if (_.includes(location.pathname, RoutePath.DETAILS)) {
+      pageTitle = RouteTitle.DETAILS;
     }
 
     const doesPageTitleBelongToRouteTitle = _.find(
