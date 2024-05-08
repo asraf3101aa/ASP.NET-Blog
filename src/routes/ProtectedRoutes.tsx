@@ -58,22 +58,44 @@ const ProtectedRoutes = () => {
               } else {
                 setUser(profileDataResponse);
 
-                blogRepository.getCategories().then((categories) => {
-                  if ("errors" in categories) {
-                    console.error(categories);
-                  } else setCategories(categories);
-                });
+                blogRepository
+                  .getCategories()
+                  .then((categories) => {
+                    if ("errors" in categories) {
+                      console.error(categories);
+                    } else setCategories(categories);
+                  })
+                  .finally(() =>
+                    setRepositoryDataLoadingFlags({
+                      ...dataLoadingFlags,
+                      isBlogRepositoryDataLoading: false,
+                    })
+                  );
 
                 const userRole = getRoleFromJwtToken(accessToken);
                 if (_.isEqual(userRole, UserRoles.BLOGGER)) {
+                  setRepositoryDataLoadingFlags({
+                    ...dataLoadingFlags,
+                    isBlogRepositoryDataLoading: true,
+                  });
                   blogRepository
                     .getBlogs(blogs?.paginationMetaData.pageNumber ?? 1)
                     .then((blogs) => {
                       if ("errors" in blogs) {
                         console.error(blogs);
                       } else setBlogs(blogs);
-                    });
+                    })
+                    .finally(() =>
+                      setRepositoryDataLoadingFlags({
+                        ...dataLoadingFlags,
+                        isBlogRepositoryDataLoading: false,
+                      })
+                    );
                 } else {
+                  setRepositoryDataLoadingFlags({
+                    ...dataLoadingFlags,
+                    isAdminRepositoryDataLoading: true,
+                  });
                   adminRepository
                     .getDashboardData(
                       dashboardDataFilters.duration,
@@ -83,18 +105,27 @@ const ProtectedRoutes = () => {
                       if ("errors" in data) {
                         console.error(data);
                       } else setDashboardData(data);
-                    });
+                    })
+                    .finally(() =>
+                      setRepositoryDataLoadingFlags({
+                        ...dataLoadingFlags,
+                        isAdminRepositoryDataLoading: false,
+                      })
+                    );
                 }
-                setRepositoryDataLoadingFlags({
-                  ...dataLoadingFlags,
-                });
               }
             }
           )
           .catch((error) => {
             console.error(error);
             ErrorToast({ Message: "Something went wrong!" });
-          });
+          })
+          .finally(() =>
+            setRepositoryDataLoadingFlags({
+              ...dataLoadingFlags,
+              isAccountRepositoryDataLoading: false,
+            })
+          );
       }
     } catch (error) {
       console.error(error);

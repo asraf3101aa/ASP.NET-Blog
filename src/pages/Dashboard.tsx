@@ -156,9 +156,18 @@ const Dashboard = () => {
           }}
         >
           <DashboardDataFilters />
-          {isAppDataLoading ? (
-            <img src="/assets/icons/Loading.svg" />
-          ) : dashboardData ? (
+          {isAppDataLoading || !dashboardData ? (
+            <Container
+              sx={{
+                height: "50vh",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <img src="/assets/icons/Loading.svg" alt="LoadingIcon" />
+            </Container>
+          ) : (
             <>
               <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
                 <Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
@@ -214,8 +223,6 @@ const Dashboard = () => {
                 </Grid>
               </Container>
             </>
-          ) : (
-            <></>
           )}
         </Container>
       </Box>

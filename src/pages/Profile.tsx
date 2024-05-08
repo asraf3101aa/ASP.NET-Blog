@@ -193,7 +193,7 @@ const Profile = () => {
             py: 2,
           }}
         >
-          {isAppDataLoading ? (
+          {isAppDataLoading || !user ? (
             <Container
               sx={{
                 height: "50vh",
@@ -204,7 +204,7 @@ const Profile = () => {
             >
               <img src="/assets/icons/Loading.svg" alt="LoadingIcon" />
             </Container>
-          ) : user ? (
+          ) : (
             <>
               <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
                 <Grid item xs={12}>
@@ -234,7 +234,13 @@ const Profile = () => {
                   </Paper>
                 </Grid>
               </Container>
-              <Container sx={{ display: "flex", pb: 2, gap: 2 }}>
+              <Container
+                sx={{
+                  display: userRole === UserRoles.BLOGGER ? "flex" : "none",
+                  pb: 2,
+                  gap: 2,
+                }}
+              >
                 <Button
                   disabled={!blogs?.paginationMetaData?.hasPreviousPage}
                   variant="outlined"
@@ -252,8 +258,6 @@ const Profile = () => {
                 </Button>
               </Container>
             </>
-          ) : (
-            <></>
           )}
         </Container>
       </Box>
