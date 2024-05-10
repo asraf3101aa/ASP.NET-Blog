@@ -4,6 +4,7 @@ import {
   IAccountRepository,
   IAdminRepository,
   IBlogRepository,
+  INotificationsRepository,
   RepositoryDataLoadingFlags,
 } from "./repository";
 import { BlogModels } from "./blog";
@@ -63,4 +64,5 @@ declare type RepositoryProps = {
   accountRepository: IAccountRepository;
   adminRepository: IAdminRepository;
   blogRepository: IBlogRepository;
+  notificationsRepository: INotificationsRepository;
 };

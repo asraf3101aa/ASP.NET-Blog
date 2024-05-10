@@ -250,3 +250,10 @@ export interface IBlogRepository {
     commentId: string
   ): Promise<ApiResponse<string>>;
 }
+
+export interface INotificationsRepository {
+  startConnection(
+    notificationReceived: (title: string, body: string) => void
+  ): void;
+  stopConnection(): void;
+}

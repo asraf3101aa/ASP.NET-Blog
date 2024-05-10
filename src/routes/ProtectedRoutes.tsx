@@ -28,7 +28,6 @@ const ProtectedRoutes = () => {
     setBlogs,
     setCategories,
     setDashboardData,
-    setHomepageBlogsData,
     setRepositoryDataLoadingFlags,
   } = useRepository()!;
 
@@ -131,22 +130,8 @@ const ProtectedRoutes = () => {
       console.error(error);
       handleRedirect(RoutePath.LOGIN);
     }
-  }, [
-    blogs?.paginationMetaData.pageNumber,
-    accountRepository,
-    adminRepository,
-    blogRepository,
-    localStorageClient,
-    dashboardDataFilters,
-    setBlogs,
-    setCategories,
-    setDashboardData,
-    setHomepageBlogsData,
-    setRepositoryDataLoadingFlags,
-    setUser,
-    handleRedirect,
-    dataLoadingFlags,
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return (
     <>
       {isAppDataLoading ? (

@@ -3,6 +3,7 @@ import {
   blogRepository,
   adminRepository,
   accountRepository,
+  notificationsRepository,
   RepositoryContext,
 } from "@/contexts/RepositoryContext";
 import { ProviderProps, RepositoryProps } from "@/@types/providers";
@@ -88,6 +89,7 @@ const RepositoryProvider = ({ children }: ProviderProps) => {
     blogRepository,
     adminRepository,
     accountRepository,
+    notificationsRepository,
   };
 
   // Provide the context value to its children
