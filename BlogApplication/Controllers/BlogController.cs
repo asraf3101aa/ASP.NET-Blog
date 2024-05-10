@@ -219,11 +219,8 @@ namespace Bislerium.Presentation.Controllers
                 return NotFound(_responseService.CustomErrorResponse("Blog", "Blog not found"));
             var user = await _accountService.GetUserByClaimsAsync(User);
             await _blogService.ReactAsync(blog, null,user.Id, reactionTypeDTO.ReactionType);
-            if(user.Id != blog.Author.Id)
-            {
-                string notificationMessage = $"{user.FirstName} {user.LastName} {reactionTypeDTO.ReactionType.ToString().ToLower()}d on your blog: {blog.Title}.";
-                await _hubContext.Clients.User(blog.AuthorId).SendAsync("notification", new { Title = reactionTypeDTO.ReactionType.ToString(), Body = notificationMessage, CreatedAt = DateTime.UtcNow });
-            }
+            string notificationMessage = $"{user.FirstName} {user.LastName} {reactionTypeDTO.ReactionType.ToString().ToLower()}d on your blog: {blog.Title}.";
+            await _hubContext.Clients.User(blog.AuthorId).SendAsync("notification", new { Title = reactionTypeDTO.ReactionType.ToString(), Body = notificationMessage, CreatedAt = DateTime.UtcNow });
             return Ok(_responseService.SuccessResponse("Reacted successfully"));
         }
 
@@ -237,11 +234,8 @@ namespace Bislerium.Presentation.Controllers
 
             var user = await _accountService.GetUserByClaimsAsync(User);
             await _blogService.AddCommentAsync(commentDto, blog.Id, user.Id);
-            if (user.Id != blog.Author.Id)
-            {
-                string notificationMessage = $"{user.FirstName} {user.LastName} commented on your blog - {blog.Title}: {commentDto.Text}";
-                await _hubContext.Clients.User(blog.AuthorId).SendAsync("notification", new { Title = "Comment", Body = notificationMessage, CreatedAt = DateTime.UtcNow });
-            }
+            string notificationMessage = $"{user.FirstName} {user.LastName} commented on your blog - {blog.Title}: {commentDto.Text}";
+            await _hubContext.Clients.User(blog.AuthorId).SendAsync("notification", new { Title = "Comment", Body = notificationMessage, CreatedAt = DateTime.UtcNow });
             return Ok(_responseService.SuccessResponse("Comment added successfully"));
         }
 
@@ -296,11 +290,8 @@ namespace Bislerium.Presentation.Controllers
 
             var user = await _accountService.GetUserByClaimsAsync(User);
             await _blogService.ReactAsync(null, comment, user.Id, reactionTypeDTO.ReactionType);
-            if (user.Id != comment.User.Id)
-            {
-                string notificationMessage = $"{user.FirstName} {user.LastName} {reactionTypeDTO.ReactionType.ToString().ToLower()}d on your comment: {comment.Text}.";
-                await _hubContext.Clients.User(blog.AuthorId).SendAsync("notification", new { Title = reactionTypeDTO.ReactionType.ToString(), Body = notificationMessage, CreatedAt = DateTime.UtcNow });
-            }
+            string notificationMessage = $"{user.FirstName} {user.LastName} {reactionTypeDTO.ReactionType.ToString().ToLower()}d on your comment: {comment.Text}.";
+            await _hubContext.Clients.User(blog.AuthorId).SendAsync("notification", new { Title = reactionTypeDTO.ReactionType.ToString(), Body = notificationMessage, CreatedAt = DateTime.UtcNow });
             return Ok(_responseService.SuccessResponse("Reacted successfully"));
         }
     }

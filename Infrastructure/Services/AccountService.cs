@@ -47,7 +47,7 @@ namespace Bislerium.Infrastructure.Services
         }
         public async Task<IdentityResult> AddToRoleAsync(User user, string RoleName)
         {
-            return await _userManager.AddToRoleAsync(user, "Blogger");
+            return await _userManager.AddToRoleAsync(user,RoleName);
         }
         public async Task<IEnumerable<string>> GetRolesAsync(User user)
         {

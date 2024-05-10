@@ -1,8 +1,6 @@
 using Bislerium.Infrastructure.DI;
 using Bislerium.Infrastructure.Persistence.Configuration;
 using Bislerium.Presentation.Helper;
-using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
 
