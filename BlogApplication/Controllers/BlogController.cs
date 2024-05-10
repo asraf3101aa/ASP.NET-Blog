@@ -221,8 +221,8 @@ namespace Bislerium.Presentation.Controllers
             await _blogService.ReactAsync(blog, null,user.Id, reactionTypeDTO.ReactionType);
             if (reactionTypeDTO.ReactionType == ReactionType.Upvote)
             {
-                string notificationMessage = $"{user.FirstName} {user.LastName} upvoted your blog\n{blog.Title}";
-                await _hubContext.Clients.User(blog.AuthorId).SendAsync("notification", notificationMessage);
+                string notificationMessage = $"{user.FirstName} {user.LastName} reacted {reactionTypeDTO.ReactionType.ToString().ToLower()} your blog {blog.Title}";
+                await _hubContext.Clients.User(blog.AuthorId).SendAsync("notification", new { Title = reactionTypeDTO.ReactionType.ToString(), Body = notificationMessage, CreatedAt = DateTime.UtcNow });
             }
             return Ok(_responseService.SuccessResponse("Reacted successfully"));
         }
@@ -237,8 +237,8 @@ namespace Bislerium.Presentation.Controllers
 
             var user = await _accountService.GetUserByClaimsAsync(User);
             await _blogService.AddCommentAsync(commentDto, blog.Id, user.Id);
-            string notificationMessage = $"{user.FirstName} {user.LastName} commented on your blog\n{blog.Title}";
-            await _hubContext.Clients.User(blog.AuthorId).SendAsync("notification", notificationMessage);
+            string notificationMessage = $"{user.FirstName} {user.LastName} commented on your blog.\n{blog.Title}\n{commentDto.Text}";
+            await _hubContext.Clients.User(blog.AuthorId).SendAsync("notification", new { Title = "Comment", Body = notificationMessage, CreatedAt = DateTime.UtcNow });
             return Ok(_responseService.SuccessResponse("Comment added successfully"));
         }
 
@@ -295,8 +295,8 @@ namespace Bislerium.Presentation.Controllers
             await _blogService.ReactAsync(null, comment, user.Id, reactionTypeDTO.ReactionType);
             if (reactionTypeDTO.ReactionType == ReactionType.Upvote)
             {
-                string notificationMessage = $"{user.FirstName} {user.LastName} upvoted your blog\n{blog.Title}";
-                await _hubContext.Clients.User(blog.AuthorId).SendAsync("notification", notificationMessage);
+                string notificationMessage = $"{user.FirstName} {user.LastName} reacted {reactionTypeDTO.ReactionType.ToString().ToLower()} your comment {comment.Text}";
+                await _hubContext.Clients.User(blog.AuthorId).SendAsync("notification", new { Title = reactionTypeDTO.ReactionType.ToString(), Body = notificationMessage, CreatedAt = DateTime.UtcNow });
             }
             return Ok(_responseService.SuccessResponse("Reacted successfully"));
         }
