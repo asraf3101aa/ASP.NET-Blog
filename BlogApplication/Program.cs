@@ -1,6 +1,8 @@
 using Bislerium.Infrastructure.DI;
 using Bislerium.Infrastructure.Persistence.Configuration;
 using Bislerium.Presentation.Helper;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
 
@@ -51,7 +53,6 @@ builder.Services.AddControllers()
             });
 builder.Services.AddSignalR();
 
-
 var app = builder.Build();
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
@@ -72,6 +73,8 @@ app.UseCors(x => x
         .SetIsOriginAllowed(origin => true) // allow any origin
         .AllowCredentials()); // allow
 
+app.UseDefaultFiles();
+
 app.UseStaticFiles();
 
 app.UseRouting();
@@ -84,7 +87,7 @@ app.UseAuthorization();
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
-    endpoints.MapHub<NotificationHub>("/notificationHub");
+    endpoints.MapHub<NotificationHub>("/notifications");
 });
 
 app.MapControllers();
