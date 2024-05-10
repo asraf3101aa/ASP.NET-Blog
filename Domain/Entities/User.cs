@@ -22,5 +22,9 @@ namespace Bislerium.Domain.Entities
             }
             set => _avatar = value;
         }
+        public bool NotifyUpvote { get; set; }
+        public bool NotifyDownvote { get; set; }
+        public bool NotifyComment { get; set; }
+        public int NotificationFrequency { get; set; }
     }
 }

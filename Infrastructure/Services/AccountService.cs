@@ -29,7 +29,11 @@ namespace Bislerium.Infrastructure.Services
                 FirstName = newUser.FirstName,
                 LastName = newUser.LastName,
                 Email = newUser.Email,
-                UserName = newUser.Email
+                UserName = newUser.Email,
+                NotifyComment = true,
+                NotifyUpvote = true,
+                NotifyDownvote = true,
+                NotificationFrequency = 6
             };
             return (await _userManager.CreateAsync(user, newUser.Password), user);
         }
@@ -80,6 +84,10 @@ namespace Bislerium.Infrastructure.Services
         {
             user.FirstName = updateUser.FirstName ?? user.FirstName;
             user.LastName = updateUser.LastName ?? user.LastName;
+            user.NotificationFrequency = updateUser.NotificationFrequency;
+            user.NotifyComment = updateUser.NotifyComment;
+            user.NotifyUpvote = updateUser.NotifyUpvote;
+            user.NotifyDownvote = updateUser.NotifyDownvote;
             return await _userManager.UpdateAsync(user);
         }
         public async Task<IdentityResult> DeleteAsync(User user)
