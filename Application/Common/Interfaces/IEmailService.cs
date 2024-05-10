@@ -1,10 +1,10 @@
-﻿using Bislerium.Application.DTOs.Extensions;
+﻿using Bislerium.Application.DTOs.Email;
 
 namespace Bislerium.Application.Common.Interfaces
 {
     public interface IEmailService
     {
-        public void SendEmail(Message message);
-        public Task SendEmailAsync(Message message);
+        public void SendEmail(EmailMessage message);
+        public Task SendEmailAsync(EmailMessage message);
     }
 }

@@ -1,7 +1,7 @@
 ﻿using Bislerium.Application.Common.Interfaces;
 using Bislerium.Application.DTOs.AccountDTOs;
 using Bislerium.Application.DTOs.AdminDTOs;
-using Bislerium.Application.DTOs.Extensions;
+using Bislerium.Application.DTOs.Email;
 using Bislerium.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -65,7 +65,7 @@ namespace Bislerium.Presentation.Controllers
             var resetLink = $"{clientOrigin}/reset-password?token={token}&email={user.Email}";
 
             // Send the password reset link to the admin user's email
-            var message = new Message(new string[] { user.Email }, "Admin Invitation", resetLink, null);
+            var message = new EmailMessage(new string[] { user.Email }, "Admin Invitation", resetLink, null);
             await _emailService.SendEmailAsync(message);
             return Ok(_responseService.SuccessResponse("Admin added successfully."));
         }

@@ -1,18 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using MimeKit;
 
-namespace Bislerium.Application.DTOs.Extensions
+namespace Bislerium.Application.DTOs.Email
 {
-    public class MailSettings
-    {
-        public string From { get; set; }
-        public string SmtpServer { get; set; }
-        public int Port { get; set; }
-        public string UserName { get; set; }
-        public string Password { get; set; }
-    }
-
-    public class Message
+    public class EmailMessage
     {
         public List<MailboxAddress> To { get; set; }
         public string Subject { get; set; }
@@ -20,7 +11,7 @@ namespace Bislerium.Application.DTOs.Extensions
 
         public IFormFileCollection Attachments { get; set; }
 
-        public Message(IEnumerable<string> to, string subject, string ? content, IFormFileCollection attachments)
+        public EmailMessage(IEnumerable<string> to, string subject, string? content, IFormFileCollection attachments)
         {
             To = new List<MailboxAddress>();
             To.AddRange(to.Select(x => new MailboxAddress(null, x)));

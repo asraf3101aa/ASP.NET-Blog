@@ -1,5 +1,5 @@
 ﻿using Bislerium.Application.Common.Interfaces;
-using Bislerium.Application.DTOs.Extensions;
+using Bislerium.Application.DTOs.Email;
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.Options;
 using MimeKit;
@@ -8,27 +8,27 @@ namespace Bislerium.Infrastructure.Services
 {
     public class EmailService : IEmailService
     {
-        private readonly MailSettings _mailSettings;
-        public EmailService(IOptions<MailSettings> mailSettings)
+        private readonly EmailSettings _mailSettings;
+        public EmailService(IOptions<EmailSettings> mailSettings)
         {
             _mailSettings = mailSettings.Value;
         }
 
-        public void SendEmail(Message message)
+        public void SendEmail(EmailMessage message)
         {
             var emailMessage = CreateEmailMessage(message);
 
             Send(emailMessage);
         }
 
-        public async Task SendEmailAsync(Message message)
+        public async Task SendEmailAsync(EmailMessage message)
         {
             var mailMessage = CreateEmailMessage(message);
 
             await SendAsync(mailMessage);
         }
 
-        private MimeMessage CreateEmailMessage(Message message)
+        private MimeMessage CreateEmailMessage(EmailMessage message)
         {
             var emailMessage = new MimeMessage();
             emailMessage.From.Add(new MailboxAddress("Blogging", _mailSettings.From));

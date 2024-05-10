@@ -1,7 +1,7 @@
 ﻿using Bislerium.Application.Common.Interfaces;
 using Bislerium.Application.DTOs.BlogDTOs;
 using Bislerium.Domain.Entities;
-using Bislerium.Infrastructure.Hubs;
+using Bislerium.Presentation.Helper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -222,7 +222,7 @@ namespace Bislerium.Presentation.Controllers
             if (reactionTypeDTO.ReactionType == ReactionType.Upvote)
             {
                 string notificationMessage = $"{user.FirstName} {user.LastName} upvoted your blog\n{blog.Title}";
-                await _hubContext.Clients.User(blog.AuthorId).SendAsync("ReceiveNotification", "Reaction", notificationMessage);
+                await _hubContext.Clients.User(blog.AuthorId).SendAsync("ReceiveNotification", notificationMessage);
             }
             return Ok(_responseService.SuccessResponse("Reacted successfully"));
         }
@@ -238,7 +238,7 @@ namespace Bislerium.Presentation.Controllers
             var user = await _accountService.GetUserByClaimsAsync(User);
             await _blogService.AddCommentAsync(commentDto, blog.Id, user.Id);
             string notificationMessage = $"{user.FirstName} {user.LastName} commented on your blog\n{blog.Title}";
-            await _hubContext.Clients.User(blog.AuthorId).SendAsync("ReceiveNotification", "Comment", notificationMessage);
+            await _hubContext.Clients.User(blog.AuthorId).SendAsync("ReceiveNotification", notificationMessage);
             return Ok(_responseService.SuccessResponse("Comment added successfully"));
         }
 
@@ -296,7 +296,7 @@ namespace Bislerium.Presentation.Controllers
             if (reactionTypeDTO.ReactionType == ReactionType.Upvote)
             {
                 string notificationMessage = $"{user.FirstName} {user.LastName} upvoted your blog\n{blog.Title}";
-                await _hubContext.Clients.User(blog.AuthorId).SendAsync("ReceiveNotification", new { Title = "Reaction", Body = notificationMessage });
+                await _hubContext.Clients.User(blog.AuthorId).SendAsync("ReceiveNotification", notificationMessage);
             }
             return Ok(_responseService.SuccessResponse("Reacted successfully"));
         }

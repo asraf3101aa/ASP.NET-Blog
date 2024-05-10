@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Bislerium.Application.DTOs.Extensions
+namespace Bislerium.Application.DTOs.Email
 {
     public class EmailBaseDTO
     {

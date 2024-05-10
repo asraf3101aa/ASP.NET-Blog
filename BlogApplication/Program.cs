@@ -1,6 +1,6 @@
 using Bislerium.Infrastructure.DI;
-using Bislerium.Infrastructure.Hubs;
 using Bislerium.Infrastructure.Persistence.Configuration;
+using Bislerium.Presentation.Helper;
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
 
@@ -50,6 +50,7 @@ builder.Services.AddControllers()
                 options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
             });
 builder.Services.AddSignalR();
+
 
 var app = builder.Build();
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);

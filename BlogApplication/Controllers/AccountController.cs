@@ -1,6 +1,6 @@
 ﻿using Bislerium.Application.Common.Interfaces;
 using Bislerium.Application.DTOs.AccountDTOs;
-using Bislerium.Application.DTOs.Extensions;
+using Bislerium.Application.DTOs.Email;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Web;
@@ -56,7 +56,7 @@ namespace Bislerium.Presentation.Controllers
             // Construct the confirmation link with the client's origin URL
             var confirmationLink = $"{clientOrigin}/confirm-email?token={token}&email={user.Email}";
 
-            var message = new Message(new string[] { user.Email }, "Confirmation email link", confirmationLink, null);
+            var message = new EmailMessage(new string[] { user.Email }, "Confirmation email link", confirmationLink, null);
             await _emailService.SendEmailAsync(message);                
             return Ok(_responseService.SuccessResponse("Registration successful"));
         }
@@ -108,7 +108,7 @@ namespace Bislerium.Presentation.Controllers
 
             // Construct the confirmation link with the client's origin URL
             var callback = $"{clientOrigin}/reset-password?token={token}&email={user.Email}";
-            var message = new Message(new string[] { user.Email }, "Reset password token", callback, null);
+            var message = new EmailMessage(new string[] { user.Email }, "Reset password token", callback, null);
             await _emailService.SendEmailAsync(message);
             return Ok(_responseService.SuccessResponse("Password reset token sent in email."));
         }
@@ -182,7 +182,7 @@ namespace Bislerium.Presentation.Controllers
 
             // Construct the confirmation link with the client's origin URL
             var confirmationLink = $"{clientOrigin}/confirm-email?token={token}&email={user.Email}";
-            var message = new Message(new string[] { user.Email }, "Confirmation email link", confirmationLink, null);
+            var message = new EmailMessage(new string[] { user.Email }, "Confirmation email link", confirmationLink, null);
             await _emailService.SendEmailAsync(message);
             return Ok(_responseService.SuccessResponse("Confirmation email sent successfully."));
         }
@@ -210,7 +210,7 @@ namespace Bislerium.Presentation.Controllers
             // Construct the confirmation link with the client's origin URL
             var confirmationLink = $"{clientOrigin}/change-email?token={token}&email={user.Email}";
 
-            var message = new Message(new string[] { emailModel.Email }, "Email change request", confirmationLink, null);
+            var message = new EmailMessage(new string[] { emailModel.Email }, "Email change request", confirmationLink, null);
             //var result = await _accountService.SetEmailAsync(user, emailModel.Email);
             //if (!result.Succeeded)
             //    return BadRequest(_responseService.IdentityResultErrorResponse(result));

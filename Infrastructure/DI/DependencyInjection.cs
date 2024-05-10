@@ -1,5 +1,5 @@
 ﻿using Bislerium.Application.Common.Interfaces;
-using Bislerium.Application.DTOs.Extensions;
+using Bislerium.Application.DTOs.Email;
 using Bislerium.Domain.Entities;
 using Bislerium.Infrastructure.Persistence;
 using Bislerium.Infrastructure.Services;
@@ -39,7 +39,7 @@ namespace Bislerium.Infrastructure.DI
             });
            
 
-            services.Configure<MailSettings>(configuration.GetSection("MailSettings"));
+            services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
             services.AddTransient<IEmailService, EmailService>();
             services.AddTransient<IAccountService, AccountService>();
             services.AddTransient<IBlogService, BlogService>();

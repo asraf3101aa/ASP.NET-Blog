@@ -1,4 +1,4 @@
-﻿using Bislerium.Application.DTOs.Extensions;
+﻿using Bislerium.Application.DTOs.Email;
 
 namespace Bislerium.Application.DTOs.AccountDTOs
 {
