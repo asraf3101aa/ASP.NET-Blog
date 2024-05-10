@@ -83,17 +83,16 @@ const CreateBlogModal: React.FC = () => {
       ...repositoryDataLoadingFlags,
       isBlogRepositoryDataLoading: true,
     });
+    const category = _.find(
+      categories,
+      (category) => category.id.toString() === formValues.categoryId!
+    );
+    const categoryId = category?.id.toString();
 
     const blogData = new FormData();
     blogData.append("title", formValues.title);
     blogData.append("body", formValues.body);
-    blogData.append(
-      "categoryId",
-      _.find(
-        categories,
-        (category) => category.name === formValues.categoryId!
-      )?.id.toString() ?? "1"
-    );
+    blogData.append("categoryId", categoryId ?? "1");
 
     if (formValues.banner) {
       blogData.append("banner", formValues.banner);
