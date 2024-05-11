@@ -127,7 +127,7 @@ const EditAccountModal: React.FC = () => {
         </DialogContent>
         {isAppDataLoading ? (
           <DialogActions sx={{ justifyContent: "flex-end" }}>
-            <img src="/assets/icons/Loading.svg" />
+            <img src="/assets/icons/Loading.svg" alt="LoadingIcon" />
           </DialogActions>
         ) : (
           <DialogActions>

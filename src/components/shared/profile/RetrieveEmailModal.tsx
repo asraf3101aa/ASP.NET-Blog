@@ -74,7 +74,7 @@ const RetrieveEmailModal = (props: {
     } finally {
       setRepositoryDataLoadingFlags({
         ...dataLoadingFlags,
-        isAccountRepositoryDataLoading: true,
+        isAccountRepositoryDataLoading: false,
       });
       setIsOpen(false);
     }
