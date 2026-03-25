@@ -1,15 +1,21 @@
-﻿namespace Bislerium.Domain.Entities
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Bislerium.Domain.Common;
+
+namespace Bislerium.Domain.Entities;
+
+public class Comment : BaseEntity
 {
-    public class Comment
-    {
-        public int Id { get; set; }
-        public string Text { get; set; }
-        public string UserId { get; set; }
-        public User User { get; set; }
-        public int BlogId { get; set; }
-        public Blog Blog { get; set; }
-        public ICollection<Reaction> Reactions { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
-    }
+    public int Id { get; set; }
+
+    [Required]
+    public string Text { get; set; } = string.Empty;
+
+    [ForeignKey(nameof(User))]
+    public string UserId { get; set; } = string.Empty;
+    public virtual User User { get; set; } = null!;
+
+    [ForeignKey(nameof(Blog))]
+    public int BlogId { get; set; }
+    public virtual Blog Blog { get; set; } = null!;
 }

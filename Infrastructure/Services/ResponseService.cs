@@ -1,51 +1,50 @@
-﻿using Bislerium.Application.Common.Interfaces;
+﻿using Bislerium.Application.Interfaces;
+using Bislerium.Application.DTOs.ResponseDTOs;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-namespace Bislerium.Infrastructure.Services
+namespace Bislerium.Infrastructure.Services;
+
+public class ResponseService : IResponseService
 {
-    public class ResponseService : IResponseService
+    public ApiResponse<object> IdentityResultErrorResponse(IdentityResult result)
     {
-        public ErrorResponse IdentityResultErrorResponse(IdentityResult result)
-        {
-            var errorResponse = new ErrorResponse();
-            foreach (var error in result.Errors)
-            {
-                errorResponse.Errors.Add(new ErrorResponse.ErrorDetail
-                {
-                    Title = error.Code,
-                    Message = error.Description
-                });
-            }
+        var errors = result.Errors.GroupBy(e => e.Code)
+            .ToDictionary(g => g.Key, g => g.Select(e => e.Description).ToArray());
 
-            return errorResponse;
-        }
+        return ApiResponse<object>.Fail(errors, "Identity operations failed");
+    }
 
-        public ErrorResponse SignInResultErrorResponse(SignInResult result)
+    public ApiResponse<object> SignInResultErrorResponse(SignInResult result)
+    {
+        var errors = new Dictionary<string, string[]>
         {
-            var errorResponse = new ErrorResponse();
-            errorResponse.Errors.Add(new ErrorResponse.ErrorDetail
-            {
-                Title = "Authentication Failed",
-                Message = "Invalid credentials."
-            });
-            return errorResponse;
-        }
+            { "Auth", new[] { "Invalid credentials." } }
+        };
+        return ApiResponse<object>.Fail(errors, "Authentication failed");
+    }
 
-        public SuccessResponse<T> SuccessResponse<T>(T data)
-        {
-            return new SuccessResponse<T>(data);
-        }
+    public ApiResponse<T> SuccessResponse<T>(T data, string message = "")
+    {
+        return ApiResponse<T>.Success(data, message);
+    }
 
-        public ErrorResponse CustomErrorResponse(string title, string message)
+    public ApiResponse<object> CustomErrorResponse(string title, string message)
+    {
+        var errors = new Dictionary<string, string[]>
         {
-            var errorResponse = new ErrorResponse();
-            errorResponse.Errors.Add(new ErrorResponse.ErrorDetail
-            {
-                Title = title,
-                Message = message
-            });
-            return errorResponse;
-        }
+            { title, new[] { message } }
+        };
+        return ApiResponse<object>.Fail(errors, message);
+    }
+
+    public ApiResponse<IDictionary<string, string[]>> ValidationFailResponse(IDictionary<string, string[]> errors, string message = "Validation failed")
+    {
+        return ApiResponse<IDictionary<string, string[]>>.Fail(errors, message);
+    }
+
+    public ApiResponse<string> ExceptionResponse(Exception ex, bool isDevelopment)
+    {
+        string errorDetail = isDevelopment ? ex.ToString() : "An internal server error occurred.";
+        return ApiResponse<string>.ErrorResponse(errorDetail, ex.Message);
     }
 }

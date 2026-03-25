@@ -1,4 +1,4 @@
-﻿using Bislerium.Application.Common.Interfaces;
+﻿using Bislerium.Application.Interfaces;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.StaticFiles;
@@ -69,6 +69,15 @@ namespace Bislerium.Infrastructure.Services
         {
             if (File.Exists(filePath))
                 File.Delete(filePath);
+        }
+
+        public string GetFullUrl(string relativePath)
+        {
+            if (string.IsNullOrEmpty(relativePath)) return null;
+            var request = _httpContextAccessor.HttpContext?.Request;
+            if (request == null) return relativePath;
+            var baseUrl = $"{request.Scheme}://{request.Host.Value}";
+            return $"{baseUrl}/{relativePath.Replace("\\", "/")}";
         }
     }
 }

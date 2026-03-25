@@ -1,15 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿namespace Bislerium.Application.DTOs.AccountDTOs;
 
-namespace Bislerium.Application.DTOs.AccountDTOs
+public class UserLogin
 {
-    public class UserLogin
-    {
-        [Required]
-        [EmailAddress]
-        public string Email { get; set; }
-
-        [Required]
-        [DataType(DataType.Password)]
-        public string Password { get; set; }
-    }
+    public string Email { get; set; }
+    public string Password { get; set; }
 }

@@ -1,30 +1,20 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Http;
+﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Identity;
+using Bislerium.Domain.Common;
 
-namespace Bislerium.Domain.Entities
+namespace Bislerium.Domain.Entities;
+
+public class User : IdentityUser, ISoftDelete, IAuditEntity
 {
-    public class User : IdentityUser
-    {
-        public string FirstName { get; set; }
-        public string? LastName { get; set; }
-        private string? _avatar;
-        public string? Avatar
-        {
-            get
-            {
-                if (string.IsNullOrEmpty(_avatar))
-                    return null;
-                var httpContextAccessor = new HttpContextAccessor();
-                var request = httpContextAccessor.HttpContext?.Request;
-                var baseUrl = $"{request?.Scheme}://{request?.Host.Value}";
+    [Required]
+    [MaxLength(20)]
+    public required string FirstName { get; set; }
+    public string? LastName { get; set; }
+    public string? AvatarPath { get; set; }
 
-                return $"{baseUrl}/{_avatar}";
-            }
-            set => _avatar = value;
-        }
-        public bool NotifyUpvote { get; set; }
-        public bool NotifyDownvote { get; set; }
-        public bool NotifyComment { get; set; }
-        public int NotificationFrequency { get; set; }
-    }
+    public virtual ICollection<UserNotificationPreference> NotificationPreferences { get; set; } = new HashSet<UserNotificationPreference>();
+
+    public bool IsDeleted { get; set; } = false;
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime? UpdatedAt { get; set; }
 }

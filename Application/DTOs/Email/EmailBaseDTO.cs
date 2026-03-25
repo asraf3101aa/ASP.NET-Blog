@@ -1,11 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿namespace Bislerium.Application.DTOs.Email;
 
-namespace Bislerium.Application.DTOs.Email
+public class EmailBaseDTO
 {
-    public class EmailBaseDTO
-    {
-        [Required]
-        [EmailAddress]
-        public string Email { get; set; }
-    }
+    public string Email { get; set; }
 }

@@ -1,13 +1,16 @@
 using Bislerium.Infrastructure.DI;
-using Bislerium.Infrastructure.Persistence.Configuration;
+using Bislerium.Application;
+using Bislerium.Infrastructure.Persistence.Configurations;
 using Bislerium.Presentation.Helper;
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
+using FluentValidation.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.ConfigureJWT(builder.Configuration);
 
@@ -49,9 +52,11 @@ builder.Services.AddControllers()
             {
                 options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
             });
+builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddSignalR();
 
 var app = builder.Build();
+app.UseMiddleware<ExceptionMiddleware>();
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 
@@ -59,7 +64,7 @@ AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI(); 
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();

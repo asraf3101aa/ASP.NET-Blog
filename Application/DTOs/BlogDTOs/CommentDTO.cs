@@ -1,10 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿namespace Bislerium.Application.DTOs.BlogDTOs;
 
-namespace Bislerium.Application.DTOs.BlogDTOs
+public class CommentDTO
 {
-    public class CommentDTO
-    {
-        [Required]
-        public string Text { get; set; }
-    }
+    public string Text { get; set; }
 }

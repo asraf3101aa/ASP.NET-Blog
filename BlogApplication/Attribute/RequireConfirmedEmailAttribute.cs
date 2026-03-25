@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Identity;
 using Bislerium.Domain.Entities;
+using Bislerium.Application.Interfaces;
 
 public class RequireConfirmedEmailAttribute : TypeFilterAttribute
 {
@@ -14,10 +15,12 @@ public class RequireConfirmedEmailAttribute : TypeFilterAttribute
 public class RequireConfirmedEmailFilter : IAsyncAuthorizationFilter
 {
     private readonly UserManager<User> _userManager;
+    private readonly IResponseService _responseService;
 
-    public RequireConfirmedEmailFilter(UserManager<User> userManager)
+    public RequireConfirmedEmailFilter(UserManager<User> userManager, IResponseService responseService)
     {
         _userManager = userManager;
+        _responseService = responseService;
     }
 
     public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
@@ -25,17 +28,7 @@ public class RequireConfirmedEmailFilter : IAsyncAuthorizationFilter
         var user = await _userManager.GetUserAsync(context.HttpContext.User);
         if (user != null && !user.EmailConfirmed)
         {
-            var errorResponse = new ErrorResponse
-            {
-                Errors = new List<ErrorResponse.ErrorDetail>
-                {
-                    new ErrorResponse.ErrorDetail
-                    {
-                        Title = "Email Confirmation Required",
-                        Message = "Your email address has not been confirmed."
-                    }
-                }
-            };
+            var errorResponse = _responseService.CustomErrorResponse("Email Confirmation Required", "Your email address has not been confirmed.");
             context.Result = new BadRequestObjectResult(errorResponse);
         }
     }

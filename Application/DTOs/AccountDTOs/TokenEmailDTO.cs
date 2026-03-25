@@ -1,11 +1,8 @@
 ﻿using Bislerium.Application.DTOs.Email;
-using System.ComponentModel.DataAnnotations;
 
-namespace Bislerium.Application.DTOs.AccountDTOs
+namespace Bislerium.Application.DTOs.AccountDTOs;
+
+public class TokenEmailDTO : EmailBaseDTO
 {
-    public class TokenEmailDTO : EmailBaseDTO
-    {
-        [Required]
-        public string Token { get; set; }
-    }
+    public string Token { get; set; }
 }
